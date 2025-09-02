@@ -1,6 +1,7 @@
 import { Button, useToast } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import './App.css';
+import { executeWorkflow } from './github';
 
 const App = () => {
 
@@ -11,8 +12,7 @@ const App = () => {
 
     try {
       setLoading(true)
-      // await executeWorkflow();
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await executeWorkflow();
       toast({
         title: "Workflow ejecutado.",
         status: "success",
