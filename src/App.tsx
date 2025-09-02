@@ -1,7 +1,7 @@
-import { Button, useToast } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Heading, useToast } from '@chakra-ui/react';
 import { useCallback, useState } from 'react';
 import './App.css';
-import { executeWorkflow } from './github';
+import { executeWorkflow, replaceDataforNewTest } from './github';
 
 const App = () => {
 
@@ -32,17 +32,68 @@ const App = () => {
     }
   }, [])
 
+  const handleReplaceData = useCallback(async () => {
+    try {
+      setLoading(true);
+      await replaceDataforNewTest(
+        `
+          [
+            {
+              id: "UnicoIDdePrueba-02092025",
+              description: "ruta sep",
+              homeCiudadOrigen: "BAQ",
+              homeCiudadDestino: "BOG",
+              targetPage: "home"
+            },
+            {
+              id: "miOtroIdDePrueba-02092025",
+              description: "ruta sep",
+              homeCiudadOrigen: "MDE",
+              homeCiudadDestino: "BOG",
+              targetPage: "home"
+            }
+          ]
+        `
+      );
+      toast({
+        title: "Datos de prueba actualizados.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error al actualizar los datos de prueba:", error);
+      toast({
+        title: "Error al actualizar los datos de prueba.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [])
+
   return (
-    <div>
-      <h1>Pruebas de workflows en Github</h1>
-      <Button 
-        colorScheme='teal' 
-        onClick={handleWorkflow}
-        isLoading={loading}
-      >
-        Ejecutar Workflows
-      </Button>
-    </div>
+    <Box textAlign='center' fontSize='xl' p={10}>
+      <Heading>Demo de pruebas con playwright - API de github</Heading>
+      <ButtonGroup mt={100}>
+        <Button
+          colorScheme='teal'
+          onClick={handleReplaceData}
+          isLoading={loading}
+        >
+          Reemplazar Datos de Prueba
+        </Button>
+        <Button
+          colorScheme='cyan'
+          onClick={handleWorkflow}
+          isLoading={loading}
+        >
+          Ejecutar Workflows
+        </Button>
+      </ButtonGroup>
+    </Box>
   )
 }
 
