@@ -8,7 +8,7 @@ export const executeWorkflow = async () => {
     //datos del repo
     const owner: string = "Aviancaswat";
     const repo: string = "avianca-test-core-nuxqa6";
-    const workflow_id: string = "playwright.yml";
+    const workflow_id: number = 177616966;
     const branchRef: string = "develop";
     const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
         owner: owner,
