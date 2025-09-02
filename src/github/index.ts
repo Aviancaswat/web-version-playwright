@@ -18,19 +18,18 @@ const octokit = new Octokit({
     auth: import.meta.env.VITE_GITHUB_TOKEN
 })
 
+const owner: string = "Aviancaswat";
+const repo: string = "avianca-test-core-nuxqa6";
+const path: string = "data/config/dataTests.ts";
+const workflow_id: number = 177616966;
+const branchRef: string = "develop";
+
 export const executeWorkflow = async () => {
-    const owner: string = "Aviancaswat";
-    const repo: string = "avianca-test-core-nuxqa6";
-    const workflow_id: number = 177616966;
-    const branchRef: string = "develop";
     const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
         owner: owner,
         repo: repo,
         workflow_id: workflow_id,
         ref: branchRef,
-        // inputs: {
-        //     name: 'Mona the Octocat',
-        // },
         headers: {
             'X-GitHub-Api-Version': '2022-11-28'
         }
@@ -40,36 +39,24 @@ export const executeWorkflow = async () => {
 }
 
 export const getFileData = async () => {
-    const owner: string = "Aviancaswat";
-    const repo: string = "avianca-test-core-nuxqa6";
-    const path: string = "data/config/dataTests.ts";
-    const branchRef: string = "develop";
-    const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+    const { data } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
         owner: owner,
         repo: repo,
         path: path,
         ref: branchRef
     })
-
-    return response.data as GitHubContentFile;
+    return data as GitHubContentFile;
 }
 
 export const replaceDataforNewTest = async (newData: string) => {
-    const owner: string = "Aviancaswat";
-    const repo: string = "avianca-test-core-nuxqa6";
-    const path: string = "data/config/dataTests.ts";
-    const branchRef: string = "develop";
     const fileData = await getFileData();
     const fileContent = atob(fileData.content);
-    console.log("fileContent 1: \n", fileContent)
     const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newData);
-    console.log("fileContent 2: \n\n", updatedContent)
-
     await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
         owner: owner,
         repo: repo,
         path: path,
-        message: 'Update test data from api',
+        message: 'Update test data from api version 4',
         content: btoa(updatedContent),
         sha: fileData.sha,
         branch: branchRef
