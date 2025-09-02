@@ -1,18 +1,18 @@
-import { Button, useToast } from '@chakra-ui/react'
-import { useCallback } from 'react'
-import './App.css'
-import { executeWorkflow } from './github'
+import { Button, useToast } from '@chakra-ui/react';
+import { useCallback, useState } from 'react';
+import './App.css';
 
 const App = () => {
 
   const toast = useToast();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleWorkflow = useCallback(async () => {
 
     try {
-      console.log("Ejecutando workflow...");
-      await executeWorkflow();
-      console.log("Workflow ejecutado.");
+      setLoading(true)
+      // await executeWorkflow();
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       toast({
         title: "Workflow ejecutado.",
         status: "success",
@@ -27,13 +27,21 @@ const App = () => {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setLoading(false);
     }
   }, [])
 
   return (
     <div>
       <h1>Pruebas de workflows en Github</h1>
-      <Button colorScheme='teal' onClick={handleWorkflow}>Ejecutar Workflows</Button>
+      <Button 
+        colorScheme='teal' 
+        onClick={handleWorkflow}
+        isLoading={loading}
+      >
+        Ejecutar Workflows
+      </Button>
     </div>
   )
 }
