@@ -5,6 +5,7 @@ const octokit = new Octokit({
 })
 
 export const executeWorkflow = async () => {
+    //datos del repo
     const owner: string = "Aviancaswat";
     const repo: string = "avianca-test-core-nuxqa6";
     const workflow_id: string = "playwright.yml";
