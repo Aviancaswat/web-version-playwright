@@ -15,7 +15,7 @@ export interface GitHubContentFile {
 }
 
 const octokit = new Octokit({
-    auth: import.meta.env.VITE_GITHUB_TOKEN
+    auth: import.meta.env.VITE_GITHUB_TOKEN, // admin
 })
 
 const owner: string = "Aviancaswat";
@@ -31,7 +31,7 @@ export const executeWorkflow = async () => {
         workflow_id: workflow_id,
         ref: branchRef,
         headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
+            'X-GitHub-Api-Version': '2022-11-28',
         }
     })
 
@@ -43,7 +43,7 @@ export const getFileData = async () => {
         owner: owner,
         repo: repo,
         path: path,
-        ref: branchRef
+        ref: branchRef,
     })
 
     return data as GitHubContentFile;
