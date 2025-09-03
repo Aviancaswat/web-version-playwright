@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup, Heading, useToast } from '@chakra-ui/react';
 import { Github } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import './App.css';
-import { replaceDataforNewTest } from './github';
+import { replaceDataforNewTest } from './github/api';
 
 const App = () => {
 
@@ -17,18 +17,20 @@ const App = () => {
         `
           [
             {
-              id: "miIdPrueba-03092025-version2",
-              description: "ruta Medellin a Bogota",
+              id: "UnicoIDdePrueba-03092025_version3",
+              description: "ruta 1",
               homeCiudadOrigen: "BAQ",
               homeCiudadDestino: "BOG",
-              targetPage: "home"
+              targetPage: "home",
+              targetMethod: "homeSeleccionarFechaLlegada"
             },
             {
-              id: "miOtroIdDePrueba-03092025-version2",
-              description: "ruta barranquilla a bogota",
+              id: "miOtroIdDePrueba-03092025_version3",
+              description: "ruta 2",
               homeCiudadOrigen: "MDE",
               homeCiudadDestino: "BOG",
-              targetPage: "home"
+              targetPage: "home",
+              targetMethod: "homeSeleccionarDestino"
             }
           ]
         `

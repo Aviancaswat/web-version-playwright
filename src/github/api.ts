@@ -25,7 +25,7 @@ const workflow_id: number = 177616966;
 const branchRef: string = "develop";
 
 export const executeWorkflow = async () => {
-    const { data, url } = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+    const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
         owner: owner,
         repo: repo,
         workflow_id: workflow_id,
@@ -35,7 +35,7 @@ export const executeWorkflow = async () => {
         }
     })
 
-    return { data, url };
+    return response;
 }
 
 export const getFileData = async () => {
@@ -45,18 +45,30 @@ export const getFileData = async () => {
         path: path,
         ref: branchRef
     })
+
     return data as GitHubContentFile;
+}
+
+const getTimestamp = () => {
+
+    const today = new Date().toISOString();
+
+    if (today.includes("T")) {
+        return `${today.split("T")[0]}-${today.split("T")[1]}`
+    }
+    return today;
 }
 
 export const replaceDataforNewTest = async (newTestData: string) => {
     const fileData = await getFileData();
     const fileContent = atob(fileData.content);
     const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newTestData);
+
     await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
         owner: owner,
         repo: repo,
         path: path,
-        message: 'Mensaje de commit desde la api',
+        message: `Commit desde la api - ${getTimestamp()}`,
         content: btoa(updatedContent),
         sha: fileData.sha,
         branch: branchRef
