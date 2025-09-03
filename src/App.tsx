@@ -40,15 +40,15 @@ const App = () => {
         `
           [
             {
-              id: "UnicoIDdePrueba-02092025_version4",
-              description: "ruta sep",
+              id: "miIdPrueba-03092025",
+              description: "ruta Medellin a Bogota",
               homeCiudadOrigen: "MDE",
               homeCiudadDestino: "BOG",
               targetPage: "home"
             },
             {
-              id: "miOtroIdDePrueba-02092025_version4",
-              description: "ruta sep",
+              id: "miOtroIdDePrueba-03092025",
+              description: "ruta barranquilla a bogota",
               homeCiudadOrigen: "BAQ",
               homeCiudadDestino: "BOG",
               targetPage: "home"
@@ -84,7 +84,7 @@ const App = () => {
           onClick={handleReplaceData}
           isLoading={loading}
         >
-          Reemplazar Datos de Prueba
+          Reemplazar dataTest y ejecutar
         </Button>
         {/* <Button
           colorScheme='cyan'
