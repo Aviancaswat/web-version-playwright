@@ -1,5 +1,6 @@
 import { Box, Button, Card, CardBody, CardHeader, Heading, Image, Text, Tooltip, useToast } from '@chakra-ui/react';
 import { Github } from 'lucide-react';
+import { RequestError } from 'octokit';
 import { useCallback, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
@@ -43,13 +44,26 @@ const App = () => {
         isClosable: true,
       });
     } catch (error) {
-      console.error("Error al actualizar los datos de prueba:", error);
+      if (error instanceof RequestError) {
+        console.error("RequestError details:", {
+          status: error.status,
+          cause: error.cause,
+          request: error.request,
+          response: error.response,
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+        });
+      }
+
       toast({
         title: "Error al actualizar los datos o ejecutar el workflow.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
+      console.error("Error details:", error);
+
     } finally {
       setLoading(false);
     }
@@ -85,7 +99,7 @@ const App = () => {
           </Text>
         </Box>
         <Box mt={50}>
-          <Tooltip 
+          <Tooltip
             label="Remplaza el dataTest y crear un nuevo workflow"
             bg={"white"}
             color={"black"}
@@ -93,7 +107,7 @@ const App = () => {
             p={2}
             textAlign={"center"}
             placement='left'
-            >
+          >
             <Button
               onClick={handleReplaceData}
               isLoading={loading}
