@@ -1,7 +1,7 @@
-import { Box, Button, Card, CardBody, CardHeader, Heading, Image, Text, Tooltip, useToast } from '@chakra-ui/react';
+import { Box, Button, Card, Heading, HStack, Image, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
 import { Github } from 'lucide-react';
 import { RequestError } from 'octokit';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
 import { replaceDataforNewTest } from './github/api';
@@ -10,32 +10,14 @@ const App = () => {
 
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReplaceData = useCallback(async () => {
 
     try {
       setLoading(true);
       await replaceDataforNewTest(
-        `
-          [
-            {
-              id: "UnicoIDdePrueba-03092025_demo_equipo",
-              description: "ruta 1",
-              homeCiudadOrigen: "BAQ",
-              homeCiudadDestino: "BOG",
-              targetPage: "home",
-              targetMethod: "homeSeleccionarFechaLlegada"
-            },
-            {
-              id: "miOtroIdDePrueba-03092025_demo_equipo",
-              description: "ruta 2",
-              homeCiudadOrigen: "MDE",
-              homeCiudadDestino: "BOG",
-              targetPage: "home",
-              targetMethod: "homeSeleccionarDestino"
-            }
-          ]
-        `
+        textAreaRef.current?.value || ""
       );
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
@@ -72,56 +54,70 @@ const App = () => {
   return (
     <Card
       fontSize='xl'
-      width={"95%"}
-      maxHeight={450}
-      height={"auto"}
       borderRadius={"lg"}
-      maxWidth={500}
+      height={"auto"}
+      width={"95%"}
+      maxWidth={800}
       margin={"auto"}
     >
-      <CardHeader minHeight={200} width={"100%"} p={0} borderTopRadius={"lg"} overflow={"hidden"}>
-        <Image
-          src={ImageBG}
-          alt="Demo de pruebas con playwright"
-          height={"100%"}
-          width={"100%"}
-          objectFit={"cover"} />
-
-      </CardHeader>
-      <CardBody>
-        <Box>
-          <Heading as="h3" size={"lg"} textAlign={"left"} mb={5}>
-            Bienvenido a Playwright UI
+      <HStack spacing={1} alignItems={"center"} justifyContent={"center"}>
+        <Box
+          height={"90vh"}
+          width={"30%"}
+          p={0}
+          borderTopRadius={"lg"}
+          overflow={"hidden"}
+        >
+          <Image
+            src={ImageBG}
+            alt="Demo de pruebas con playwright"
+            height={"100%"}
+            width={"100%"}
+            objectFit={"cover"} />
+        </Box>
+        <VStack
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          width={"70%"}
+          spacing={6}
+          p={4}>
+          <Heading>
+            <Text as={"span"} color={"#805AD5"}>Demo</Text> - Playwright UI
           </Heading>
-          <Text color={"gray.600"} textAlign={"left"} fontSize={"sm"}>
-            Esta es una herramienta para facilitar la creación y
-            ejecución de pruebas automatizadas en la app de Avianca.
-          </Text>
-        </Box>
-        <Box mt={50}>
-          <Tooltip
-            label="Remplaza el dataTest y crear un nuevo workflow"
-            bg={"white"}
-            color={"black"}
-            borderRadius={"lg"}
-            p={2}
-            textAlign={"center"}
-            placement='left'
+          <Box p={4} borderWidth="1px" borderRadius="lg" boxShadow="md">
+            <Textarea
+              ref={textAreaRef}
+              placeholder={
+                "Ejemplo de JSON:\n" +
+                JSON.stringify([{
+                  id: "Mi id de prueba",
+                  description: "Mi descripcion de prueba",
+                  homeCiudadOrigen: "BAQ",
+                  homeCiudadDestino: "BOG",
+                  targetPage: "home",
+                  targetMethod: "homeSeleccionarFechaLlegada"
+                }], null, 2)
+              }
+              cols={50}
+              rows={14}
+              resize={"none"}
+            />
+          </Box>
+          <Button
+            onClick={handleReplaceData}
+            alignSelf={"flex-end"}
+            isLoading={loading}
+            loadingText='Creando Workflow...'
+            rightIcon={<Github />}
+            bg={"black"}
+            color={"white"}
+            _hover={{ bg: "#00000099", color: "white" }}
           >
-            <Button
-              onClick={handleReplaceData}
-              isLoading={loading}
-              loadingText='Creando Workflow...'
-              rightIcon={<Github />}
-              bg={"black"}
-              color={"white"}
-              _hover={{ bg: "#00000095", color: "white" }}
-            >
-              Crear Workflow
-            </Button>
-          </Tooltip>
-        </Box>
-      </CardBody>
+            Crear Workflow
+          </Button>
+        </VStack>
+      </HStack>
     </Card>
   )
 }

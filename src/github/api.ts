@@ -59,18 +59,46 @@ const getTimestamp = () => {
     return today;
 }
 
-export const replaceDataforNewTest = async (newTestData: string) => {
-    const fileData = await getFileData();
-    const fileContent = atob(fileData.content);
-    const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newTestData);
+const transformerData = (data: string) => {
+    const jsonData = JSON.parse(data);
+    if (jsonData.length === 0) return;
 
-    await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
-        owner: owner,
-        repo: repo,
-        path: path,
-        message: `Commit desde la api - ${getTimestamp()}`,
-        content: btoa(updatedContent),
-        sha: fileData.sha,
-        branch: branchRef
+    let arrayAllData = [];
+
+    for (let i = 0; i < jsonData.length; i++) {
+        let newArray = [];
+        const element = jsonData[i];
+        newArray.push(element);
+        arrayAllData.push(newArray);
+    }
+
+    return arrayAllData;
+}
+
+export const replaceDataforNewTest = async (newTestData: string) => {
+    const datas = transformerData(newTestData); // Transformar el string JSON en un array de arrays
+    console.log("datas: ", datas);
+
+    if (!datas || datas.length === 0) return;
+
+    const promises = datas.map(async (data: any[], index) => {
+        const fileData = await getFileData();
+        console.log(`sha version ${index}: `, fileData.sha)
+        const fileContent = atob(fileData.content);
+        const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, JSON.stringify(data, null, 2));
+
+        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+            owner: owner,
+            repo: repo,
+            path: path,
+            message: `Commit desde la api - ${getTimestamp()}`,
+            content: btoa(updatedContent),
+            sha: fileData.sha,
+            branch: branchRef
+        })
     })
+
+    for await (const response of promises) {
+        console.log("Response commit: ", response);
+    }
 }
