@@ -76,27 +76,45 @@ const transformerData = (data: string) => {
 }
 
 export const replaceDataforNewTest = async (newTestData: string) => {
-    const datas = transformerData(newTestData); // Transformar el string JSON en un array de arrays
+    const datas = transformerData(newTestData);
     console.log("datas: ", datas);
 
     if (!datas || datas.length === 0) return;
 
     const promises = datas.map(async (data: any[], index) => {
-        const fileData = await getFileData();
-        console.log(`sha version ${index}: `, fileData.sha)
-        const fileContent = atob(fileData.content);
+        let fileData = await getFileData();
+        console.log(`sha version ${index}: `, fileData.sha);
+        let fileContent = atob(fileData.content);
         const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, JSON.stringify(data, null, 2));
 
-        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
-            owner: owner,
-            repo: repo,
-            path: path,
-            message: `Commit desde la api - ${getTimestamp()}`,
-            content: btoa(updatedContent),
-            sha: fileData.sha,
-            branch: branchRef
-        })
-    })
+        try {
+            const response = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+                owner: owner,
+                repo: repo,
+                path: path,
+                message: `Commit desde la api - ${getTimestamp()} - (${index++})`,
+                content: btoa(updatedContent),
+                sha: fileData.sha,
+                branch: branchRef
+            });
+
+            console.log("Commit realizado exitosamente:", response);
+
+        } catch (error) {
+            console.error("Error al realizar el commit:", error);
+            const updatedFileData = await getFileData();
+            console.log("Nuevo sha:", updatedFileData.sha);
+            await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+                owner: owner,
+                repo: repo,
+                path: path,
+                message: `Commit desde la api - ${getTimestamp()} - (${index++})`,
+                content: btoa(updatedContent),
+                sha: updatedFileData.sha,
+                branch: branchRef
+            });
+        }
+    });
 
     for await (const response of promises) {
         console.log("Response commit: ", response);
