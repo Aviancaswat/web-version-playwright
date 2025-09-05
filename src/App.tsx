@@ -1,4 +1,4 @@
-import { Box, Button, Card, Heading, HStack, Image, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
+import { Box, Button, Card, Heading, Image, Stack, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
 import { Github } from 'lucide-react';
 import { RequestError } from 'octokit';
 import { useCallback, useRef, useState } from 'react';
@@ -58,12 +58,12 @@ const App = () => {
       height={"auto"}
       width={"95%"}
       maxWidth={800}
-      margin={"auto"}
+      margin={{base: "300px auto auto auto", lg: "auto"}}
     >
-      <HStack spacing={1} alignItems={"center"} justifyContent={"center"}>
+      <Stack spacing={1} direction={{ base: "column", lg: "row" }} alignItems={"center"} justifyContent={"center"}>
         <Box
-          height={"90vh"}
-          width={"30%"}
+          height={{ base: 150, lg: "90vh" }}
+          width={{ base: "100%", lg: "30%" }}
           p={0}
           borderTopRadius={"lg"}
           overflow={"hidden"}
@@ -79,7 +79,7 @@ const App = () => {
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
-          width={"70%"}
+          width={{base: "100%", lg: "70%"}}
           spacing={6}
           p={4}>
           <Heading>
@@ -89,7 +89,7 @@ const App = () => {
             <Textarea
               ref={textAreaRef}
               placeholder={
-                "Ejemplo de JSON:\n" +
+                "Ejemplo de Entrada:\n\n" +
                 JSON.stringify([{
                   id: "Mi id de prueba",
                   description: "Mi descripcion de prueba",
@@ -117,7 +117,7 @@ const App = () => {
             Crear Workflow
           </Button>
         </VStack>
-      </HStack>
+      </Stack>
     </Card>
   )
 }
