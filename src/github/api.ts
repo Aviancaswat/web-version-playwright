@@ -38,16 +38,28 @@ export const executeWorkflow = async () => {
     return response;
 }
 
-export const getFileData = async () => {
-    const { data } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-        owner: owner,
-        repo: repo,
-        path: path,
-        ref: branchRef,
-    })
-
-    return data as GitHubContentFile;
-}
+// Función auxiliar mejorada para obtener datos del archivo con retry
+const getFileData = async (retries = 3): Promise<any> => {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+                owner: owner,
+                repo: repo,
+                path: path,
+                ref: branchRef,
+                headers: {
+                    'If-None-Match': ''
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.warn(`Intento ${i + 1} fallido al obtener archivo:`, error);
+            if (i === retries - 1) throw error;
+            const waitTime = (i + 1) * 2000; 
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+    }
+};
 
 const getTimestamp = () => {
 
@@ -76,47 +88,84 @@ const transformerData = (data: string) => {
 }
 
 export const replaceDataforNewTest = async (newTestData: string) => {
+    console.log("newTestData: ", newTestData)
     const datas = transformerData(newTestData);
     console.log("datas: ", datas);
 
     if (!datas || datas.length === 0) return;
 
-    const promises = datas.map(async (data: any[], index) => {
-        let fileData = await getFileData();
-        console.log(`sha version ${index}: `, fileData.sha);
-        let fileContent = atob(fileData.content);
-        const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, JSON.stringify(data, null, 2));
+    const commitResults = [];
+
+    for (let i = 0; i < datas.length; i++) {
+        const data = datas[i];
 
         try {
+
+            console.log(`\n--- Procesando commit ${i + 1}/${datas.length} ---`);
+
+            let fileData = await getFileData();
+            console.log(`SHA actual para commit ${i + 1}: `, fileData.sha);
+
+            let fileContent = atob(fileData.content);
+
+            const updatedContent = fileContent.replace(
+                /\[\s*{[\s\S]*?}\s*]/,
+                JSON.stringify(data, null, 2)
+            );
+
             const response = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
                 owner: owner,
                 repo: repo,
                 path: path,
-                message: `Commit desde la api - ${getTimestamp()} - (${index++})`,
+                message: `Prueba Paralelismo - Test ${i + 1} - ${getTimestamp()}`,
                 content: btoa(updatedContent),
                 sha: fileData.sha,
                 branch: branchRef
             });
 
-            console.log("Commit realizado exitosamente:", response);
+            console.log(`✅ Commit ${i + 1} realizado exitosamente`);
+            console.log(`Nuevo SHA del commit: `, response.data.commit?.sha);
+            console.log(`Nuevo SHA del contenido: `, response.data.content?.sha);
+
+            commitResults.push({
+                index: i + 1,
+                success: true,
+                commitSha: response.data.commit?.sha,
+                contentSha: response.data.content?.sha,
+                data: data
+            });
+
+            // Opcional: Agregar un pequeño delay entre commits para evitar rate limiting
+            if (i < datas.length - 1) {
+                console.log(`Esperando 2 segundos antes del siguiente commit...`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
 
         } catch (error) {
-            console.error("Error al realizar el commit:", error);
-            const updatedFileData = await getFileData();
-            console.log("Nuevo sha:", updatedFileData.sha);
-            await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
-                owner: owner,
-                repo: repo,
-                path: path,
-                message: `Commit desde la api - ${getTimestamp()} - (${index++})`,
-                content: btoa(updatedContent),
-                sha: updatedFileData.sha,
-                branch: branchRef
+            console.error(`❌ Error en commit ${i + 1}:`, error);
+            commitResults.push({
+                index: i + 1,
+                success: false,
+                error: error,
+                data: data
             });
+
+            // Opcional: Decidir si continuar o parar en caso de error
+            // throw error; // Descomentar si quieres parar en el primer error
+        }
+    }
+
+    // Resumen final
+    console.log('\n=== RESUMEN DE COMMITS ===');
+    console.log(`Total de elementos procesados: ${datas.length}`);
+    console.log(`Commits exitosos: ${commitResults.filter(r => r.success).length}`);
+    console.log(`Commits fallidos: ${commitResults.filter(r => !r.success).length}`);
+
+    commitResults.forEach(result => {
+        if (result.success) {
+            console.log(`✅ Commit ${result.index}: SHA ${result.commitSha}`);
+        } else {
+            console.log(`❌ Commit ${result.index}: ${result.error}`);
         }
     });
-
-    for await (const response of promises) {
-        console.log("Response commit: ", response);
-    }
-}
+};
