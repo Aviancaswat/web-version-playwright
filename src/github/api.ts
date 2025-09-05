@@ -38,7 +38,6 @@ export const executeWorkflow = async () => {
     return response;
 }
 
-// Función auxiliar mejorada para obtener datos del archivo con retry
 const getFileData = async (retries = 3): Promise<any> => {
     for (let i = 0; i < retries; i++) {
         try {
@@ -124,8 +123,6 @@ export const replaceDataforNewTest = async (newTestData: string) => {
             });
 
             console.log(`✅ Commit ${i + 1} realizado exitosamente`);
-            console.log(`Nuevo SHA del commit: `, response.data.commit?.sha);
-            console.log(`Nuevo SHA del contenido: `, response.data.content?.sha);
 
             commitResults.push({
                 index: i + 1,
@@ -135,7 +132,6 @@ export const replaceDataforNewTest = async (newTestData: string) => {
                 data: data
             });
 
-            // Opcional: Agregar un pequeño delay entre commits para evitar rate limiting
             if (i < datas.length - 1) {
                 console.log(`Esperando 2 segundos antes del siguiente commit...`);
                 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -149,13 +145,9 @@ export const replaceDataforNewTest = async (newTestData: string) => {
                 error: error,
                 data: data
             });
-
-            // Opcional: Decidir si continuar o parar en caso de error
-            // throw error; // Descomentar si quieres parar en el primer error
         }
     }
 
-    // Resumen final
     console.log('\n=== RESUMEN DE COMMITS ===');
     console.log(`Total de elementos procesados: ${datas.length}`);
     console.log(`Commits exitosos: ${commitResults.filter(r => r.success).length}`);
