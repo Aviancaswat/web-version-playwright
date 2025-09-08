@@ -70,22 +70,6 @@ const getTimestamp = () => {
     return today;
 }
 
-const transformerData = (data: string) => {
-    const jsonData = JSON.parse(data);
-    if (jsonData.length === 0) return;
-
-    let arrayAllData = [];
-
-    for (let i = 0; i < jsonData.length; i++) {
-        let newArray = [];
-        const element = jsonData[i];
-        newArray.push(element);
-        arrayAllData.push(newArray);
-    }
-
-    return arrayAllData;
-}
-
 export const replaceDataforNewTest = async (newTestData: string) => {
 
     if (!newTestData || newTestData === "") return;
