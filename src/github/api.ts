@@ -54,7 +54,7 @@ const getFileData = async (retries = 3): Promise<any> => {
         } catch (error) {
             console.warn(`Intento ${i + 1} fallido al obtener archivo:`, error);
             if (i === retries - 1) throw error;
-            const waitTime = (i + 1) * 2000; 
+            const waitTime = (i + 1) * 2000;
             await new Promise(resolve => setTimeout(resolve, waitTime));
         }
     }
@@ -87,77 +87,33 @@ const transformerData = (data: string) => {
 }
 
 export const replaceDataforNewTest = async (newTestData: string) => {
-    console.log("newTestData: ", newTestData)
-    const datas = transformerData(newTestData);
-    console.log("datas: ", datas);
 
-    if (!datas || datas.length === 0) return;
+    if (!newTestData || newTestData === "") return;
 
-    const commitResults = [];
+    try {
 
-    for (let i = 0; i < datas.length; i++) {
-        const data = datas[i];
+        console.log(`\n--- Procesando commit ---`);
+        let fileData = await getFileData();
+        console.log(`SHA actual para el commit: `, fileData.sha);
+        let fileContent = atob(fileData.content);
+        console.log("fileContent: ", fileContent)
+        const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newTestData);
+        console.log("Update content: ", updatedContent)
 
-        try {
+        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+            owner: owner,
+            repo: repo,
+            path: path,
+            message: `Nueva Prueba Paralelismo - Test - ${getTimestamp()}`,
+            content: btoa(updatedContent),
+            sha: fileData.sha,
+            branch: branchRef
+        });
 
-            console.log(`\n--- Procesando commit ${i + 1}/${datas.length} ---`);
-
-            let fileData = await getFileData();
-            console.log(`SHA actual para commit ${i + 1}: `, fileData.sha);
-
-            let fileContent = atob(fileData.content);
-
-            const updatedContent = fileContent.replace(
-                /\[\s*{[\s\S]*?}\s*]/,
-                JSON.stringify(data, null, 2)
-            );
-
-            const response = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
-                owner: owner,
-                repo: repo,
-                path: path,
-                message: `Prueba Paralelismo - Test ${i + 1} - ${getTimestamp()}`,
-                content: btoa(updatedContent),
-                sha: fileData.sha,
-                branch: branchRef
-            });
-
-            console.log(`✅ Commit ${i + 1} realizado exitosamente`);
-
-            commitResults.push({
-                index: i + 1,
-                success: true,
-                commitSha: response.data.commit?.sha,
-                contentSha: response.data.content?.sha,
-                data: data
-            });
-
-            if (i < datas.length - 1) {
-                console.log(`Esperando 2 segundos antes del siguiente commit...`);
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-
-        } catch (error) {
-            console.error(`❌ Error en commit ${i + 1}:`, error);
-            commitResults.push({
-                index: i + 1,
-                success: false,
-                error: error,
-                data: data
-            });
-        }
+        console.log(`✅ Commit realizado exitosamente`);
     }
-
-    console.log('\n=== RESUMEN DE COMMITS ===');
-    console.log(`Total de elementos procesados: ${datas.length}`);
-    console.log(`Commits exitosos: ${commitResults.filter(r => r.success).length}`);
-    console.log(`Commits fallidos: ${commitResults.filter(r => !r.success).length}`);
-
-    commitResults.forEach(result => {
-        if (result.success) {
-            console.log(`✅ Commit ${result.index}: SHA ${result.commitSha}`);
-        } else {
-            console.log(`❌ Commit ${result.index}: ${result.error}`);
-        }
-    });
+    catch (error) {
+        console.error(`Error en el proceso del commit ${error}`)
+        throw error;
+    }
 };
