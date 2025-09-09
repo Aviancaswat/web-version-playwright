@@ -1,10 +1,10 @@
 import { Box, Button, Card, Heading, Image, Stack, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
-import { Github } from 'lucide-react';
+import { Frame } from 'lucide-react';
 import { RequestError } from 'octokit';
 import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
-import { replaceDataforNewTest } from './github/api';
+import { createPipeline } from './azure/api';
 
 const App = () => {
 
@@ -16,9 +16,7 @@ const App = () => {
 
     try {
       setLoading(true);
-      await replaceDataforNewTest(
-        textAreaRef.current?.value || ""
-      );
+      await createPipeline();
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
         status: "success",
@@ -58,7 +56,7 @@ const App = () => {
       height={"auto"}
       width={"95%"}
       maxWidth={800}
-      margin={{base: "300px auto auto auto", lg: "auto"}}
+      margin={{ base: "300px auto auto auto", lg: "auto" }}
     >
       <Stack spacing={1} direction={{ base: "column", lg: "row" }} alignItems={"center"} justifyContent={"center"}>
         <Box
@@ -79,7 +77,7 @@ const App = () => {
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
-          width={{base: "100%", lg: "70%"}}
+          width={{ base: "100%", lg: "70%" }}
           spacing={6}
           p={4}>
           <Heading>
@@ -109,12 +107,12 @@ const App = () => {
             alignSelf={"flex-end"}
             isLoading={loading}
             loadingText='Creando Workflow...'
-            rightIcon={<Github />}
-            bg={"black"}
+            rightIcon={<Frame />}
+            bg={"blue.400"}
             color={"white"}
-            _hover={{ bg: "#00000099", color: "white" }}
+            _hover={{ bg: "" }}
           >
-            Crear Workflow
+            Crear pipeline azure 
           </Button>
         </VStack>
       </Stack>
