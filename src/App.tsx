@@ -112,7 +112,7 @@ const App = () => {
             color={"white"}
             _hover={{ bg: "" }}
           >
-            Crear pipeline azure 
+            Get conections api
           </Button>
         </VStack>
       </Stack>

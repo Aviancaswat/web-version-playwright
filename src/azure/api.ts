@@ -24,7 +24,3 @@ export const createPipeline = async () => {
 // Autenticación utilizando el PAT.
 
 // Enviar la solicitud usando curl o cualquier cliente HTTP de tu preferencia.
-
-const updateDataTestAndMakeCommit = () => {
-    return undefined;
-}
