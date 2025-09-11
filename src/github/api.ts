@@ -18,10 +18,12 @@ type StatusWorkflow = 'queued' | 'in_progress' | 'completed'
 type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled'
 
 type ResultWorkflowStatus = {
+    workflowId?: string,
+    //buscar la manera de obtener este id para mejorar la descarga del reporte.
+    // que la descarga del reporte sea igual al workflow que se eeta ejecutando en tiempo real
     status: StatusWorkflow,
     result: ResultWorkflow
 }
-
 
 const octokit = new Octokit({
     auth: import.meta.env.VITE_GITHUB_TOKEN, // admin
@@ -176,7 +178,7 @@ export const checkStatusWorkflow = async (commitSHA?: string): Promise<boolean> 
             console.log("fetch get status...")
             const response = await checkWorkflowStatus(commitSHA)
             console.log("Response status: ", response)
-            
+
             if (!response) {
                 resolve(false);
                 return;
