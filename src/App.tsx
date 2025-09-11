@@ -1,22 +1,23 @@
-import { Box, Button, Card, Heading, Image, Stack, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
-import { Frame } from 'lucide-react';
+import { Box, Button, ButtonGroup, Card, Heading, Image, Stack, Text, Textarea, useToast, VStack } from '@chakra-ui/react';
+import { DownloadIcon, Github } from 'lucide-react';
 import { RequestError } from 'octokit';
 import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
-import { createPipeline } from './azure/api';
+import { downLoadReportHTML, replaceDataforNewTest } from './github/api';
 
 const App = () => {
 
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingReport, setLoadingReport] = useState<boolean>(false)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReplaceData = useCallback(async () => {
 
     try {
       setLoading(true);
-      await createPipeline();
+      await replaceDataforNewTest(textAreaRef.current?.value ?? "")
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
         status: "success",
@@ -46,6 +47,30 @@ const App = () => {
 
     } finally {
       setLoading(false);
+    }
+  }, [])
+
+  const handleDownloadReport = useCallback(async () => {
+    try {
+      setLoadingReport(true)
+      await downLoadReportHTML()
+      toast({
+        title: "se ha descargado el reporte html correctamente!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      setLoadingReport(false)
+    }
+    catch (error) {
+      setLoadingReport(false)
+      console.error(`Error al descargar el archivo: ${error}`)
+      toast({
+        title: "Error al descargar el reporte html",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      })
     }
   }, [])
 
@@ -102,18 +127,29 @@ const App = () => {
               resize={"none"}
             />
           </Box>
-          <Button
-            onClick={handleReplaceData}
-            alignSelf={"flex-end"}
-            isLoading={loading}
-            loadingText='Creando Workflow...'
-            rightIcon={<Frame />}
-            bg={"blue.400"}
-            color={"white"}
-            _hover={{ bg: "" }}
-          >
-            Get conections api
-          </Button>
+          <ButtonGroup display={"flex"} justifyContent={"end"}>
+            <Button
+              onClick={handleReplaceData}
+              isLoading={loading}
+              loadingText='Creando Workflow...'
+              rightIcon={<Github />}
+              bg={"black"}
+              color={"white"}
+              _hover={{ bg: "" }}
+            >
+              Ejecutar workflow
+            </Button>
+            <Button
+              onClick={handleDownloadReport}
+              isLoading={loadingReport}
+              loadingText='Descargando reporte...'
+              rightIcon={<DownloadIcon />}
+              variant={"outline"}
+              _hover={{ bg: "" }}
+            >
+              Descargar reporte
+            </Button>
+          </ButtonGroup>
         </VStack>
       </Stack>
     </Card>

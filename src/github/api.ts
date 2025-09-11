@@ -101,3 +101,56 @@ export const replaceDataforNewTest = async (newTestData: string) => {
         throw error;
     }
 };
+
+export const getArtefactsByRepo = async () => {
+
+    try {
+
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+            owner: owner,
+            repo: repo,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+        console.log("Data artefacts: ", data)
+        return data;
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`)
+        throw error;
+    }
+}
+
+export const downLoadReportHTML = async () => {
+
+    try {
+        const { artifacts, total_count } = await getArtefactsByRepo()
+        if (total_count === 0) return;
+        const indexArtifact = artifacts.findIndex(e => e.name === "playwright-report");
+        if (indexArtifact === -1) return;
+        const artifactId = artifacts[indexArtifact].id;
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
+            owner: owner,
+            repo: repo,
+            artifact_id: artifactId,
+            archive_format: 'zip',
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+
+        const blob = new Blob([data as ArrayBuffer], { type: 'application/zip' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte-html-${getTimestamp()}.zip`; 
+        a.click();
+        URL.revokeObjectURL(url);
+        console.log("Reponse download: ", data)
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`)
+        throw error;
+    }
+}
