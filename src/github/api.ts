@@ -14,6 +14,15 @@ export interface GitHubContentFile {
     download_url: string;
 }
 
+type StatusWorkflow = 'queued' | 'in_progress' | 'completed'
+type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled'
+
+type ResultWorkflowStatus = {
+    status: StatusWorkflow,
+    result: ResultWorkflow
+}
+
+
 const octokit = new Octokit({
     auth: import.meta.env.VITE_GITHUB_TOKEN, // admin
 })
@@ -70,7 +79,7 @@ const getTimestamp = () => {
     return today;
 }
 
-export const replaceDataforNewTest = async (newTestData: string) => {
+export const replaceDataforNewTest = async (newTestData: string): Promise<string | undefined> => {
 
     if (!newTestData || newTestData === "") return;
 
@@ -84,20 +93,23 @@ export const replaceDataforNewTest = async (newTestData: string) => {
         const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newTestData);
         console.log("Update content: ", updatedContent)
 
-        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+        const { data: { commit } } = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
             owner: owner,
             repo: repo,
             path: path,
-            message: `Nueva Prueba Paralelismo - Test - ${getTimestamp()}`,
+            message: `Descargar reporte - ${getTimestamp()}`,
             content: btoa(updatedContent),
             sha: fileData.sha,
             branch: branchRef
         });
 
         console.log(`✅ Commit realizado exitosamente`);
+        const commitSHA = commit.sha;
+        return commitSHA
+
     }
     catch (error) {
-        console.error(`Error en el proceso del commit ${error}`)
+        console.error(`Error en el proceso del commit ${error}`);
         throw error;
     }
 };
@@ -122,14 +134,78 @@ export const getArtefactsByRepo = async () => {
     }
 }
 
+const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
+
+    console.log("commitSHA Function: ", commitSHA)
+    if (!commitSHA) return;
+
+    try {
+
+        const { data: { workflow_runs, total_count } } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs', {
+            owner: owner,
+            repo: repo,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+
+        if (total_count === 0) return;
+        const workflow = workflow_runs.find(e => e.head_sha === commitSHA);
+
+        if (!workflow) return;
+
+        const statusWorkflow = workflow.status as StatusWorkflow;
+        const resultWorkflow = workflow.conclusion as ResultWorkflow;
+
+        return {
+            status: statusWorkflow,
+            result: resultWorkflow
+        }
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al check workflow status ${error}`)
+        throw error
+    }
+}
+
+export const checkStatusWorkflow = async (commitSHA?: string): Promise<boolean> => {
+    if (!commitSHA) return false;
+
+    return new Promise<boolean>((resolve) => {
+        const getStatus = async () => {
+            console.log("fetch get status...")
+            const response = await checkWorkflowStatus(commitSHA)
+            console.log("Response status: ", response)
+            
+            if (!response) {
+                resolve(false);
+                return;
+            }
+
+            const { status } = response;
+
+            if (status === "completed") {
+                clearInterval(intervalId);
+                console.log("Workflow completed...");
+                resolve(true);
+            } else {
+                console.log(`Workflow status: ${status}, se volverá a checkear en 30 segundos...`);
+            }
+        };
+
+        getStatus();
+        const intervalId = setInterval(getStatus, 30000);
+    });
+}
+
 export const downLoadReportHTML = async () => {
 
     try {
         const { artifacts, total_count } = await getArtefactsByRepo()
         if (total_count === 0) return;
-        const indexArtifact = artifacts.findIndex(e => e.name === "playwright-report");
-        if (indexArtifact === -1) return;
-        const artifactId = artifacts[indexArtifact].id;
+        const artifactFound = artifacts.find(e => e.name === "playwright-report");
+        if (!artifactFound) return;
+        const artifactId = artifactFound.id;
         const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
             owner: owner,
             repo: repo,
@@ -144,7 +220,7 @@ export const downLoadReportHTML = async () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte-html-${getTimestamp()}.zip`; 
+        a.download = `reporte-html-${getTimestamp()}.zip`;
         a.click();
         URL.revokeObjectURL(url);
         console.log("Reponse download: ", data)

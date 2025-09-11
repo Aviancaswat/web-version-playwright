@@ -4,20 +4,24 @@ import { RequestError } from 'octokit';
 import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
-import { downLoadReportHTML, replaceDataforNewTest } from './github/api';
+import { checkStatusWorkflow, downLoadReportHTML, replaceDataforNewTest } from './github/api';
 
 const App = () => {
 
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingReport, setLoadingReport] = useState<boolean>(false)
+  const [statusWorkflow, setStatusWorkflow] = useState<boolean>(true)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReplaceData = useCallback(async () => {
 
     try {
+
       setLoading(true);
-      await replaceDataforNewTest(textAreaRef.current?.value ?? "")
+      const commitResponse = await replaceDataforNewTest(textAreaRef.current?.value ?? "")
+      const statusReponse = await checkStatusWorkflow(commitResponse)
+      setStatusWorkflow(!statusReponse)
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
         status: "success",
@@ -140,6 +144,7 @@ const App = () => {
               Ejecutar workflow
             </Button>
             <Button
+              // isDisabled={statusWorkflow}
               onClick={handleDownloadReport}
               isLoading={loadingReport}
               loadingText='Descargando reporte...'
