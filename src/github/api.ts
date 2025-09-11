@@ -68,7 +68,7 @@ export const replaceDataforNewTest = async (newTestData: string) => {
         owner: owner,
         repo: repo,
         path: path,
-        message: `Commit desde la api - ${getTimestamp()}`,
+        message: `Commit de Wilmar - ${getTimestamp()}`,
         content: btoa(updatedContent),
         sha: fileData.sha,
         branch: branchRef
