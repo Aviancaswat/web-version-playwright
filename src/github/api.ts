@@ -83,6 +83,7 @@ const getTimestamp = () => {
 
 export const replaceDataforNewTest = async (newTestData: string): Promise<string | undefined> => {
 
+    console.log("newTestData: ", newTestData)
     if (!newTestData || newTestData === "") return;
 
     try {
@@ -136,7 +137,7 @@ export const getArtefactsByRepo = async () => {
     }
 }
 
-const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
+export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
 
     console.log("commitSHA Function: ", commitSHA)
     if (!commitSHA) return;
@@ -162,7 +163,7 @@ const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowSt
         return {
             status: statusWorkflow,
             result: resultWorkflow,
-            workflowId: workflow.id 
+            workflowId: workflow.id
         }
         //si es undefined es porque el workflow apenas se está inicializando
     }
@@ -170,42 +171,6 @@ const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowSt
         console.error(`Ha ocurrido un error al check workflow status ${error}`)
         throw error
     }
-}
-
-export const checkStatusWorkflow = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
-    if (!commitSHA) return;
-
-    return new Promise<ResultWorkflowStatus>((resolve) => {
-        const getStatus = async () => {
-            console.log("fetch get status...")
-            const response = await checkWorkflowStatus(commitSHA)
-            console.log("Response status: ", response)
-
-            if (!response) {
-                resolve({
-                    status: "queued",
-                    result: "neutral"
-                });
-                return;
-            }
-
-            const { status } = response;
-
-            if (status === "completed") {
-                clearInterval(intervalId);
-                console.log("Workflow completed...");
-                resolve({
-                    status: response.status,
-                    result: response.result,
-                });
-            } else {
-                console.log(`Workflow status: ${status}, se volverá a checkear en 30 segundos...`);
-            }
-        };
-
-        getStatus();
-        const intervalId = setInterval(getStatus, 30000);
-    });
 }
 
 export const downLoadReportHTML = async () => {
