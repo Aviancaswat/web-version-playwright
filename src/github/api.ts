@@ -14,11 +14,11 @@ export interface GitHubContentFile {
     download_url: string;
 }
 
-type StatusWorkflow = 'queued' | 'in_progress' | 'completed'
-type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled'
+export type StatusWorkflow = 'queued' | 'in_progress' | 'completed'
+export type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled'
 
 type ResultWorkflowStatus = {
-    workflowId?: string,
+    workflowId?: number,
     //buscar la manera de obtener este id para mejorar la descarga del reporte.
     // que la descarga del reporte sea igual al workflow que se eeta ejecutando en tiempo real
     status: StatusWorkflow,
@@ -161,8 +161,10 @@ const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowSt
 
         return {
             status: statusWorkflow,
-            result: resultWorkflow
+            result: resultWorkflow,
+            workflowId: workflow.id 
         }
+        //si es undefined es porque el workflow apenas se está inicializando
     }
     catch (error) {
         console.error(`Ha ocurrido un error al check workflow status ${error}`)
@@ -170,17 +172,20 @@ const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowSt
     }
 }
 
-export const checkStatusWorkflow = async (commitSHA?: string): Promise<boolean> => {
-    if (!commitSHA) return false;
+export const checkStatusWorkflow = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
+    if (!commitSHA) return;
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<ResultWorkflowStatus>((resolve) => {
         const getStatus = async () => {
             console.log("fetch get status...")
             const response = await checkWorkflowStatus(commitSHA)
             console.log("Response status: ", response)
 
             if (!response) {
-                resolve(false);
+                resolve({
+                    status: "queued",
+                    result: "neutral"
+                });
                 return;
             }
 
@@ -189,7 +194,10 @@ export const checkStatusWorkflow = async (commitSHA?: string): Promise<boolean> 
             if (status === "completed") {
                 clearInterval(intervalId);
                 console.log("Workflow completed...");
-                resolve(true);
+                resolve({
+                    status: response.status,
+                    result: response.result,
+                });
             } else {
                 console.log(`Workflow status: ${status}, se volverá a checkear en 30 segundos...`);
             }

@@ -5,13 +5,14 @@ import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import ImageBG from "./assets/fondo-ui.jpg";
 import { checkStatusWorkflow, downLoadReportHTML, replaceDataforNewTest } from './github/api';
+import { testStore } from './store/test-store';
 
 const App = () => {
 
+  const {setStatusWorkflow, setResultWorkflow} = testStore()
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingReport, setLoadingReport] = useState<boolean>(false)
-  const [statusWorkflow, setStatusWorkflow] = useState<boolean>(true)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleReplaceData = useCallback(async () => {
@@ -21,7 +22,7 @@ const App = () => {
       setLoading(true);
       const commitResponse = await replaceDataforNewTest(textAreaRef.current?.value ?? "")
       const statusReponse = await checkStatusWorkflow(commitResponse)
-      setStatusWorkflow(!statusReponse)
+      setStatusWorkflow(statusReponse?.status ?? "queued")
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
         status: "success",
