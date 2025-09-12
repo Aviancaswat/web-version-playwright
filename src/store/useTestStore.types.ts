@@ -1,5 +1,4 @@
 export interface Test {
-  id: string;
   [key: string]: any;
 }
 

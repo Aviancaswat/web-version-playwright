@@ -21,35 +21,15 @@ import stepFields from "../../json/CreateTestForm/inputData.json";
 //Store
 import useTestStore from "../../store/useTestStore";
 
-//TODO: Refactorizar codigo
-//TODO: Cambiar diseño de los botontes por los de la pagina de avianca
+//Components
+import SearchableSelectComponent from "../SearchableSelectComponent/SearchableSelectComponent";
+
+//Types
+import type { InputTypes, Option } from "./CreateTestFormComponent.types";
+
 //TODO: Cuando seleccione pasajeros o flujo superior en el paso de pasajeros, mostrar texto explicativo: "El formulario se va rellenar."
 //TODO: Mostrar mensaje en paso de asientos: "Se va seleccionar un asiento al azar."
 //TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
-//TODO: HACER CAMPSO DE SELECCION ORIGEN Y DESTINO en selector con buscador interno Medellin - MDE
-//TODO: Camibiar nombre de los pasos: home, booking, etc.
-//TODO: hacer que todos los labels queden una sola linea
-
-interface Input {
-  name: string;
-  label: string;
-  type: "select" | "text" | "date" | "number";
-  isRequired: boolean;
-  hasPlaceholder?: boolean;
-  hasDefaultValue?: boolean;
-  defaultValue?: string | number;
-  option?: { value: string | number; label: string }[];
-  showIf?: {
-    field?: string;
-    equals?: string;
-  };
-}
-
-interface Step {
-  key: number;
-  stepTitle: string;
-  input: Input[];
-}
 
 const CreateTestFormComponent: React.FC = () => {
   const addTest = useTestStore((state) => state.addTest);
@@ -62,8 +42,8 @@ const CreateTestFormComponent: React.FC = () => {
 
     stepFields.forEach((step) => {
       step.input.map((field) => {
-        if ((field as Input).hasDefaultValue) {
-          initialData[field.name] = (field as Input).defaultValue ?? "";
+        if ((field as InputTypes).hasDefaultValue) {
+          initialData[field.name] = (field as InputTypes).defaultValue ?? "";
         }
       });
     });
@@ -89,12 +69,12 @@ const CreateTestFormComponent: React.FC = () => {
     stepFields.forEach((step) => {
       step.input.forEach((field) => {
         if ("showIf" in field) {
-          const inputField = field as Input;
+          const inputField = field as InputTypes;
 
           const dependencyValue = formData[inputField.showIf?.field ?? ""];
 
           if (
-            dependencyValue !== inputField.showIf.equals &&
+            dependencyValue !== inputField.showIf?.equals &&
             formData[inputField.name] !== undefined
           ) {
             setFormData((prev) => {
@@ -108,23 +88,28 @@ const CreateTestFormComponent: React.FC = () => {
     });
   }, [formData.homeisActiveOptionOutbound]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
 
     if (steps[currentStep] === 0 && e.target.name === "targetPage") {
-      const targetPageField = stepFields
-        .find((step) => step.key === 0)
-        .input.find((field) => field.name === "targetPage");
+      const targetPageField = stepFields!.find((step) => step.key === 0);
+      const targetPageInput = targetPageField?.input;
+      const targetPageInputField = targetPageInput?.find(
+        (field) => field.name === "targetPage"
+      );
 
-      const selectedOption = targetPageField.option.find(
+      const selectedOption = targetPageInputField?.option?.find(
         (option) => option.value === e.target.value
       );
 
-      if (selectedOption) {
-        const targetKey = selectedOption.stepKey;
+      if (selectedOption && "stepKey" in selectedOption) {
+        const targetKey = selectedOption.stepKey as number;
+
         const newSteps = stepFields
           .filter((step) => step.key <= targetKey)
           .map((step) => step.key);
@@ -136,6 +121,7 @@ const CreateTestFormComponent: React.FC = () => {
   };
 
   const nextStep = () => setCurrentStep((prev) => prev + 1);
+
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   const handleSave = () => {
@@ -148,12 +134,12 @@ const CreateTestFormComponent: React.FC = () => {
         }
 
         if (field.type === "number" && transformedData[field.name]) {
-          transformedData[field.name] = parseInt(transformedData[field.name]);
+          transformedData[field.name] = parseInt(
+            transformedData[field.name].toString()
+          );
         }
       });
     });
-
-    //FIXME: Cuando se ingresa un valor en campso de numero, se guarda como string.
 
     addTest(transformedData);
     setFormData(initializeFormData);
@@ -164,38 +150,45 @@ const CreateTestFormComponent: React.FC = () => {
   const currentStepFields =
     stepFields.find((step) => step.key === steps[currentStep])?.input || [];
 
-  const isStepComplete = (stepKey) => {
+  const isStepComplete = (stepKey: Option["stepKey"]) => {
     const step = stepFields.find((step) => step.key === stepKey);
+
     if (!step) return false;
 
     return step.input.every((field) => {
-      if (field.showIf) {
-        const dependencyValue = formData[field.showIf.field];
-        if (dependencyValue !== field.showIf.equals) {
+      if ("showIf" in field) {
+        const dependencyValue =
+          field.showIf?.field && formData[field.showIf?.field];
+
+        if (dependencyValue !== field.showIf?.equals) {
           return true;
         }
       }
 
       if (!field.isRequired) return true;
+
       const value = formData[field.name];
+
       if (value === undefined || value === null) return false;
       if (typeof value === "string") return value.trim() !== "";
+
       return true;
     });
   };
 
-  const shouldShowField = (field) => {
+  const shouldShowField = (field: any) => {
     if (!field.showIf) return true;
 
-    const dependencyValue = formData[field.showIf.field];
+    const dependencyValue = field.showIf.field && formData[field.showIf.field];
 
     return dependencyValue === field.showIf.equals;
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string | number) => {
     if (!dateString) return "";
 
-    const [, month, day] = dateString.split("-");
+    const [, month, day] = dateString.toString().split("-");
+
     const months = [
       "jan",
       "feb",
@@ -240,7 +233,11 @@ const CreateTestFormComponent: React.FC = () => {
             return (
               <HStack
                 key={stepKey}
-                ref={(element) => (stepRefs.current[index] = element)}
+                ref={(element) => {
+                  if (element) {
+                    stepRefs.current[index] = element;
+                  }
+                }}
               >
                 <Circle
                   size="32px"
@@ -277,45 +274,56 @@ const CreateTestFormComponent: React.FC = () => {
             >
               <FormControl isRequired={field.isRequired}>
                 <FormLabel>{field.label}</FormLabel>
-                {field.type === "select" ? (
+                {field.type === "select" && (
                   <Select
                     name={field.name}
                     value={formData[field.name] || ""}
                     onChange={handleInputChange}
                   >
                     <option value="">Selecciona una opción</option>
-                    {field.option.map((option) => (
-                      <option key={option.value} value={option.value}>
+                    {field.option?.map((option, index) => (
+                      <option key={index} value={option.value}>
                         {option.label}
                       </option>
                     ))}
                   </Select>
-                ) : (
-                  <Input
-                    type={field.type}
-                    name={field.name}
-                    placeholder={
-                      field.hasPlaceholder ? field.placeholderText : ""
+                )}
+                {field.type === "searchable-select" && field.option && (
+                  <SearchableSelectComponent
+                    options={field.option}
+                    value={formData[field.name] || ""}
+                    onChange={(val) =>
+                      setFormData((prev) => ({ ...prev, [field.name]: val }))
                     }
-                    value={
-                      formData[field.name] ??
-                      (field.hasDefaultValue ? field.defaultValue : "")
-                    }
-                    onChange={(e) => {
-                      let value = e.target.value;
-                      if (field.type === "number") {
-                        if (value === "" || Number(value) >= 0) {
-                          setFormData((prev) => ({
-                            ...prev,
-                            [field.name]: value,
-                          }));
-                        }
-                      } else {
-                        handleInputChange(e);
-                      }
-                    }}
                   />
                 )}
+                {field.type !== "select" &&
+                  field.type !== "searchable-select" && (
+                    <Input
+                      type={field.type}
+                      name={field.name}
+                      placeholder={
+                        "placeholderText" in field ? field?.placeholderText : ""
+                      }
+                      value={
+                        formData[field.name] ??
+                        ("defaultValue" in field ? field.defaultValue : "")
+                      }
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        if (field.type === "number") {
+                          if (value === "" || Number(value) >= 0) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              [field.name]: value,
+                            }));
+                          }
+                        } else {
+                          handleInputChange(e);
+                        }
+                      }}
+                    />
+                  )}
               </FormControl>
             </GridItem>
           ))}

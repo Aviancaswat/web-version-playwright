@@ -59,7 +59,7 @@ const getTimestamp = () => {
     return today;
 }
 
-export const replaceDataforNewTest = async (newTestData: string) => {
+export const replaceDataforNewTest = async (testName: string, newTestData: string) => {
     const fileData = await getFileData();
     const fileContent = atob(fileData.content);
     const updatedContent = fileContent.replace(/\[\s*{[\s\S]*?}\s*]/, newTestData);
@@ -68,7 +68,7 @@ export const replaceDataforNewTest = async (newTestData: string) => {
         owner: owner,
         repo: repo,
         path: path,
-        message: `Commit de Wilmar - ${getTimestamp()}`,
+        message: `${testName} - ${getTimestamp()}`,
         content: btoa(updatedContent),
         sha: fileData.sha,
         branch: branchRef

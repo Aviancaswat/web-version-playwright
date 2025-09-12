@@ -2,7 +2,7 @@
 import CreateWorkflowBody from "../../components/CreateWorkflowBody/CreateWorkflowBody";
 import Navbar from "../../components/Navbar/Navbar";
 
-const CreateWorkflow = () => {
+const CreateWorkflow: React.FC = () => {
   return (
     <>
       <Navbar />

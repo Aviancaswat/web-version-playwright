@@ -4,7 +4,7 @@ import { Box } from "@chakra-ui/react";
 import CreateTestFormComponent from "../CreateTestFormComponent/CreateTestFormComponent";
 import TestListComponent from "../TestListComponent/TestListComponent";
 
-const CreateWorkflowBody = () => {
+const CreateWorkflowBody: React.FC = () => {
   return (
     <Box
       w={"100vw"}

@@ -1,10 +1,8 @@
-import React from "react";
+import { useState } from "react";
 import {
   Box,
-  Heading,
   Text,
   Button,
-  VStack,
   Divider,
   Accordion,
   AccordionItem,
@@ -12,22 +10,32 @@ import {
   AccordionPanel,
   AccordionIcon,
   HStack,
+  Input,
 } from "@chakra-ui/react";
 
 // Store
 import useTestStore from "../../store/useTestStore";
+
+//Services
 import { replaceDataforNewTest } from "../../github/api";
 
-const TestListComponent = () => {
+//TODO: Agregar boton de editar prueba
+
+const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests } = useTestStore();
 
+  const [testListName, setTestListName] = useState<string>("");
+
   const handleSubmitTest = async () => {
+    if (!testListName.trim()) return;
+
     try {
-      await replaceDataforNewTest(JSON.stringify(tests));
+      await replaceDataforNewTest(testListName, JSON.stringify(tests));
     } catch (err) {
       console.error(err);
     } finally {
       clearTests();
+      setTestListName("");
     }
   };
 
@@ -43,18 +51,23 @@ const TestListComponent = () => {
       p={5}
       w="100%"
       maxW="500px"
-      h={"300px"}
+      h={"325px"}
     >
       <Text fontSize="sm" fontWeight={"bold"} mb={2}>
         Listado de pruebas
       </Text>
-
+      <Input
+        placeholder="Nombre set de pruebas*"
+        mb={4}
+        value={testListName}
+        onChange={(e) => setTestListName(e.target.value)}
+      />
       {tests.length === 0 ? (
-        <Text color="gray.500" h={"150px"}>
+        <Text color="gray.500" h={"125px"}>
           No hay pruebas creadas todavía
         </Text>
       ) : (
-        <Accordion allowMultiple h={"150px"} overflowY={"auto"}>
+        <Accordion allowMultiple h={"125px"} overflowY={"auto"}>
           {tests.map((test, index) => (
             <AccordionItem
               key={index}
@@ -131,7 +144,7 @@ const TestListComponent = () => {
           backgroundColor={"#1b1b1b"}
           borderRadius={"full"}
           onClick={handleSubmitTest}
-          isDisabled={tests.length === 0}
+          isDisabled={tests.length === 0 || !testListName.trim()}
         >
           Iniciar prueba
         </Button>

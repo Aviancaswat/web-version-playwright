@@ -5,7 +5,7 @@
     "input": [
       {
         "name": "id",
-        "label": "Nombre de la prueba:",
+        "label": "Nombre prueba:",
         "type": "text",
         "isRequired": true,
         "hasPlaceholder": false
@@ -16,8 +16,8 @@
         "type": "select",
         "isRequired": true,
         "option": [
-          { "value": "home", "label": "Inicio", "stepKey": 1 },
-          { "value": "booking", "label": "Reserva", "stepKey": 2 }
+          { "value": "home", "label": "Home", "stepKey": 1 },
+          { "value": "booking", "label": "Booking", "stepKey": 2 }
         ]
       },
       {
@@ -97,7 +97,7 @@
       },
       {
         "name": "description",
-        "label": "Descripción de la prueba:",
+        "label": "Descripción:",
         "type": "text",
         "isRequired": true,
         "hasPlaceholder": true,
@@ -107,12 +107,12 @@
   },
   {
     "key": 1,
-    "stepTitle": "Inicio",
+    "stepTitle": "Home",
     "input": [
       {
         "name": "homeCiudadOrigen",
         "label": "Origen: ",
-        "type": "select",
+        "type": "searchable-select",
         "isRequired": true,
         "option": [
           { "value": "AUC", "label": "Arauca" },
@@ -130,7 +130,7 @@
       {
         "name": "homeCiudadDestino",
         "label": "Destino: ",
-        "type": "select",
+        "type": "searchable-select",
         "isRequired": true,
         "option": [
           { "value": "AUC", "label": "Arauca" },
@@ -151,8 +151,8 @@
         "type": "select",
         "isRequired": true,
         "option": [
-          { "value": false, "label": "Ida y vuelta" },
-          { "value": true, "label": "Solo ida" }
+          { "value": "false", "label": "Ida y vuelta" },
+          { "value": "true", "label": "Solo ida" }
         ]
       },
       {
@@ -207,7 +207,7 @@
   },
   {
     "key": 2,
-    "stepTitle": "Reserva",
+    "stepTitle": "Booking",
     "input": [
       {
         "name": "bookingNumeroVueloIda",
