@@ -15,6 +15,7 @@ import {
 
 // Store
 import useTestStore from "../../store/useTestStore";
+import useLoadingStore from "../../store/useLoadingStore";
 
 //Services
 import { replaceDataforNewTest } from "../../github/api";
@@ -22,6 +23,8 @@ import { replaceDataforNewTest } from "../../github/api";
 //TODO: Agregar boton de editar prueba
 
 const TestListComponent: React.FC = () => {
+  const { setShowLoading } = useLoadingStore();
+
   const { tests, removeTest, clearTests } = useTestStore();
 
   const [testListName, setTestListName] = useState<string>("");
@@ -30,12 +33,14 @@ const TestListComponent: React.FC = () => {
     if (!testListName.trim()) return;
 
     try {
+      setShowLoading(true);
       await replaceDataforNewTest(testListName, JSON.stringify(tests));
     } catch (err) {
       console.error(err);
     } finally {
       clearTests();
       setTestListName("");
+      setShowLoading(false);
     }
   };
 

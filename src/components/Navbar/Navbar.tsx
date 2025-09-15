@@ -1,14 +1,19 @@
+import { Link } from "react-router-dom";
+
+//Styles
 import "./Navbar.css";
 
 const Navbar = () => {
   return (
     <nav className="navbar-container">
       <div className="navbar-subcontainer">
-        <img
-          className="logo-img"
-          src="/public/avianca-icon.png"
-          alt="logo avianca"
-        />
+        <Link to="/">
+          <img
+            className="logo-img"
+            src="/public/avianca-icon.png"
+            alt="logo avianca"
+          />
+        </Link>
       </div>
     </nav>
   );
