@@ -10,20 +10,21 @@ import { testStore } from './store/test-store';
 const App = () => {
 
   const { statusWorkflow, setStatusWorkflow } = testStore()
-  const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingReport, setLoadingReport] = useState<boolean>(false)
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [valuesStatusWorkflow, setValuesStatusWorkflow] = useState<string[]>([])
+  const [workflowRunIdState, setWorkflowRunIdState] = useState<number | undefined>(undefined);
+  const toast = useToast();
 
-  const checkStatusWorkflow = async (commitSHA?: string): Promise<void> => {
+  const checkStatusWorkflow = async (commitSHA?: string): Promise<number | undefined> => {
 
     if (!commitSHA) {
       setStatusWorkflow("queued")
       setValuesStatusWorkflow([...valuesStatusWorkflow, "Inicializando workflow..."])
     }
 
-    return new Promise<void>(() => {
+    return new Promise<number | undefined>((resolve) => {
       const getStatus = async () => {
         console.log("fetch get status...")
         const response = await checkWorkflowStatus(commitSHA)
@@ -31,27 +32,29 @@ const App = () => {
 
         if (!response) {
           setStatusWorkflow("queued")
-          setValuesStatusWorkflow([...valuesStatusWorkflow, "Incializando workflow..."])
+          setValuesStatusWorkflow([...valuesStatusWorkflow, "Inicializando workflow..."])
           return;
         }
 
-        const { status } = response;
+        const { status, workflowId } = response;
+        console.log("workflowId RUN: ", workflowId)
 
         if (status === "completed") {
           clearInterval(intervalId);
           console.log("Workflow completed...");
           setStatusWorkflow("completed")
           setValuesStatusWorkflow([...valuesStatusWorkflow, "Workflow Completado"])
+          resolve(workflowId);
         }
         else if (status === "in_progress") {
           setStatusWorkflow("in_progress")
           setValuesStatusWorkflow([...valuesStatusWorkflow, "En progreso..."])
         }
-        console.log(`Workflow status: ${status}, se volverá a checkear en 30 segundos...`);
-      };
+        console.log(`Workflow status: ${status}, se volverá a checkear en 15 segundos...`);
+      }
 
       getStatus();
-      const intervalId = setInterval(getStatus, 30000);
+      const intervalId = setInterval(getStatus, 15000);
     });
   }
 
@@ -61,7 +64,10 @@ const App = () => {
 
       setLoading(true);
       const commitResponse = await replaceDataforNewTest(textAreaRef.current?.value ?? "")
-      await checkStatusWorkflow(commitResponse)
+      const response = await checkStatusWorkflow(commitResponse)
+      console.log("Se termino de resolver la proomesa: WORKFLOW ID: ", response)
+      setWorkflowRunIdState(response)
+      console.log("WORKFLOW STATE: ", workflowRunIdState)
       toast({
         title: "Datos actualizados y ejecución del workflow exitosa",
         status: "success",
@@ -95,7 +101,7 @@ const App = () => {
   const handleDownloadReport = useCallback(async () => {
     try {
       setLoadingReport(true)
-      await downLoadReportHTML()
+      await downLoadReportHTML(workflowRunIdState)
       toast({
         title: "se ha descargado el reporte html correctamente!",
         status: "success",
@@ -114,11 +120,12 @@ const App = () => {
         isClosable: true,
       })
     }
-  }, [])
+  }, [workflowRunIdState])
 
   useEffect(() => {
     console.log("effect workflow change: ", statusWorkflow)
-  }, [valuesStatusWorkflow])
+    console.log("WORKFLOW STATE actualizado: ", workflowRunIdState);
+  }, [valuesStatusWorkflow, workflowRunIdState])
 
   return (
     <Card
@@ -189,7 +196,7 @@ const App = () => {
                 cols={50}
                 rows={14}
                 resize={"none"}
-                value={valuesStatusWorkflow.map(e => e + "\n")}
+                value={[...valuesStatusWorkflow.map(e => e + "\n")]}
                 isReadOnly
               />
             </Box>

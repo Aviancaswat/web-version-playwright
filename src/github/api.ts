@@ -72,13 +72,13 @@ const getFileData = async (retries = 3): Promise<any> => {
 };
 
 const getTimestamp = () => {
-
-    const today = new Date().toISOString();
-
-    if (today.includes("T")) {
-        return `${today.split("T")[0]}-${today.split("T")[1]}`
-    }
-    return today;
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const hour = String(today.getHours()).padStart(2, '0');
+    const minute = String(today.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year}_${hour}-${minute}`;
 }
 
 export const replaceDataforNewTest = async (newTestData: string): Promise<string | undefined> => {
@@ -165,7 +165,6 @@ export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWor
             result: resultWorkflow,
             workflowId: workflow.id
         }
-        //si es undefined es porque el workflow apenas se está inicializando
     }
     catch (error) {
         console.error(`Ha ocurrido un error al check workflow status ${error}`)
@@ -173,12 +172,16 @@ export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWor
     }
 }
 
-export const downLoadReportHTML = async () => {
+export const downLoadReportHTML = async (workflowRunId?: number) => {
+    console.log("workflowRunId pasado a download report: ", workflowRunId)
+    if (!workflowRunId) throw new Error("No hay workflow id asignado")
 
     try {
         const { artifacts, total_count } = await getArtefactsByRepo()
+
         if (total_count === 0) return;
-        const artifactFound = artifacts.find(e => e.name === "playwright-report");
+        const artifactFound = artifacts.find(e => e.name === "playwright-report" && (e.workflow_run && e.workflow_run.id === workflowRunId));
+        console.log("artifactFound: ", artifactFound)
         if (!artifactFound) return;
         const artifactId = artifactFound.id;
         const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
