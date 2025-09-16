@@ -30,6 +30,7 @@ import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 //TODO: Cuando seleccione pasajeros o flujo superior en el paso de pasajeros, mostrar texto explicativo: "El formulario se va rellenar."
 //TODO: Mostrar mensaje en paso de asientos: "Se va seleccionar un asiento al azar."
 //TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
+//TODO: Agregar al lado del nombre de la ciudad el codigo ej: Medellin (MDE)
 
 const CreateTestFormComponent: React.FC = () => {
   const addTest = useTestStore((state) => state.addTest);

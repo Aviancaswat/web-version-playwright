@@ -91,20 +91,17 @@ export const replaceDataforNewTest = async (
   testName: string,
   newTestData: string
 ): Promise<string | undefined> => {
-  console.log("newTestData: ", newTestData);
   if (!newTestData || newTestData === "") return;
 
   try {
-    console.log(`\n--- Procesando commit ---`);
     let fileData = await getFileData();
-    console.log(`SHA actual para el commit: `, fileData.sha);
+ 
     let fileContent = atob(fileData.content);
-    console.log("fileContent: ", fileContent);
+
     const updatedContent = fileContent.replace(
       /\[\s*{[\s\S]*?}\s*]/,
       newTestData
     );
-    console.log("Update content: ", updatedContent);
 
     const {
       data: { commit },
@@ -118,7 +115,6 @@ export const replaceDataforNewTest = async (
       branch: branchRef,
     });
 
-    console.log(`✅ Commit realizado exitosamente`);
     const commitSHA = commit.sha;
     return commitSHA;
   } catch (error) {
@@ -139,7 +135,6 @@ export const getArtefactsByRepo = async () => {
         },
       }
     );
-    console.log("Data artefacts: ", data);
     return data;
   } catch (error) {
     console.error(
@@ -152,7 +147,6 @@ export const getArtefactsByRepo = async () => {
 export const checkWorkflowStatus = async (
   commitSHA?: string
 ): Promise<ResultWorkflowStatus | undefined> => {
-  console.log("commitSHA Function: ", commitSHA);
   if (!commitSHA) return;
 
   try {
@@ -186,7 +180,6 @@ export const checkWorkflowStatus = async (
 };
 
 export const downLoadReportHTML = async (workflowRunId?: number) => {
-  console.log("workflowRunId pasado a download report: ", workflowRunId);
   if (!workflowRunId) throw new Error("No hay workflow id asignado");
 
   try {
@@ -199,7 +192,7 @@ export const downLoadReportHTML = async (workflowRunId?: number) => {
         e.workflow_run &&
         e.workflow_run.id === workflowRunId
     );
-    console.log("artifactFound: ", artifactFound);
+
     if (!artifactFound) return;
     const artifactId = artifactFound.id;
     const { data } = await octokit.request(
@@ -222,7 +215,6 @@ export const downLoadReportHTML = async (workflowRunId?: number) => {
     a.download = `reporte-html-${getTimestamp()}.zip`;
     a.click();
     URL.revokeObjectURL(url);
-    console.log("Reponse download: ", data);
   } catch (error) {
     console.error(
       `Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`
