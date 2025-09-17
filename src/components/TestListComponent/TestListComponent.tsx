@@ -100,25 +100,31 @@ const TestListComponent: React.FC = () => {
       boxShadow="md"
       w="100%"
       maxW="500px"
-      h={"325px"}
-      position={"relative"}
+      position="relative"
+      display="flex"
+      flexDirection="column"
+      h="100%"
+      mt={2}
     >
-      <Box p={5}>
-        <Text fontSize="sm" fontWeight={"bold"} mb={2}>
+      {/* Contenido que crece */}
+      <Box p={5} flex="1 1 auto" minH={0}>
+        <Text fontSize="sm" fontWeight="bold" mb={2}>
           Listado de pruebas
         </Text>
+
         <Input
           placeholder="Nombre set de pruebas*"
           mb={4}
           value={testListName}
           onChange={(e) => setTestListName(e.target.value)}
         />
+
         {tests.length === 0 ? (
-          <Text color="gray.500" h={"125px"}>
+          <Text color="gray.500" minH="125px">
             No hay pruebas creadas todavía
           </Text>
         ) : (
-          <Accordion allowMultiple h={"125px"} overflowY={"auto"}>
+          <Accordion allowMultiple maxH="240px" overflowY="auto">
             {tests.map((test, index) => (
               <AccordionItem
                 key={index}
@@ -162,52 +168,57 @@ const TestListComponent: React.FC = () => {
             ))}
           </Accordion>
         )}
+      </Box>
 
-        <Divider my={4} />
+      <Divider />
 
-        <Box
-          w="100%"
-          display={"flex"}
-          justifyContent={"space-between"}
-          columnGap={4}
-        >
-          {tests.length > 0 && !workflowId && (
+      {/* Footer pegado abajo */}
+      <Box
+        w="100%"
+        display="flex"
+        justifyContent="space-between"
+        columnGap={4}
+        p={5}
+        mt="auto"
+      >
+        {tests.length > 0 && !workflowId && (
+          <Button
+            w="100%"
+            backgroundColor="#ffffff"
+            border="2px solid #1b1b1b"
+            color="#1b1b1b"
+            borderRadius="full"
+            _hover={{
+              backgroundColor: "#1b1b1b",
+              color: "#ffffff",
+              borderColor: "#1b1b1b",
+            }}
+            onClick={handleCleanList}
+            isDisabled={tests.length === 0}
+          >
+            Limpiar lista
+          </Button>
+        )}
+        {!workflowId && (
+          <Button
+            w="100%"
+            colorScheme="blackAlpha"
+            backgroundColor="#1b1b1b"
+            borderRadius="full"
+            onClick={handleSubmitTest}
+            isDisabled={tests.length === 0 || !testListName.trim()}
+          >
+            Iniciar prueba
+          </Button>
+        )}
+        {workflowId && (
+          <>
             <Button
               w="100%"
-              backgroundColor={"#ffffff"}
-              border={"2px solid #1b1b1b"}
-              color={"#1b1b1b"}
-              borderRadius={"full"}
-              _hover={{
-                backgroundColor: "#1b1b1b",
-                color: "#ffffff",
-                borderColor: "#1b1b1b",
-              }}
-              onClick={handleCleanList}
-              isDisabled={tests.length === 0}
-            >
-              Limpiar lista
-            </Button>
-          )}
-          {!workflowId && (
-            <Button
-              w="100%"
-              colorScheme="blackAlpha"
-              backgroundColor={"#1b1b1b"}
-              borderRadius={"full"}
-              onClick={handleSubmitTest}
-              isDisabled={tests.length === 0 || !testListName.trim()}
-            >
-              Iniciar prueba
-            </Button>
-          )}
-          {workflowId && (
-            <Button
-              w="100%"
-              backgroundColor={"#ffffff"}
-              border={"2px solid #1b1b1b"}
-              color={"#1b1b1b"}
-              borderRadius={"full"}
+              backgroundColor="#ffffff"
+              border="2px solid #1b1b1b"
+              color="#1b1b1b"
+              borderRadius="full"
               _hover={{
                 backgroundColor: "#1b1b1b",
                 color: "#ffffff",
@@ -217,21 +228,20 @@ const TestListComponent: React.FC = () => {
             >
               Reiniciar
             </Button>
-          )}
-          {workflowId && (
             <Button
               w="100%"
               colorScheme="blackAlpha"
-              backgroundColor={"#1b1b1b"}
-              borderRadius={"full"}
+              backgroundColor="#1b1b1b"
+              borderRadius="full"
               onClick={() => downLoadReportHTML(workflowId)}
             >
               Descargar reporte
             </Button>
-          )}
-        </Box>
+          </>
+        )}
       </Box>
     </Box>
+
   );
 };
 
