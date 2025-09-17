@@ -237,12 +237,16 @@ const CreateTestFormComponent: React.FC = () => {
       maxW="500px"
       w="100%"
       mx="auto"
-      mt={10}
+      mt={2}
       p={5}
       borderWidth={1}
       borderRadius="md"
       boxShadow="md"
+      display="flex"
+      flexDirection="column"
+      h="100%"
     >
+      {/* Header/Stepper (no scroll) */}
       <Box
         overflowX="auto"
         mb={8}
@@ -258,15 +262,11 @@ const CreateTestFormComponent: React.FC = () => {
             return (
               <HStack
                 key={stepKey}
-                ref={(element) => {
-                  if (element) {
-                    stepRefs.current[index] = element;
-                  }
-                }}
+                ref={(element) => { if (element) stepRefs.current[index] = element; }}
               >
                 <Circle
-                  size="32px"
-                  bg={index === currentStep ? "#23C847" : "gray.300"}
+                  size="26px"
+                  bg={index === currentStep ? "#FF0000" : "gray.300"}
                   color="white"
                   fontWeight="bold"
                 >
@@ -287,47 +287,47 @@ const CreateTestFormComponent: React.FC = () => {
         </HStack>
       </Box>
 
-      <Grid templateColumns="repeat(2, 1fr)" alignItems={"end"} gap={4}>
-        {currentStepFields
-          .filter((field) => shouldShowField(field))
-          .map((field, index, array) => (
-            <GridItem
-              key={field.name}
-              colSpan={
-                array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1
-              }
-            >
-              <FormControl isRequired={field.isRequired}>
-                <FormLabel>{field.label}</FormLabel>
-                {field.type === "select" && (
-                  <Select
-                    name={field.name}
-                    value={formData[field.name] || ""}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Selecciona una opción</option>
-                    {(
-                      dependentFieldOption[field.name] ||
-                      field.option ||
-                      []
-                    ).map((option: Option, index: number) => (
-                      <option key={index} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-                )}
-                {field.type === "searchable-select" && field.option && (
-                  <SearchableSelectComponent
-                    options={field.option}
-                    value={formData[field.name] || ""}
-                    onChange={(val) =>
-                      setFormData((prev) => ({ ...prev, [field.name]: val }))
-                    }
-                  />
-                )}
-                {field.type !== "select" &&
-                  field.type !== "searchable-select" && (
+      {/* Zona scrollable para campos */}
+      <Box flex="1 1 auto" minH={0} maxH="100%" overflowY="auto" pr={1}>
+        <Grid templateColumns="repeat(2, 1fr)" alignItems="end" gap={4}>
+          {currentStepFields
+            .filter((field) => shouldShowField(field))
+            .map((field, index, array) => (
+              <GridItem
+                key={field.name}
+                colSpan={array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1}
+              >
+                <FormControl isRequired={field.isRequired}>
+                  <FormLabel>{field.label}</FormLabel>
+
+                  {field.type === "select" && (
+                    <Select
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Selecciona una opción</option>
+                      {(dependentFieldOption[field.name] || field.option || []).map(
+                        (option: Option, i: number) => (
+                          <option key={i} value={option.value}>
+                            {option.label}
+                          </option>
+                        )
+                      )}
+                    </Select>
+                  )}
+
+                  {field.type === "searchable-select" && field.option && (
+                    <SearchableSelectComponent
+                      options={field.option}
+                      value={formData[field.name] || ""}
+                      onChange={(val) =>
+                        setFormData((prev) => ({ ...prev, [field.name]: val }))
+                      }
+                    />
+                  )}
+
+                  {field.type !== "select" && field.type !== "searchable-select" && (
                     <Input
                       type={field.type}
                       name={field.name}
@@ -353,19 +353,20 @@ const CreateTestFormComponent: React.FC = () => {
                       }}
                     />
                   )}
-              </FormControl>
-            </GridItem>
-          ))}
-      </Grid>
+                </FormControl>
+              </GridItem>
+            ))}
+        </Grid>
+      </Box>
 
-      <ButtonGroup justifyContent="space-between" mt={6} w="100%">
+      <ButtonGroup justifyContent="space-between" mt="auto" pt={4} w="100%">
         {currentStep > 0 && (
           <Button
             onClick={prevStep}
-            backgroundColor={"#ffffff"}
-            border={"2px solid #1b1b1b"}
-            color={"#1b1b1b"}
-            borderRadius={"full"}
+            backgroundColor="#ffffff"
+            border="2px solid #1b1b1b"
+            color="#1b1b1b"
+            borderRadius="full"
             _hover={{
               backgroundColor: "#1b1b1b",
               color: "#ffffff",
@@ -379,9 +380,9 @@ const CreateTestFormComponent: React.FC = () => {
           <Button
             onClick={nextStep}
             colorScheme="black"
-            backgroundColor={"#1b1b1b"}
+            backgroundColor="#1b1b1b"
             isDisabled={!isStepComplete(steps[currentStep])}
-            borderRadius={"full"}
+            borderRadius="full"
           >
             Siguiente
           </Button>
@@ -390,8 +391,8 @@ const CreateTestFormComponent: React.FC = () => {
             <Button
               onClick={handleSave}
               colorScheme="blackAlpha"
-              backgroundColor={"#1b1b1b"}
-              borderRadius={"full"}
+              backgroundColor="#1b1b1b"
+              borderRadius="full"
               isDisabled={!isStepComplete(steps[currentStep])}
             >
               Crear prueba
@@ -400,6 +401,7 @@ const CreateTestFormComponent: React.FC = () => {
         )}
       </ButtonGroup>
     </Box>
+
   );
 };
 
