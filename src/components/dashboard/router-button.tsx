@@ -17,8 +17,9 @@ export const RouterButton: React.FC<RouterButtonProps> = (
             to={path}
             width={"100%"}
             textAlign={"left"}
-            p={4}
-            _hover={{ bg: "#eee", border: "none" }}
+            p={3}
+            borderRadius={"md"}
+            _hover={{ bg: "#191919", border: "none" }}
             _focus={{ border: "none", outline: "none" }}
         >
             <Icon as={icon} w={5} h={5} />

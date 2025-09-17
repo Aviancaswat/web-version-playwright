@@ -1,17 +1,11 @@
 import {
     Box,
     Divider,
-    Drawer,
-    DrawerBody,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
+    Heading,
     Text,
-    useDisclosure,
     VStack
 } from '@chakra-ui/react'
 import type { LucideProps } from 'lucide-react'
-import { useEffect } from 'react'
 import { RouterButton } from './router-button'
 
 export type ChildrenSideBarDashboardProps = {
@@ -26,29 +20,36 @@ export type SideBarDashboardProps = {
 
 export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens }) => {
 
-    const { isOpen, onOpen } = useDisclosure()
-    useEffect(() => { onOpen() })
-
     return (
-        <Drawer
-            isOpen={isOpen}
-            onClose={() => { }}
-            placement="left"
+        <VStack
+            p={2}
+            height={"100vh"}
+            maxWidth={350}
+            bg={"blackAlpha.900"}
+            position={"relative"}
         >
-            <DrawerContent>
-                <DrawerHeader textAlign="center">Avianca Playwright</DrawerHeader>
-                <DrawerBody p="1">
-                    <Text color="gray.500" textAlign="center">
+            <Box>
+                <Heading
+                    as="h1"
+                    size={"lg"}
+                    textAlign="center"
+                    color={"whiteAlpha.900"}
+                    mt={5}
+                >
+                    Avianca Playwright
+                </Heading>
+                <Box p="1">
+                    <Text mt={2} color="gray.300" textAlign="center">
                         Gestiona tus workflows de forma automática y
-                        visualiza el historial completo de ejecuciones,
-                        con detalles sobre su estado y duración
+                        visualiza el historial completo
                     </Text>
-                    <Box mt={2}>
+                    <Box mt={10}>
                         <VStack
                             spacing={0}
                             width="100%"
                             display="flex"
                             flexDirection="column"
+                            color={"whiteAlpha.900"}
                         >
                             {
                                 childrens.map((child, item) => (
@@ -57,13 +58,17 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
                             }
                         </VStack>
                     </Box>
-                </DrawerBody>
-                <Divider />
-                <DrawerFooter width="100%">
-                    <Text width="100%" textAlign="center">Avianca Evolutivos - {new Date().getFullYear()}</Text>
-                </DrawerFooter>
-            </DrawerContent>
-        </Drawer>
+                </Box>
+                <Box
+                    width="100%"
+                    position={"absolute"}
+                    bottom={0}
+                >
+                    <Divider />
+                    <Text mt={3} mb={3} width="100%" textAlign="center" color={"whiteAlpha.900"}>Avianca Evolutivos - {new Date().getFullYear()}</Text>
+                </Box>
+            </Box>
+        </VStack>
     )
 }
 

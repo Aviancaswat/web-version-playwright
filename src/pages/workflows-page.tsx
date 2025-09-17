@@ -1,10 +1,17 @@
-import { Heading } from "@chakra-ui/react"
+import { Box, Heading } from "@chakra-ui/react";
 
 const WorkflowsPage = () => {
     return (
-        <Heading>
-            Workflows Page
-        </Heading>
+        <Box 
+            height={"100%"}
+            display={"grid"}
+            placeContent={"center"}
+            >
+            <Heading>
+                Workflows Page
+            </Heading>
+        </Box>
     )
 }
-export default WorkflowsPage
+
+export default WorkflowsPage;
