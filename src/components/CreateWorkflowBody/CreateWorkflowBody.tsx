@@ -7,7 +7,6 @@ import TestListComponent from "../TestListComponent/TestListComponent";
 const CreateWorkflowBody: React.FC = () => {
   return (
     <Box
-      w={"100vw"}
       h={"89vh"}
       display={"flex"}
       justifyContent={"center"}
