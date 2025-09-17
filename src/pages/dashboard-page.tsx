@@ -29,10 +29,10 @@ const DashboardPage = () => {
         <Box height={"100%"}>
             <Heading as="h1" size={"lg"}>Dashboard Page</Heading>
             <Box className="container-dash" mt={5}>
-                <HStack 
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
+                <HStack
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
                 >
                     {
                         dataCardsDetailsDash.map((data, index) => (
