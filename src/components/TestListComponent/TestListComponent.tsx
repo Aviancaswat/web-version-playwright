@@ -99,26 +99,28 @@ const TestListComponent: React.FC = () => {
       boxShadow="md"
       w="100%"
       maxW="500px"
-      h={"325px"}
-      position={"relative"}
+      position="relative"
+      mt={2}
+      display="flex"
+      flexDirection="column"
+      h="full"
     >
       <SpinnerComponent showSpinner={showSpinner} />
-      <Box p={5}>
-        <Text fontSize="sm" fontWeight={"bold"} mb={2}>
-          Listado de pruebas
-        </Text>
+      {/* Contenido que crece */}
+      <Box p={5} flex="1 1 auto" minH="0">
+        <Text fontSize="sm" fontWeight="bold" mb={2}>Listado de pruebas</Text>
         <Input
           placeholder="Nombre set de pruebas*"
           mb={4}
           value={testListName}
           onChange={(e) => setTestListName(e.target.value)}
         />
+
         {tests.length === 0 ? (
-          <Text color="gray.500" h={"125px"}>
-            No hay pruebas creadas todavía
-          </Text>
+          <Text color="gray.500" minH="220px">No hay pruebas creadas todavía</Text>
         ) : (
-          <Accordion allowMultiple h={"125px"} overflowY={"auto"}>
+          // Si quieres evitar “saltos”, usa maxH + overflow en vez de h fija
+          <Accordion allowMultiple maxH="220px" overflowY="auto">
             {tests.map((test, index) => (
               <AccordionItem
                 key={index}
@@ -134,17 +136,12 @@ const TestListComponent: React.FC = () => {
                     _focus={{ borderColor: "#FF0000", outline: "none" }}
                   >
                     <HStack justify="space-between" w="100%">
-                      <Text fontWeight="bold" fontSize="sm">
-                        {test.id}
-                      </Text>
+                      <Text fontWeight="bold" fontSize="sm">{test.id}</Text>
                       <HStack>
                         <Button
                           size="xs"
                           colorScheme="red"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeTest(index);
-                          }}
+                          onClick={(e) => { e.stopPropagation(); removeTest(index); }}
                         >
                           Eliminar
                         </Button>
@@ -162,76 +159,65 @@ const TestListComponent: React.FC = () => {
             ))}
           </Accordion>
         )}
+      </Box>
 
-        <Divider my={4} />
+      <Divider />
 
-        <Box
-          w="100%"
-          display={"flex"}
-          justifyContent={"space-between"}
-          columnGap={4}
-        >
-          {tests.length > 0 && !workflowId && (
+      {/* Footer pegado abajo */}
+      <HStack p={5} spacing={4} mt="auto">
+        {tests.length > 0 && !workflowId && (
+          <Button
+            w="100%"
+            backgroundColor="#ffffff"
+            border="2px solid #1b1b1b"
+            color="#1b1b1b"
+            borderRadius="full"
+            _hover={{ backgroundColor: "#1b1b1b", color: "#ffffff", borderColor: "#1b1b1b" }}
+            onClick={handleCleanList}
+            isDisabled={tests.length === 0}
+          >
+            Limpiar lista
+          </Button>
+        )}
+        {!workflowId && (
+          <Button
+            w="100%"
+            colorScheme="blackAlpha"
+            backgroundColor="#1b1b1b"
+            borderRadius="full"
+            onClick={handleSubmitTest}
+            isDisabled={tests.length === 0 || !testListName.trim()}
+          >
+            Iniciar prueba
+          </Button>
+        )}
+        {workflowId && (
+          <>
             <Button
               w="100%"
-              backgroundColor={"#ffffff"}
-              border={"2px solid #1b1b1b"}
-              color={"#1b1b1b"}
-              borderRadius={"full"}
-              _hover={{
-                backgroundColor: "#1b1b1b",
-                color: "#ffffff",
-                borderColor: "#1b1b1b",
-              }}
-              onClick={handleCleanList}
-              isDisabled={tests.length === 0}
-            >
-              Limpiar lista
-            </Button>
-          )}
-          {!workflowId && (
-            <Button
-              w="100%"
-              colorScheme="blackAlpha"
-              backgroundColor={"#1b1b1b"}
-              borderRadius={"full"}
-              onClick={handleSubmitTest}
-              isDisabled={tests.length === 0 || !testListName.trim()}
-            >
-              Iniciar prueba
-            </Button>
-          )}
-          {workflowId && (
-            <Button
-              w="100%"
-              backgroundColor={"#ffffff"}
-              border={"2px solid #1b1b1b"}
-              color={"#1b1b1b"}
-              borderRadius={"full"}
-              _hover={{
-                backgroundColor: "#1b1b1b",
-                color: "#ffffff",
-                borderColor: "#1b1b1b",
-              }}
+              backgroundColor="#ffffff"
+              border="2px solid #1b1b1b"
+              color="#1b1b1b"
+              borderRadius="full"
+              _hover={{ backgroundColor: "#1b1b1b", color: "#ffffff", borderColor: "#1b1b1b" }}
               onClick={handleCleanAll}
             >
               Reiniciar
             </Button>
-          )}
-          {workflowId && (
             <Button
               w="100%"
               colorScheme="blackAlpha"
-              backgroundColor={"#1b1b1b"}
-              borderRadius={"full"}
+              backgroundColor="#1b1b1b"
+              borderRadius="full"
               onClick={() => downLoadReportHTML(workflowId)}
             >
               Descargar reporte
             </Button>
-          )}
-        </Box>
-      </Box>
+          </>
+        )}
+      </HStack>
     </Box>
+
   );
 };
 

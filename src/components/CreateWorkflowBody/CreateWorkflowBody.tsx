@@ -13,16 +13,17 @@ const CreateWorkflowBody: React.FC = () => {
       alignItems={"center"}
     >
       <Box
-        w={{ base: "unset", lg: "1004px" }}
+        maxW={{ base: "unset", lg: "1004px" }}
         h={"100%"}
         display={"grid"}
         gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }}
         justifyContent={"center"}
-        alignItems={"center"}
+        alignContent={"space-evenly"}
         columnGap={"5rem"}
         rowGap={"2rem"}
         mb={{ base: "5rem", lg: "0" }}
         mt={{ base: "5rem", lg: "0" }}
+        alignItems="stretch"
       >
         <Box m={{ base: "0 1rem", lg: "0" }}>
           <CreateTestFormComponent />
