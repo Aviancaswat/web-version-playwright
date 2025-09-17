@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 
 //Store
 import useLoadingStore from "../../store/useLoadingStore";
@@ -18,6 +18,8 @@ const LoadingScreenComponent: React.FC = () => {
         w={"100%"}
         h={"100%"}
         display={"flex"}
+        flexDirection={"column"}
+        rowGap={3}
         justifyContent={"center"}
         alignItems={"center"}
       >
@@ -27,6 +29,9 @@ const LoadingScreenComponent: React.FC = () => {
           src="/public/plane-loader.gif"
           alt="loader plane image"
         />
+        <Text color="blackAlpha.900">
+          Ejecutando prueba... Esto puede tardar unos minutos.
+        </Text>
       </Box>
     </Box>
   ) : null;

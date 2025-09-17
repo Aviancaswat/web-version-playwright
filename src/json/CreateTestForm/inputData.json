@@ -25,35 +25,7 @@
         "label": "Método objetivo:",
         "type": "select",
         "isRequired": true,
-        "option": [
-          { "value": "none", "label": "No aplica" },
-          { "value": "homeSeleccionarOrigen", "label": "Seleccionar Origen" },
-          { "value": "homeSeleccionarDestino", "label": "Seleccionar Destino" },
-          {
-            "value": "homeSeleccionarFechaSalida",
-            "label": "Seleccionar Fecha de Salida"
-          },
-          {
-            "value": "homeSeleccionarFechaLlegada",
-            "label": "Seleccionar Fecha de Llegada"
-          },
-          {
-            "value": "homeSeleccionarPasajeros",
-            "label": "Seleccionar Pasajeros"
-          },
-          {
-            "value": "bookingSeleccionarVueloIda",
-            "label": "Seleccionar Vuelo de Ida en Reserva"
-          },
-          {
-            "value": "bookingSeleccionarVueloVuelta",
-            "label": "Seleccionar Vuelo de Vuelta en Reserva"
-          },
-          {
-            "value": "passengerRellenarFormulario",
-            "label": "Rellenar Formulario de Pasajero"
-          }
-        ]
+        "option": []
       },
       {
         "name": "homeIdioma",
@@ -108,6 +80,23 @@
   {
     "key": 1,
     "stepTitle": "Home",
+    "method": [
+      { "value": "none", "label": "No aplica" },
+      { "value": "homeSeleccionarOrigen", "label": "Seleccionar Origen" },
+      { "value": "homeSeleccionarDestino", "label": "Seleccionar Destino" },
+      {
+        "value": "homeSeleccionarFechaSalida",
+        "label": "Seleccionar Fecha de Salida"
+      },
+      {
+        "value": "homeSeleccionarFechaLlegada",
+        "label": "Seleccionar Fecha de Llegada"
+      },
+      {
+        "value": "homeSeleccionarPasajeros",
+        "label": "Seleccionar Pasajeros"
+      }
+    ],
     "input": [
       {
         "name": "homeCiudadOrigen",
@@ -115,16 +104,16 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca" },
-          { "value": "EJA", "label": "Barrancabermeja" },
-          { "value": "BGA", "label": "Bucaramanga" },
-          { "value": "CTG", "label": "Cartagena" },
-          { "value": "MTR", "label": "Monteria" },
-          { "value": "NVA", "label": "Neiva" },
-          { "value": "PEI", "label": "Pereira" },
-          { "value": "VUP", "label": "Valledupar" },
-          { "value": "AXM", "label": "Armenia" },
-          { "value": "BAQ", "label": "Barranquilla" }
+          { "value": "AUC", "label": "Arauca (AUC)" },
+          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CTG", "label": "Cartagena (CTG)" },
+          { "value": "MTR", "label": "Monteria (MTR)" },
+          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "PEI", "label": "Pereira (PEI)" },
+          { "value": "VUP", "label": "Valledupar (VUP)" },
+          { "value": "AXM", "label": "Armenia (AXM)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
         ]
       },
       {
@@ -133,16 +122,16 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca" },
-          { "value": "EJA", "label": "Barrancabermeja" },
-          { "value": "BGA", "label": "Bucaramanga" },
-          { "value": "CTG", "label": "Cartagena" },
-          { "value": "MTR", "label": "Monteria" },
-          { "value": "NVA", "label": "Neiva" },
-          { "value": "PEI", "label": "Pereira" },
-          { "value": "VUP", "label": "Valledupar" },
-          { "value": "AXM", "label": "Armenia" },
-          { "value": "BAQ", "label": "Barranquilla" }
+          { "value": "AUC", "label": "Arauca (AUC)" },
+          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CTG", "label": "Cartagena (CTG)" },
+          { "value": "MTR", "label": "Monteria (MTR)" },
+          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "PEI", "label": "Pereira (PEI)" },
+          { "value": "VUP", "label": "Valledupar (VUP)" },
+          { "value": "AXM", "label": "Armenia (AXM)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
         ]
       },
       {
@@ -208,6 +197,16 @@
   {
     "key": 2,
     "stepTitle": "Booking",
+    "method": [
+      {
+        "value": "bookingSeleccionarVueloIda",
+        "label": "Seleccionar Vuelo de Ida en Reserva"
+      },
+      {
+        "value": "bookingSeleccionarVueloVuelta",
+        "label": "Seleccionar Vuelo de Vuelta en Reserva"
+      }
+    ],
     "input": [
       {
         "name": "bookingNumeroVueloIda",

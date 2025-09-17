@@ -15,6 +15,7 @@ import {
 
 // Store
 import useTestStore from "../../store/useTestStore";
+import useLoadingStore from "../../store/useLoadingStore";
 
 //Services
 import {
@@ -23,13 +24,12 @@ import {
   replaceDataforNewTest,
 } from "../../github/api";
 
-//Components
-import SpinnerComponent from "../SpinnerComponent/SpinnerComponent";
-
 //TODO: Agregar boton de editar prueba
 
 const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests } = useTestStore();
+
+  const { setShowLoading } = useLoadingStore();
 
   const [testListName, setTestListName] = useState<string>("");
 
@@ -66,7 +66,8 @@ const TestListComponent: React.FC = () => {
     if (!testListName.trim()) return;
 
     try {
-      setShowSpinner(true);
+      setShowLoading(true);
+
       const commit = await replaceDataforNewTest(
         testListName,
         JSON.stringify(tests)
@@ -78,7 +79,7 @@ const TestListComponent: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setShowSpinner(false);
+      setShowLoading(false);
     }
   };
 
@@ -102,7 +103,6 @@ const TestListComponent: React.FC = () => {
       h={"325px"}
       position={"relative"}
     >
-      <SpinnerComponent showSpinner={showSpinner} />
       <Box p={5}>
         <Text fontSize="sm" fontWeight={"bold"} mb={2}>
           Listado de pruebas

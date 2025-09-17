@@ -30,13 +30,15 @@ import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 //TODO: Cuando seleccione pasajeros o flujo superior en el paso de pasajeros, mostrar texto explicativo: "El formulario se va rellenar."
 //TODO: Mostrar mensaje en paso de asientos: "Se va seleccionar un asiento al azar."
 //TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
-//TODO: Agregar al lado del nombre de la ciudad el codigo ej: Medellin (MDE)
 
 const CreateTestFormComponent: React.FC = () => {
   const addTest = useTestStore((state) => state.addTest);
 
   const [steps, setSteps] = useState<number[]>([0]);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [dependentFieldOption, setDependentFieldOption] = useState<
+    Record<string, Option[]>
+  >({});
 
   const initializeFormData = () => {
     const initialData: { [key: string]: string | number } = {};
@@ -89,6 +91,20 @@ const CreateTestFormComponent: React.FC = () => {
     });
   }, [formData.homeisActiveOptionOutbound]);
 
+  const getMethodOptionsByStep = (targetKey: number) => {
+    let accumulatedOptions: Option[] = [];
+
+    for (let i = 1; i <= targetKey; i++) {
+      const step = stepFields.find((step) => step.key === i);
+
+      if (step?.method) {
+        accumulatedOptions = [...accumulatedOptions, ...step.method];
+      }
+    }
+
+    return accumulatedOptions;
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -110,6 +126,13 @@ const CreateTestFormComponent: React.FC = () => {
 
       if (selectedOption && "stepKey" in selectedOption) {
         const targetKey = selectedOption.stepKey as number;
+
+        const newTargetMethodOptions = getMethodOptionsByStep(targetKey);
+
+        setDependentFieldOption({
+          ...dependentFieldOption,
+          targetMethod: newTargetMethodOptions,
+        });
 
         const newSteps = stepFields
           .filter((step) => step.key <= targetKey)
@@ -144,6 +167,7 @@ const CreateTestFormComponent: React.FC = () => {
 
     addTest(transformedData);
     setFormData(initializeFormData);
+    setDependentFieldOption({});
     setSteps([0]);
     setCurrentStep(0);
   };
@@ -282,7 +306,11 @@ const CreateTestFormComponent: React.FC = () => {
                     onChange={handleInputChange}
                   >
                     <option value="">Selecciona una opción</option>
-                    {field.option?.map((option, index) => (
+                    {(
+                      dependentFieldOption[field.name] ||
+                      field.option ||
+                      []
+                    ).map((option: Option, index: number) => (
                       <option key={index} value={option.value}>
                         {option.label}
                       </option>
