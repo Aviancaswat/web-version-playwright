@@ -6,9 +6,9 @@ import './index.css'
 import theme from './utils/utils.ts'
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <ChakraProvider theme={theme}>
+  <ChakraProvider theme={theme}>
+    <BrowserRouter>
       <App />
-    </ChakraProvider>
-  </BrowserRouter>
+    </BrowserRouter>
+  </ChakraProvider>
 )

@@ -1,11 +1,13 @@
-import { Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Button, Menu, MenuButton, MenuItem, MenuList, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useId } from "react";
-import type { ResultWorkflow, StatusWorkflow } from "../../github/api";
+import { type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 
 type TableItems = {
     workflowname: string,
     statusWorkflow: StatusWorkflow,
-    resultWorkflow: ResultWorkflow
+    resultWorkflow: ResultWorkflow,
+    timeExecute: string | number
 }
 
 type TableWorkflowItemsProps = {
@@ -14,19 +16,22 @@ type TableWorkflowItemsProps = {
 
 const tableData: TableItems[] = [
     {
-        workflowname: "example 1",
+        workflowname: "Ruta de BOG-STA",
         statusWorkflow: "in_progress",
-        resultWorkflow: undefined
+        resultWorkflow: undefined,
+        timeExecute: "Por definir"
     },
     {
-        workflowname: "example 2",
+        workflowname: "Llenado de formulario de pasajeros",
         statusWorkflow: "queued",
-        resultWorkflow: undefined
+        resultWorkflow: undefined,
+        timeExecute: "Por definir"
     },
     {
-        workflowname: "example 2",
+        workflowname: "Ruta de BOG-CALI",
         statusWorkflow: "completed",
-        resultWorkflow: "success"
+        resultWorkflow: "success",
+        timeExecute: "2.50"
     }
 ]
 
@@ -61,6 +66,19 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                         <Td>{row.workflowname}</Td>
                         <Td>{parserValueWorkflow(row.statusWorkflow)}</Td>
                         <Td>{parserValueWorkflow(row.resultWorkflow)}</Td>
+                        <Td>{row.timeExecute}</Td>
+                        <Td>
+                            <Menu closeOnSelect={false}>
+                                <MenuButton as={Button} bg="none">
+                                    <GripHorizontal />
+                                </MenuButton>
+                                <MenuList>
+                                    <MenuItem icon={<FolderDown />}>Descargar Reporte</MenuItem>
+                                    <MenuItem icon={<ImageDown />}>Descargar Imagenes</MenuItem>
+                                    <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
+                                </MenuList>
+                            </Menu>
+                        </Td>
                     </Tr>
                 ))
             }
@@ -70,13 +88,19 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 
 const TableWorkflowsDash: React.FC = () => {
     return (
-        <TableContainer>
-            <Table size='sm'>
+        <TableContainer
+            p={3}
+            boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
+            borderRadius={"md"}
+        >
+            <Table size='sm' variant={"striped"} colorScheme="green">
                 <Thead>
                     <Tr>
                         <Th>Nombre del workflow</Th>
                         <Th>Status</Th>
-                        <Th>Resultado </Th>
+                        <Th>Resultado</Th>
+                        <Th>Tiempo(min)</Th>
+                        <Th>Acciones</Th>
                     </Tr>
                 </Thead>
                 <Tbody>

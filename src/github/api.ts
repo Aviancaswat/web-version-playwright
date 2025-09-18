@@ -71,14 +71,14 @@ const getFileData = async (retries = 3): Promise<any> => {
     }
 };
 
-const getTimestamp = () => {
+export const getTimestamp = () => {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, '0');
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const year = today.getFullYear();
     const hour = String(today.getHours()).padStart(2, '0');
     const minute = String(today.getMinutes()).padStart(2, '0');
-    return `${day}-${month}-${year}_${hour}-${minute}`;
+    return `${day}-${month}-${year} ${hour}:${minute}`;
 }
 
 export const replaceDataforNewTest = async (newTestData: string): Promise<string | undefined> => {
