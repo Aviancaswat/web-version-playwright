@@ -7,4 +7,7 @@ export interface TestStore {
   addTest: (test: Test) => void;
   removeTest: (index: number) => void;
   clearTests: () => void;
+  isBlocked: boolean;
+  blockForm: () => void;
+  unblockForm: () => void;
 }

@@ -32,7 +32,7 @@ import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 //TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
 
 const CreateTestFormComponent: React.FC = () => {
-  const addTest = useTestStore((state) => state.addTest);
+  const { addTest, isBlocked } = useTestStore();
 
   const [steps, setSteps] = useState<number[]>([0]);
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -195,7 +195,25 @@ const CreateTestFormComponent: React.FC = () => {
       const value = formData[field.name];
 
       if (value === undefined || value === null) return false;
-      if (typeof value === "string") return value.trim() !== "";
+      if (typeof value === "string" && value.trim() === "") return false;
+
+      if (field.name === "homeFechaSalida") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [year, month, day] = (value as string).split("-").map(Number);
+
+        const departureDate = new Date(year, month - 1, day);
+
+        if (departureDate < today) return false;
+      }
+
+      if (field.name === "homeFechaLlegada") {
+        const departureDate = new Date(formData["homeFechaSalida"]);
+        const returnDate = new Date(value);
+
+        if (returnDate <= departureDate) return false;
+      }
 
       return true;
     });
@@ -246,7 +264,6 @@ const CreateTestFormComponent: React.FC = () => {
       flexDirection="column"
       h="100%"
     >
-      {/* Header/Stepper (no scroll) */}
       <Box
         overflowX="auto"
         mb={8}
@@ -262,7 +279,9 @@ const CreateTestFormComponent: React.FC = () => {
             return (
               <HStack
                 key={stepKey}
-                ref={(element) => { if (element) stepRefs.current[index] = element; }}
+                ref={(element) => {
+                  if (element) stepRefs.current[index] = element;
+                }}
               >
                 <Circle
                   size="26px"
@@ -286,8 +305,6 @@ const CreateTestFormComponent: React.FC = () => {
           })}
         </HStack>
       </Box>
-
-      {/* Zona scrollable para campos */}
       <Box flex="1 1 auto" minH={0} maxH="100%" overflowY="auto" pr={1}>
         <Grid templateColumns="repeat(2, 1fr)" alignItems="end" gap={4}>
           {currentStepFields
@@ -295,7 +312,9 @@ const CreateTestFormComponent: React.FC = () => {
             .map((field, index, array) => (
               <GridItem
                 key={field.name}
-                colSpan={array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1}
+                colSpan={
+                  array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1
+                }
               >
                 <FormControl isRequired={field.isRequired}>
                   <FormLabel>{field.label}</FormLabel>
@@ -305,15 +324,18 @@ const CreateTestFormComponent: React.FC = () => {
                       name={field.name}
                       value={formData[field.name] || ""}
                       onChange={handleInputChange}
+                      disabled={isBlocked}
                     >
                       <option value="">Selecciona una opción</option>
-                      {(dependentFieldOption[field.name] || field.option || []).map(
-                        (option: Option, i: number) => (
-                          <option key={i} value={option.value}>
-                            {option.label}
-                          </option>
-                        )
-                      )}
+                      {(
+                        dependentFieldOption[field.name] ||
+                        field.option ||
+                        []
+                      ).map((option: Option, i: number) => (
+                        <option key={i} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </Select>
                   )}
 
@@ -327,32 +349,36 @@ const CreateTestFormComponent: React.FC = () => {
                     />
                   )}
 
-                  {field.type !== "select" && field.type !== "searchable-select" && (
-                    <Input
-                      type={field.type}
-                      name={field.name}
-                      placeholder={
-                        "placeholderText" in field ? field?.placeholderText : ""
-                      }
-                      value={
-                        formData[field.name] ??
-                        ("defaultValue" in field ? field.defaultValue : "")
-                      }
-                      onChange={(e) => {
-                        let value = e.target.value;
-                        if (field.type === "number") {
-                          if (value === "" || Number(value) >= 0) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              [field.name]: value,
-                            }));
-                          }
-                        } else {
-                          handleInputChange(e);
+                  {field.type !== "select" &&
+                    field.type !== "searchable-select" && (
+                      <Input
+                        type={field.type}
+                        name={field.name}
+                        disabled={isBlocked}
+                        placeholder={
+                          "placeholderText" in field
+                            ? field?.placeholderText
+                            : ""
                         }
-                      }}
-                    />
-                  )}
+                        value={
+                          formData[field.name] ??
+                          ("defaultValue" in field ? field.defaultValue : "")
+                        }
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          if (field.type === "number") {
+                            if (value === "" || Number(value) >= 0) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                [field.name]: value,
+                              }));
+                            }
+                          } else {
+                            handleInputChange(e);
+                          }
+                        }}
+                      />
+                    )}
                 </FormControl>
               </GridItem>
             ))}
@@ -401,7 +427,6 @@ const CreateTestFormComponent: React.FC = () => {
         )}
       </ButtonGroup>
     </Box>
-
   );
 };
 
