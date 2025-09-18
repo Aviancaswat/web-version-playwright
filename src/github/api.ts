@@ -23,6 +23,7 @@ type ResultWorkflowStatus = {
   // que la descarga del reporte sea igual al workflow que se eeta ejecutando en tiempo real
   status: StatusWorkflow;
   result: ResultWorkflow;
+  title: string;
 };
 
 const octokit = new Octokit({
@@ -95,7 +96,7 @@ export const replaceDataforNewTest = async (
 
   try {
     let fileData = await getFileData();
- 
+
     let fileContent = atob(fileData.content);
 
     const updatedContent = fileContent.replace(
@@ -171,6 +172,7 @@ export const checkWorkflowStatus = async (
     return {
       status: statusWorkflow,
       result: resultWorkflow,
+      title: workflow.display_title,
       workflowId: workflow.id,
     };
   } catch (error) {

@@ -11,7 +11,9 @@ import {
   AccordionIcon,
   HStack,
   Input,
+  Circle,
 } from "@chakra-ui/react";
+import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 
 // Store
 import useTestStore from "../../store/useTestStore";
@@ -24,36 +26,43 @@ import {
   replaceDataforNewTest,
 } from "../../github/api";
 
+//Types
+import type { TestResultData } from "./TestListComponent.types";
+
 //TODO: Agregar boton de editar prueba
 
 const TestListComponent: React.FC = () => {
-  const { tests, removeTest, clearTests } = useTestStore();
+  const { tests, removeTest, clearTests, blockForm, unblockForm } =
+    useTestStore();
 
   const { setShowLoading } = useLoadingStore();
 
   const [testListName, setTestListName] = useState<string>("");
 
-  const [workflowId, setWorkflowId] = useState<number | null>(null);
-
-  const [showSpinner, setShowSpinner] = useState<boolean>(false);
+  const [resultData, setResultData] = useState<TestResultData | null>(null);
 
   const checkStatusWorkflow = async (
     commitSHA?: string
-  ): Promise<number | undefined> => {
+  ): Promise<TestResultData | undefined> => {
     if (!commitSHA) return;
 
-    return new Promise<number | undefined>((resolve) => {
+    return new Promise<TestResultData | undefined>((resolve) => {
       const getStatus = async () => {
         const response = await checkWorkflowStatus(commitSHA);
 
         if (!response) return;
 
-        const { status, workflowId } = response;
+        const { status, result, title, workflowId } = response;
 
         if (status === "completed") {
           clearInterval(intervalId);
 
-          resolve(workflowId);
+          resolve({
+            status,
+            result,
+            title,
+            workflowId: workflowId !== undefined ? workflowId : 0,
+          });
         }
       };
 
@@ -67,6 +76,7 @@ const TestListComponent: React.FC = () => {
 
     try {
       setShowLoading(true);
+      blockForm();
 
       const commit = await replaceDataforNewTest(
         testListName,
@@ -75,7 +85,7 @@ const TestListComponent: React.FC = () => {
 
       const response = (await checkStatusWorkflow(commit)) || null;
 
-      setWorkflowId(response);
+      setResultData(response);
     } catch (err) {
       console.error(err);
     } finally {
@@ -90,7 +100,8 @@ const TestListComponent: React.FC = () => {
   const handleCleanAll = () => {
     clearTests();
     setTestListName("");
-    setWorkflowId(null);
+    setResultData(null);
+    unblockForm();
   };
 
   return (
@@ -106,18 +117,41 @@ const TestListComponent: React.FC = () => {
       h="100%"
       mt={2}
     >
-      {/* Contenido que crece */}
       <Box p={5} flex="1 1 auto" minH={0}>
         <Text fontSize="sm" fontWeight="bold" mb={2}>
           Listado de pruebas
         </Text>
 
-        <Input
-          placeholder="Nombre set de pruebas*"
-          mb={4}
-          value={testListName}
-          onChange={(e) => setTestListName(e.target.value)}
-        />
+        {resultData?.status !== "completed" && (
+          <Input
+            placeholder="Nombre set de pruebas*"
+            mb={4}
+            value={testListName}
+            onChange={(e) => setTestListName(e.target.value)}
+          />
+        )}
+        {resultData?.status === "completed" && (
+          <Box
+            mb={4}
+            display={"flex"}
+            alignItems={"center"}
+            w={"100%"}
+            justifyContent={"space-between"}
+          >
+            <Text fontSize="md" fontWeight={"bold"}>
+              {resultData.title}
+            </Text>
+            {resultData.result === "success" ? (
+              <Circle size="20px" mt={2} bg="green.400" color="white">
+                <CheckIcon w={3} h={3} />
+              </Circle>
+            ) : (
+              <Circle size="20px" mt={2} bg="red.400" color="white">
+                <CloseIcon w={3} h={3} />
+              </Circle>
+            )}
+          </Box>
+        )}
 
         {tests.length === 0 ? (
           <Text color="gray.500" minH="125px">
@@ -144,16 +178,18 @@ const TestListComponent: React.FC = () => {
                         {test.id}
                       </Text>
                       <HStack>
-                        <Button
-                          size="xs"
-                          colorScheme="red"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeTest(index);
-                          }}
-                        >
-                          Eliminar
-                        </Button>
+                        {resultData?.status !== "completed" && (
+                          <Button
+                            size="xs"
+                            colorScheme="red"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeTest(index);
+                            }}
+                          >
+                            Eliminar
+                          </Button>
+                        )}
                         <AccordionIcon />
                       </HStack>
                     </HStack>
@@ -172,7 +208,6 @@ const TestListComponent: React.FC = () => {
 
       <Divider />
 
-      {/* Footer pegado abajo */}
       <Box
         w="100%"
         display="flex"
@@ -181,7 +216,7 @@ const TestListComponent: React.FC = () => {
         p={5}
         mt="auto"
       >
-        {tests.length > 0 && !workflowId && (
+        {tests.length > 0 && !resultData && (
           <Button
             w="100%"
             backgroundColor="#ffffff"
@@ -199,7 +234,7 @@ const TestListComponent: React.FC = () => {
             Limpiar lista
           </Button>
         )}
-        {!workflowId && (
+        {!resultData && (
           <Button
             w="100%"
             colorScheme="blackAlpha"
@@ -211,7 +246,7 @@ const TestListComponent: React.FC = () => {
             Iniciar prueba
           </Button>
         )}
-        {workflowId && (
+        {resultData && (
           <>
             <Button
               w="100%"
@@ -233,7 +268,7 @@ const TestListComponent: React.FC = () => {
               colorScheme="blackAlpha"
               backgroundColor="#1b1b1b"
               borderRadius="full"
-              onClick={() => downLoadReportHTML(workflowId)}
+              onClick={() => downLoadReportHTML(resultData.workflowId)}
             >
               Descargar reporte
             </Button>
@@ -241,7 +276,6 @@ const TestListComponent: React.FC = () => {
         )}
       </Box>
     </Box>
-
   );
 };
 
