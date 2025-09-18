@@ -28,7 +28,7 @@ const store = create<Store>()(
     )
 )
 
-export const testStore = () => {
+export const useTestStore = () => {
     const { statusWorkflow, resultWorkflow, setStatusWorkflow, setResultWorkflow } = store()
     return {
         statusWorkflow,

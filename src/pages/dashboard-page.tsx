@@ -1,7 +1,8 @@
-import { Box, Heading, HStack } from "@chakra-ui/react"
+import { Box, Heading, HStack, Text } from "@chakra-ui/react"
 import { Bug, CirclePause, TestTube } from "lucide-react"
 import type { CardDetailsDashProps } from "../components/dashboard/card-details"
 import CardDetailsDash from "../components/dashboard/card-details"
+import TableWorkflowsDash from "../components/dashboard/table-workflows"
 
 const dataCardsDetailsDash: CardDetailsDashProps[] = [
     {
@@ -27,7 +28,8 @@ const dataCardsDetailsDash: CardDetailsDashProps[] = [
 const DashboardPage = () => {
     return (
         <Box height={"100%"}>
-            <Heading as="h1" size={"lg"}>Dashboard Page</Heading>
+            <Heading as="h1" size={"lg"}>Dashboard</Heading>
+            <Text>Análisis del desempeño de tus procesos de CI/CD en GitHub Actions</Text>
             <Box className="container-dash" mt={5}>
                 <HStack
                     display={"flex"}
@@ -40,6 +42,14 @@ const DashboardPage = () => {
                         ))
                     }
                 </HStack>
+            </Box>
+            <Box mt={10}>
+                <Heading as="h3" size={"md"}>
+                    Información general de los workflows
+                </Heading>
+                <Box mt={10} width={"100%"}>
+                    <TableWorkflowsDash />
+                </Box>
             </Box>
         </Box>
     )

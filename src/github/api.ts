@@ -14,8 +14,8 @@ export interface GitHubContentFile {
     download_url: string;
 }
 
-export type StatusWorkflow = 'queued' | 'in_progress' | 'completed'
-export type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled'
+export type StatusWorkflow = 'queued' | 'in_progress' | 'completed' | undefined
+export type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled' | undefined
 
 type ResultWorkflowStatus = {
     workflowId?: number,
