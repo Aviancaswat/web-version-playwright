@@ -9,25 +9,29 @@ const dataCardsDetailsDash: CardDetailsDashProps[] = [
         icon: TestTube,
         title: "Total exitosas",
         value: 150,
-        type: "success"
+        type: "success",
+        stat: 75.25
     },
     {
         icon: Bug,
         title: "Total fallidas",
         value: 10,
-        type: "error"
+        type: "error",
+        stat: 10.75
     },
     {
         icon: CirclePause,
         title: "Total canceladas",
         value: 5,
-        type: "cancelated"
+        type: "cancelated",
+        stat: 10
     },
     {
         icon: Timer,
         title: "Total tiempo",
-        value: 5,
-        type: "time"
+        value: 5.45,
+        type: "time",
+        stat: 0
     }
 ]
 
@@ -72,7 +76,7 @@ const DashboardPage = () => {
                     }
                 </HStack>
             </Box>
-            <Box mt={10}>
+            <Box mt={5}>
                 <Heading as="h3" size={"md"} mb={5}>
                     Información general de los workflows
                 </Heading>

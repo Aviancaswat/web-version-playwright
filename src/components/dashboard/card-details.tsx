@@ -6,7 +6,8 @@ export type CardDetailsDashProps = {
     icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>,
     title: string,
     value: string | number,
-    type: "success" | "error" | "cancelated" | "time"
+    type: "success" | "error" | "cancelated" | "time",
+    stat: number | string
 }
 
 const CardDetailsDash: React.FC<CardDetailsDashProps> = (
@@ -14,7 +15,8 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
         icon,
         title,
         value,
-        type
+        type,
+        stat
     }
 ) => {
 
@@ -25,7 +27,7 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
         let time: NodeJS.Timeout;
         time = setTimeout(() => {
             setLoading(false)
-        }, 5000);
+        }, 3000);
 
         () => clearTimeout(time)
     }, [])
@@ -74,13 +76,17 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
                         {value}
                         <Text fontSize={"md"}>{type === "time" ? "horas" : "pruebas"}</Text>
                     </StatNumber>
-                    <StatHelpText>
-                        <StatArrow
-                            color={type === "success" ? "green.800" : (type === "error" ? "red.500" : "gray.800")}
-                            type={type === "success" ? "increase" : (type === "error" ? "decrease" : "decrease")}
-                        />
-                        23.36%
-                    </StatHelpText>
+                    {
+                        type !== "time" && (
+                            <StatHelpText>
+                                <StatArrow
+                                    color={type === "success" ? "green.800" : (type === "error" ? "red.500" : "gray.800")}
+                                    type={type === "success" ? "increase" : (type === "error" ? "decrease" : "decrease")}
+                                />
+                                {stat}%
+                            </StatHelpText>
+                        )
+                    }
                 </Stat>
             </Skeleton>
         </Card>

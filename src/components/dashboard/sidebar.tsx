@@ -27,13 +27,13 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
         <VStack
             p={2}
             height={"100vh"}
-            maxWidth={350}
+            maxWidth={320}
             bg={"green.900"}
             position={"relative"}
         >
             <Box>
                 <Center>
-                    <Image src={avLogo} width={100} height={100}/>
+                    <Image src={avLogo} width={85} height={85} />
                 </Center>
                 <Heading
                     as="h1"
@@ -45,10 +45,9 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
                 </Heading>
                 <Box p="1">
                     <Text mt={2} color="gray.300" textAlign="center">
-                        Gestiona tus workflows de forma automática y
-                        visualiza el historial completo
+                        Visualiza y gestiona tus workflows
                     </Text>
-                    <Divider />
+                    <Divider mt={5} />
                     <Box mt={10}>
                         <VStack
                             spacing={0}
