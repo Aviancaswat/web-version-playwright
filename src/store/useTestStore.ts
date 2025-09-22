@@ -16,6 +16,13 @@ const useTestStore = create<TestStore>()(
         set((state) => ({
           tests: state.tests.filter((_, i) => i !== index),
         })),
+      updateTest: (index, test) =>
+        set((state) => {
+          const newTests = [...state.tests];
+          newTests[index] = test;
+          
+          return { tests: newTests };
+        }),
       clearTests: () => set({ tests: [] }),
       isBlocked: false,
       blockForm: () => set({ isBlocked: true }),

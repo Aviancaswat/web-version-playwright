@@ -20,6 +20,7 @@ import stepFields from "../../json/CreateTestForm/inputData.json";
 
 //Store
 import useTestStore from "../../store/useTestStore";
+import useEditTestStore from "../../store/useEditTestStore";
 
 //Components
 import SearchableSelectComponent from "../SearchableSelectComponent/SearchableSelectComponent";
@@ -32,7 +33,8 @@ import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 //TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
 
 const CreateTestFormComponent: React.FC = () => {
-  const { addTest, isBlocked } = useTestStore();
+  const { addTest, isBlocked, updateTest } = useTestStore();
+  const { editTest, testIndexToEdit, cleanEditTest } = useEditTestStore();
 
   const [steps, setSteps] = useState<number[]>([0]);
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -57,6 +59,26 @@ const CreateTestFormComponent: React.FC = () => {
   const [formData, setFormData] = useState(initializeFormData);
 
   const stepRefs = useRef<HTMLElement[]>([]);
+
+  useEffect(() => {
+    if (editTest) {
+      const updatedData: typeof formData = { ...editTest };
+
+      stepFields.forEach((step) => {
+        step.input.forEach((field) => {
+          if (field.type === "date" && updatedData[field.name]) {
+            updatedData[field.name] =
+              formatDate(updatedData[field.name], "yyyy-mm-dd") ?? "";
+          }
+        });
+      });
+
+      setFormData(updatedData);
+      if (editTest.targetPage) {
+        applyTargetPageFunction(editTest.targetPage);
+      }
+    }
+  }, [editTest]);
 
   useEffect(() => {
     if (stepRefs.current[currentStep]) {
@@ -91,6 +113,36 @@ const CreateTestFormComponent: React.FC = () => {
     });
   }, [formData.homeisActiveOptionOutbound]);
 
+  const applyTargetPageFunction = (targetPage: string) => {
+    const targetPageField = stepFields!.find((step) => step.key === 0);
+    const targetPageInput = targetPageField?.input;
+    const targetPageInputField = targetPageInput?.find(
+      (field) => field.name === "targetPage"
+    );
+
+    const selectedOption = targetPageInputField?.option?.find(
+      (option) => option.value === targetPage
+    );
+
+    if (selectedOption && "stepKey" in selectedOption) {
+      const targetKey = selectedOption.stepKey as number;
+
+      const newTargetMethodOptions = getMethodOptionsByStep(targetKey);
+
+      setDependentFieldOption({
+        ...dependentFieldOption,
+        targetMethod: newTargetMethodOptions,
+      });
+
+      const newSteps = stepFields
+        .filter((step) => step.key <= targetKey)
+        .map((step) => step.key);
+
+      setSteps(newSteps);
+      setCurrentStep(0);
+    }
+  };
+
   const getMethodOptionsByStep = (targetKey: number) => {
     let accumulatedOptions: Option[] = [];
 
@@ -114,33 +166,7 @@ const CreateTestFormComponent: React.FC = () => {
     }));
 
     if (steps[currentStep] === 0 && e.target.name === "targetPage") {
-      const targetPageField = stepFields!.find((step) => step.key === 0);
-      const targetPageInput = targetPageField?.input;
-      const targetPageInputField = targetPageInput?.find(
-        (field) => field.name === "targetPage"
-      );
-
-      const selectedOption = targetPageInputField?.option?.find(
-        (option) => option.value === e.target.value
-      );
-
-      if (selectedOption && "stepKey" in selectedOption) {
-        const targetKey = selectedOption.stepKey as number;
-
-        const newTargetMethodOptions = getMethodOptionsByStep(targetKey);
-
-        setDependentFieldOption({
-          ...dependentFieldOption,
-          targetMethod: newTargetMethodOptions,
-        });
-
-        const newSteps = stepFields
-          .filter((step) => step.key <= targetKey)
-          .map((step) => step.key);
-
-        setSteps(newSteps);
-        setCurrentStep(0);
-      }
+      applyTargetPageFunction(e.target.value);
     }
   };
 
@@ -154,7 +180,8 @@ const CreateTestFormComponent: React.FC = () => {
     stepFields.forEach((step) => {
       step.input.forEach((field) => {
         if (field.type === "date" && transformedData[field.name]) {
-          transformedData[field.name] = formatDate(transformedData[field.name]);
+          transformedData[field.name] =
+            formatDate(transformedData[field.name], "mm-dd") ?? "";
         }
 
         if (field.type === "number" && transformedData[field.name]) {
@@ -165,7 +192,13 @@ const CreateTestFormComponent: React.FC = () => {
       });
     });
 
-    addTest(transformedData);
+    if (editTest && testIndexToEdit !== null) {
+      updateTest(testIndexToEdit, transformedData);
+      cleanEditTest();
+    } else {
+      addTest(transformedData);
+    }
+
     setFormData(initializeFormData);
     setDependentFieldOption({});
     setSteps([0]);
@@ -227,27 +260,59 @@ const CreateTestFormComponent: React.FC = () => {
     return dependencyValue === field.showIf.equals;
   };
 
-  const formatDate = (dateString: string | number) => {
+  const formatDate = (dateString: string | number, typeFormat: string) => {
     if (!dateString) return "";
 
-    const [, month, day] = dateString.toString().split("-");
+    if (typeFormat === "mm-dd") {
+      const [, month, day] = dateString.toString().split("-");
 
-    const months = [
-      "jan",
-      "feb",
-      "mar",
-      "apr",
-      "may",
-      "jun",
-      "jul",
-      "aug",
-      "sep",
-      "oct",
-      "nov",
-      "dec",
-    ];
+      const months = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+      ];
 
-    return `${months[Number(month) - 1]} ${Number(day)}`;
+      return `${months[Number(month) - 1]} ${Number(day)} `;
+    }
+
+    if (typeFormat === "yyyy-mm-dd") {
+      const months: Record<string, string> = {
+        jan: "01",
+        feb: "02",
+        mar: "03",
+        apr: "04",
+        may: "05",
+        jun: "06",
+        jul: "07",
+        aug: "08",
+        sep: "09",
+        oct: "10",
+        nov: "11",
+        dec: "12",
+      };
+
+      const [mon, dayStr] = (dateString as string).split(" ");
+      const day = String(dayStr).padStart(2, "0");
+      const today = new Date();
+      const year = today.getFullYear();
+
+      let candidate = new Date(`${year}-${months[mon.toLowerCase()]}-${day}`);
+
+      if (candidate < today) {
+        candidate.setFullYear(year + 1);
+      }
+
+      return candidate.toISOString().split("T")[0];
+    }
   };
 
   return (
@@ -341,7 +406,15 @@ const CreateTestFormComponent: React.FC = () => {
 
                   {field.type === "searchable-select" && field.option && (
                     <SearchableSelectComponent
-                      options={field.option}
+                      options={
+                        field.name === "homeCiudadDestino" &&
+                        formData["homeCiudadOrigen"]
+                          ? field.option.filter(
+                              (option) =>
+                                option.value !== formData["homeCiudadOrigen"]
+                            )
+                          : field.option
+                      }
                       value={formData[field.name] || ""}
                       onChange={(val) =>
                         setFormData((prev) => ({ ...prev, [field.name]: val }))
@@ -353,6 +426,7 @@ const CreateTestFormComponent: React.FC = () => {
                     field.type !== "searchable-select" && (
                       <Input
                         type={field.type}
+                        min={new Date().toISOString().split("T")[0]}
                         name={field.name}
                         disabled={isBlocked}
                         placeholder={
@@ -421,7 +495,7 @@ const CreateTestFormComponent: React.FC = () => {
               borderRadius="full"
               isDisabled={!isStepComplete(steps[currentStep])}
             >
-              Crear prueba
+              {editTest ? "Actualizar prueba" : "Crear prueba"}
             </Button>
           )
         )}

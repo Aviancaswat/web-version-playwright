@@ -12,12 +12,14 @@ import {
   HStack,
   Input,
   Circle,
+  IconButton,
 } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { CheckIcon, CloseIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 // Store
 import useTestStore from "../../store/useTestStore";
 import useLoadingStore from "../../store/useLoadingStore";
+import useEditTestStore from "../../store/useEditTestStore";
 
 //Services
 import {
@@ -29,11 +31,11 @@ import {
 //Types
 import type { TestResultData } from "./TestListComponent.types";
 
-//TODO: Agregar boton de editar prueba
-
 const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests, blockForm, unblockForm } =
     useTestStore();
+
+  const { setEditTest } = useEditTestStore();
 
   const { setShowLoading } = useLoadingStore();
 
@@ -179,16 +181,33 @@ const TestListComponent: React.FC = () => {
                       </Text>
                       <HStack>
                         {resultData?.status !== "completed" && (
-                          <Button
-                            size="xs"
+                          <IconButton
+                            size="sm"
+                            aria-label="Eliminar"
+                            title="Eliminar"
+                            icon={<DeleteIcon />}
                             colorScheme="red"
+                            _hover={{borderColor: "#FF0000"}}
+                            variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
                               removeTest(index);
                             }}
-                          >
-                            Eliminar
-                          </Button>
+                          />
+                        )}
+                        {resultData?.status !== "completed" && (
+                          <IconButton
+                            size="sm"
+                            aria-label="Editar"
+                            title="Editar"
+                            icon={<EditIcon />}
+                            colorScheme="blue"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditTest(test, index);
+                            }}
+                          />
                         )}
                         <AccordionIcon />
                       </HStack>

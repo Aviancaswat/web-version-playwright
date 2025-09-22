@@ -3,21 +3,24 @@ import { Box } from "@chakra-ui/react";
 //Components
 import CreateTestFormComponent from "../CreateTestFormComponent/CreateTestFormComponent";
 import TestListComponent from "../TestListComponent/TestListComponent";
+
+//Constants
 const NAVBAR_H = "63px";
+
 const CreateWorkflowBody: React.FC = () => {
   return (
     <Box
       minH={`calc(100dvh - ${NAVBAR_H})`}
       display="flex"
       justifyContent="center"
-      alignItems="center" 
+      alignItems="center"
       px={{ base: 4, lg: 0 }}
     >
       <Box
         w={{ base: "unset", lg: "1004px" }}
         display="grid"
         gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }}
-        alignItems="stretch"           
+        alignItems="stretch"
         columnGap="5rem"
         rowGap="2rem"
       >
@@ -29,7 +32,6 @@ const CreateWorkflowBody: React.FC = () => {
         </Box>
       </Box>
     </Box>
-
   );
 };
 
