@@ -208,3 +208,40 @@ export const downLoadReportHTML = async (workflowRunId?: number) => {
         throw error;
     }
 }
+
+export const getAllWorkflowsByRepo = async () => {
+    try {
+
+        const data = await octokit.request('GET /repos/{owner}/{repo}/actions/workflows', {
+            owner: owner,
+            repo: repo,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+        console.log("Data workflows: ", data)
+        return data;
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo ${error}`)
+        throw error;
+    }
+}
+
+export const getRunsByRepo = async () => {
+    try {
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs', {
+            owner: owner,
+            repo: repo,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+        console.log("Data runs by repo: ", data)
+        return data;
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo ${error}`)
+        throw error;
+    }
+}
