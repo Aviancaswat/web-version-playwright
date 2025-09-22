@@ -1,7 +1,7 @@
 import { Button, Menu, MenuButton, MenuItem, MenuList, SkeletonText, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useEffect, useId, useState, type ReactElement } from "react";
-import { type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
 
@@ -37,9 +37,18 @@ const tableData: TableItems[] = [
     }
 ]
 
+type DataWorkflows = {
+    id: number,
+    display_title: string,
+    status: string | null,
+    conclusion: string | null,
+    total_count: number,
+}
+
 const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 
     const [isLoading, setLoading] = useState<boolean>(false)
+    const [dataWorkflows, setDataWorkflows] = useState<DataWorkflows[]>([])
 
     const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
         switch (value) {
@@ -63,23 +72,47 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
     }
 
     useEffect(() => {
-        setLoading(true)
-        let timeOut: NodeJS.Timeout;
-        timeOut = setTimeout(() => {
-            setLoading(false)
-        }, 3000);
+        try {
+            setLoading(true)
+            const getWorkflows = async () => {
+                const { workflow_runs, total_count } = await getRunsByRepo()
+                if (total_count === 0) throw new Error("No hay workflows"); // no hay workflows
+                console.log("workflow_runs: ", workflow_runs)
 
-        () => clearTimeout(timeOut)
+                // Aquí puedes procesar los workflows obtenidos
+                const newData: DataWorkflows[] = workflow_runs.map(workflow => {
+                    return {
+                        id: workflow.id,
+                        display_title: workflow.display_title,
+                        status: workflow.status,
+                        conclusion: workflow.conclusion,
+                        total_count: total_count
+                    };
+                });
+
+                setDataWorkflows(newData);
+                return newData;
+            }
+
+            getWorkflows();
+        }
+        catch (error) {
+            console.log(error)
+            throw error;
+        }
+        finally {
+            setLoading(false);
+        }
     }, [])
 
     return (
         <>
             {
-                data.map((row, index) => (
+                dataWorkflows.map((row, index) => (
                     <Tr key={index}>
                         <Td>
                             <SkeletonText p={0} m={0} isLoaded={!isLoading} noOfLines={1} skeletonHeight={2}>
-                                {row.workflowname}
+                                {row.display_title}
                             </SkeletonText>
                         </Td>
                         <Td>
@@ -90,7 +123,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                 noOfLines={1}
                                 skeletonHeight={2}
                             >
-                                {parserValueWorkflow(row.statusWorkflow)}
+                                {parserValueWorkflow(row.status as StatusWorkflow)}
                             </SkeletonText>
                         </Td>
                         <Td>
@@ -101,7 +134,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                 noOfLines={1}
                                 skeletonHeight={2}
                             >
-                                {parserValueWorkflow(row.resultWorkflow)}
+                                {parserValueWorkflow(row.conclusion as ResultWorkflow)}
                             </SkeletonText>
                         </Td>
                         <Td>
@@ -112,7 +145,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                 noOfLines={1}
                                 skeletonHeight={2}
                             >
-                                {row.timeExecute}
+                                {index}
                             </SkeletonText>
                         </Td>
                         <Td>

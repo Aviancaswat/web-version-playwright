@@ -1,10 +1,8 @@
 import { Box, Button, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
 import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube, Timer } from "lucide-react"
-import { useEffect } from "react"
 import type { CardDetailsDashProps } from "../components/dashboard/card-details"
 import CardDetailsDash from "../components/dashboard/card-details"
 import TableWorkflowsDash from "../components/dashboard/table-workflows"
-import { getRunsByRepo } from "../github/api"
 
 const dataCardsDetailsDash: CardDetailsDashProps[] = [
     {
@@ -38,12 +36,11 @@ const dataCardsDetailsDash: CardDetailsDashProps[] = [
 ]
 
 const DashboardPage = () => {
-    useEffect(() => {
-        const getWorkflows = async () => {
-            await getRunsByRepo()
-        }
-        getWorkflows()
-    }, [])
+
+
+    //display_title = nombre del workflow o del commit
+    //status = completed
+    //conclusion = failure
 
     return (
         <Box height={"100%"}>
