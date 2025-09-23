@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { DataWorkflows } from '../components/dashboard/table-workflows'
 import type { ResultWorkflow, StatusWorkflow } from '../github/api'
 
 type State = {
-    statusWorkflow: StatusWorkflow,
+    statusWorkflow: StatusWorkflow
     resultWorkflow: ResultWorkflow
+    dataWorkflows: DataWorkflows[]
 }
 
 type Actions = {
-    setStatusWorkflow: (newStatus: StatusWorkflow) => void,
-    setResultWorkflow: (newResult: ResultWorkflow) => void
+    setStatusWorkflow: (newStatus: StatusWorkflow) => void;
+    setResultWorkflow: (newResult: ResultWorkflow) => void;
+    setDataWorkflows: (newData: DataWorkflows[]) => void;
 }
 
 type Store = State & Actions
@@ -19,8 +22,10 @@ const store = create<Store>()(
         (set) => ({
             statusWorkflow: "queued",
             resultWorkflow: "neutral",
+            dataWorkflows: [],
             setStatusWorkflow: (newState) => set(() => ({ statusWorkflow: newState })),
-            setResultWorkflow: (newResult) => set(() => ({ resultWorkflow: newResult }))
+            setResultWorkflow: (newResult) => set(() => ({ resultWorkflow: newResult })),
+            setDataWorkflows: (newData) => set(() => ({ dataWorkflows: newData }))
         }),
         {
             name: "test-store"
@@ -29,11 +34,13 @@ const store = create<Store>()(
 )
 
 export const useTestStore = () => {
-    const { statusWorkflow, resultWorkflow, setStatusWorkflow, setResultWorkflow } = store()
+    const { statusWorkflow, resultWorkflow, setStatusWorkflow, setResultWorkflow, dataWorkflows, setDataWorkflows } = store()
     return {
         statusWorkflow,
         resultWorkflow,
         setStatusWorkflow,
-        setResultWorkflow
+        setResultWorkflow,
+        dataWorkflows,
+        setDataWorkflows
     }
 }

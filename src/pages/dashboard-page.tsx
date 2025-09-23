@@ -1,46 +1,66 @@
 import { Box, Button, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
-import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube, Timer } from "lucide-react"
+import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube } from "lucide-react"
+import { useEffect, useState } from "react"
 import type { CardDetailsDashProps } from "../components/dashboard/card-details"
 import CardDetailsDash from "../components/dashboard/card-details"
 import TableWorkflowsDash from "../components/dashboard/table-workflows"
+import { useTestStore } from "../store/test-store"
 
 const dataCardsDetailsDash: CardDetailsDashProps[] = [
     {
         icon: TestTube,
         title: "Total exitosas",
-        value: 150,
+        value: 0,
         type: "success",
-        stat: 75.25
+        stat: 0
     },
     {
         icon: Bug,
         title: "Total fallidas",
-        value: 10,
+        value: 0,
         type: "error",
-        stat: 10.75
+        stat: 0
     },
     {
         icon: CirclePause,
         title: "Total canceladas",
-        value: 5,
-        type: "cancelated",
-        stat: 10
-    },
-    {
-        icon: Timer,
-        title: "Total tiempo",
-        value: 5.45,
-        type: "time",
+        value: 0,
+        type: "cancelled",
         stat: 0
     }
 ]
 
 const DashboardPage = () => {
 
+    const { dataWorkflows } = useTestStore()
+    const [data, setDataCardsDetailsDash] = useState<CardDetailsDashProps[]>([])
 
-    //display_title = nombre del workflow o del commit
-    //status = completed
-    //conclusion = failure
+    useEffect(() => {
+        if (dataWorkflows.length > 0) {
+
+            const successWorkflows = dataWorkflows.filter(item => item.conclusion === "success").length;
+            const failureWorkflows = dataWorkflows.filter(item => item.conclusion === "failure").length;
+            const cancelledWorkflows = dataWorkflows.filter(item => item.conclusion === "cancelled").length;
+            const totalWorkflows = dataWorkflows.length;
+
+            const newData = dataCardsDetailsDash.map(card => {
+                switch (card.title) {
+                    case "Total exitosas":
+                        return { ...card, value: successWorkflows, stat: ((successWorkflows / totalWorkflows) * 100).toFixed(2) }
+                    case "Total fallidas":
+                        return { ...card, value: failureWorkflows, stat: ((failureWorkflows / totalWorkflows) * 100).toFixed(2) }
+                    case "Total canceladas":
+                        return { ...card, value: cancelledWorkflows, stat: ((cancelledWorkflows / totalWorkflows) * 100).toFixed(2) }
+                    case "Total tiempo":
+                        return { ...card, value: totalWorkflows, stat: ((totalWorkflows / totalWorkflows) * 100).toFixed(2) }
+                    default:
+                        return card
+                }
+            })
+
+            setDataCardsDetailsDash(newData)
+        }
+    }, [dataWorkflows])
 
     return (
         <Box height={"100%"}>
@@ -76,7 +96,7 @@ const DashboardPage = () => {
                     flexWrap={"wrap"}
                 >
                     {
-                        dataCardsDetailsDash.map((data, index) => (
+                        data.map((data, index) => (
                             <CardDetailsDash key={index} {...data} />
                         ))
                     }
@@ -86,7 +106,7 @@ const DashboardPage = () => {
                 <Heading as="h3" size={"md"} mb={5}>
                     Información general de los workflows
                 </Heading>
-                <Box width={"100%"} margin={"auto"}>
+                <Box width={"95%"} margin={"auto"}>
                     <TableWorkflowsDash />
                 </Box>
             </Box>

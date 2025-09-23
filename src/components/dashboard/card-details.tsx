@@ -6,7 +6,7 @@ export type CardDetailsDashProps = {
     icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>,
     title: string,
     value: string | number,
-    type: "success" | "error" | "cancelated" | "time",
+    type: "success" | "error" | "cancelled",
     stat: number | string
 }
 
@@ -27,7 +27,7 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
         let time: NodeJS.Timeout;
         time = setTimeout(() => {
             setLoading(false)
-        }, 3000);
+        }, 1000);
 
         () => clearTimeout(time)
     }, [])
@@ -36,13 +36,13 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
         <Card
             variant={"elevated"}
             height={150}
-            maxWidth={200}
-            width={"40%"}
+            maxWidth={250}
+            width={"100%"}
             p={2}
             bg={type === "success" ? "green.300" : ""}
             borderBottom={"6px solid green"}
         >
-            <HStack justify={"space-around"}>
+            <HStack justify={"space-between"}>
                 <Box>
                     <SkeletonText
                         isLoaded={!isLoading}
@@ -74,18 +74,16 @@ const CardDetailsDash: React.FC<CardDetailsDashProps> = (
                 <Stat width={"100%"}>
                     <StatNumber fontSize={"4xl"} display={"flex"} alignItems={"end"} gap={2}>
                         {value}
-                        <Text fontSize={"md"}>{type === "time" ? "horas" : "pruebas"}</Text>
+                        <Text fontSize={"md"}>{"pruebas"}</Text>
                     </StatNumber>
                     {
-                        type !== "time" && (
-                            <StatHelpText>
-                                <StatArrow
-                                    color={type === "success" ? "green.800" : (type === "error" ? "red.500" : "gray.800")}
-                                    type={type === "success" ? "increase" : (type === "error" ? "decrease" : "decrease")}
-                                />
-                                {stat}%
-                            </StatHelpText>
-                        )
+                        <StatHelpText>
+                            <StatArrow
+                                color={type === "success" ? "green.800" : (type === "error" ? "red.500" : "gray.800")}
+                                type={type === "success" ? "increase" : (type === "error" ? "decrease" : "decrease")}
+                            />
+                            {stat}%
+                        </StatHelpText>
                     }
                 </Stat>
             </Skeleton>

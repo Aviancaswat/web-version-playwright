@@ -26,7 +26,7 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
                 case "queued":
                     return { color: "yellow", text: "Inicializando", icon: Clock5 };
                 case "cancelled":
-                    return { color: "white", text: "Cancelado", icon: RefreshCwOff }
+                    return { color: "orange", text: "Cancelado", icon: RefreshCwOff }
                 case "neutral":
                 default:
                     return { color: "gray", text: "Por definir", icon: CircleQuestionMark }

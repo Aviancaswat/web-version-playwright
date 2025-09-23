@@ -1,54 +1,24 @@
-import { Button, Menu, MenuButton, MenuItem, MenuList, SkeletonText, Spinner, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
-import { useEffect, useId, useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
 
-type TableItems = {
-    workflowname: string,
-    statusWorkflow: StatusWorkflow,
-    resultWorkflow: ResultWorkflow,
-    timeExecute: string | number
-}
-
-type TableWorkflowItemsProps = {
-    data: TableItems[]
-}
-
-const tableData: TableItems[] = [
-    {
-        workflowname: "Ruta de BOG-STA",
-        statusWorkflow: "in_progress",
-        resultWorkflow: undefined,
-        timeExecute: "Por definir"
-    },
-    {
-        workflowname: "Llenado de formulario de pasajeros",
-        statusWorkflow: "queued",
-        resultWorkflow: undefined,
-        timeExecute: "Por definir"
-    },
-    {
-        workflowname: "Ruta de BOG-CALI",
-        statusWorkflow: "completed",
-        resultWorkflow: "success",
-        timeExecute: "2.50"
-    }
-]
-
-type DataWorkflows = {
+export type DataWorkflows = {
     id: number,
     display_title: string,
     status: string | null,
     conclusion: string | null,
-    total_count: number,
+    total_count: number
 }
 
-const TableWorkflowItems = () => {
+type TableWorkflowItemsProps = {
+    data: DataWorkflows[];
+}
 
-    const [isLoading, setLoading] = useState<boolean>(false)
-    const [dataWorkflows, setDataWorkflows] = useState<DataWorkflows[]>([])
+const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 
     const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
         switch (value) {
@@ -71,119 +41,78 @@ const TableWorkflowItems = () => {
         }
     }
 
-    useEffect(() => {
-        try {
-            const getWorkflows = async () => {
-                setLoading(true)
-                const { workflow_runs, total_count } = await getRunsByRepo()
-                if (total_count === 0) throw new Error("No hay workflows"); // no hay workflows
-                console.log("workflow_runs: ", workflow_runs)
-
-                // Aquí puedes procesar los workflows obtenidos
-                const newData: DataWorkflows[] = workflow_runs.map(workflow => {
-                    return {
-                        id: workflow.id,
-                        display_title: workflow.display_title,
-                        status: workflow.status,
-                        conclusion: workflow.conclusion,
-                        total_count: total_count
-                    };
-                });
-
-                setDataWorkflows(newData);
-                return newData;
-            }
-            getWorkflows();
-        }
-        catch (error) {
-            console.log(error)
-            throw error;
-        }
-        finally {
-            setLoading(false);
-        }
-    }, [])
-
     return (
         <>
-            <span>{isLoading ? "true" : "false"} - Hola</span>
             {
-                isLoading ? (
-                    <Spinner
-                        thickness='4px'
-                        speed='0.65s'
-                        emptyColor='gray.200'
-                        color='blue.500'
-                        size='xl'
-                    />
-                ) :
-
-                    dataWorkflows.map((row, index) => (
-                        <Tr key={index}>
-
-                            <Td>
-                                <SkeletonText p={0} m={0} isLoaded={!isLoading} noOfLines={1} skeletonHeight={2}>
-                                    {row.display_title}
-                                </SkeletonText>
-                            </Td>
-                            <Td>
-                                <SkeletonText
-                                    p={0}
-                                    m={0}
-                                    isLoaded={!isLoading}
-                                    noOfLines={1}
-                                    skeletonHeight={2}
-                                >
-                                    {parserValueWorkflow(row.status as StatusWorkflow)}
-                                </SkeletonText>
-                            </Td>
-                            <Td>
-                                <SkeletonText
-                                    p={0}
-                                    m={0}
-                                    isLoaded={!isLoading}
-                                    noOfLines={1}
-                                    skeletonHeight={2}
-                                >
-                                    {parserValueWorkflow(row.conclusion as ResultWorkflow)}
-                                </SkeletonText>
-                            </Td>
-                            <Td>
-                                <SkeletonText
-                                    p={0}
-                                    m={0}
-                                    isLoaded={!isLoading}
-                                    noOfLines={1}
-                                    skeletonHeight={2}
-                                >
-                                    {index}
-                                </SkeletonText>
-                            </Td>
-                            <Td>
-                                <Menu closeOnSelect={false}>
-                                    <MenuButton as={Button} bg="none">
-                                        <GripHorizontal />
-                                    </MenuButton>
-                                    <MenuList>
-                                        <MenuItem icon={<FolderDown />}>Descargar Reporte</MenuItem>
-                                        <MenuItem icon={<ImageDown />}>Descargar Imagenes</MenuItem>
-                                        <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
-                                    </MenuList>
-                                </Menu>
-                            </Td>
-                        </Tr>
-                    ))
+                data.map((row) => (
+                    <Tr key={row.id}>
+                        <Td>{row.display_title}</Td>
+                        <Td>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
+                        <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
+                        <Td>
+                            <Menu closeOnSelect={false}>
+                                <MenuButton as={Button} bg="none">
+                                    <GripHorizontal />
+                                </MenuButton>
+                                <MenuList>
+                                    <MenuItem icon={<FolderDown />}>Descargar Reporte</MenuItem>
+                                    <MenuItem icon={<ImageDown />}>Descargar Imagenes</MenuItem>
+                                    <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
+                                </MenuList>
+                            </Menu>
+                        </Td>
+                    </Tr>
+                ))
             }
         </>
-    )
-}
+    );
+};
 
 const TableWorkflowsDash: React.FC = () => {
+    const [isLoading, setLoading] = useState<boolean>(false);
+    const { setDataWorkflows, dataWorkflows } = useTestStore()
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 3;
+
+    useEffect(() => {
+        const getWorkflows = async () => {
+            setLoading(true);
+            try {
+                const { workflow_runs, total_count } = await getRunsByRepo();
+                if (total_count === 0) throw new Error("No hay workflows");
+
+                const newData: DataWorkflows[] = workflow_runs.map(workflow => ({
+                    id: workflow.id,
+                    display_title: workflow.display_title,
+                    status: workflow.status,
+                    conclusion: workflow.conclusion,
+                    total_count: total_count
+                }));
+
+                setDataWorkflows(newData);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getWorkflows();
+    }, []);
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = dataWorkflows.slice(indexOfFirstItem, indexOfLastItem);
+
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
     return (
         <TableContainer
-            p={3}
+            p={1}
             boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
             borderRadius={"md"}
+            width={"100%"}
+            position="relative"
         >
             <Table size='sm' variant={"striped"} colorScheme="green" width={"100%"}>
                 <Thead>
@@ -191,23 +120,53 @@ const TableWorkflowsDash: React.FC = () => {
                         <Th>Nombre del workflow</Th>
                         <Th>Status</Th>
                         <Th>Resultado</Th>
-                        <Th>Tiempo(min)</Th>
                         <Th>Acciones</Th>
                     </Tr>
                 </Thead>
-                <Tbody>
-                    <TableWorkflowItems key={useId()} />
+                <Tbody width={"100%"} height={100} position="relative">
+                    {
+                        isLoading ? (
+                            <Box
+                                width={"100%"}
+                                display={"flex"}
+                                justifyContent={"center"}
+                                alignItems={"center"}
+                                position={"absolute"}
+                                top={0}
+                                left={0}
+                                right={0}
+                                bottom={0}
+                                zIndex={1}
+                            >
+                                <Spinner
+                                    thickness='4px'
+                                    speed='0.65s'
+                                    emptyColor='gray.200'
+                                    color='green.500'
+                                    size='xl'
+                                />
+                            </Box>
+                        ) : (
+                            currentItems.length > 0 && (
+                                <TableWorkflowItems data={currentItems} />
+                            )
+                        )}
                 </Tbody>
                 <Tfoot>
                     <Tr m={0} p={0}>
                         <Th m={0} p={0}>
-                            <PaginationTableDash />
+                            <PaginationTableDash
+                                totalItems={dataWorkflows.length}
+                                itemsPerPage={itemsPerPage}
+                                currentPage={currentPage}
+                                paginate={paginate}
+                            />
                         </Th>
                     </Tr>
                 </Tfoot>
             </Table>
-        </TableContainer >
-    )
-}
+        </TableContainer>
+    );
+};
 
-export default TableWorkflowsDash
+export default TableWorkflowsDash;

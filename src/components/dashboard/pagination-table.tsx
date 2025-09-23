@@ -1,33 +1,35 @@
-import { Button, ButtonGroup } from "@chakra-ui/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Box, Button } from "@chakra-ui/react";
 
-const PaginationTableDash = () => {
+type PaginationProps = {
+    totalItems: number;
+    itemsPerPage: number;
+    currentPage: number;
+    paginate: (pageNumber: number) => void;
+};
+
+const PaginationTableDash: React.FC<PaginationProps> = ({ totalItems, itemsPerPage, currentPage, paginate }) => {
+    const pageNumbers = [];
+
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+        pageNumbers.push(i);
+    }
+
     return (
-        <ButtonGroup
-            width={"100%"}
-            mt={2}
-            display={"flex"}
-            alignItems={"center"}
-        >
-            <Button
-                size={"xs"}
-                colorScheme="green"
-            >
-                <ChevronLeft size={15}/>
-            </Button>
-            {
-                [1, 2, 3, 4, 5, 6, 7, 8, 9].map((btn, index) => (
-                    <Button key={index} size={"xs"} colorScheme="green" variant={"outline"}>{btn}</Button>
-                ))
-            }
-            <Button
-                size={"xs"}
-                colorScheme="green"
-            >
-                <ChevronRight size={15}/>
-            </Button>
-        </ButtonGroup>
-    )
-}
+        <Box display="flex" float={"left"}>
+            {pageNumbers.map(number => (
+                <Button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    colorScheme={currentPage === number ? "green" : "gray"}
+                    variant="solid"
+                    size={"xs"}
+                    m={1}
+                >
+                    {number}
+                </Button>
+            ))}
+        </Box>
+    );
+};
 
 export default PaginationTableDash;

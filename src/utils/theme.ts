@@ -4,8 +4,8 @@ import '@fontsource-variable/inter'
 
 const Button = defineStyleConfig({
   baseStyle: {
-      bg: "red",
-      color: "blue"
+    _hover: { bg: "green.500", border: "none", color: "white" },
+    _focus: { border: "none", outline: "none" }
   }
 })
 
