@@ -1,13 +1,14 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+
+//Components
+import HomeBody from "../components/HomeBody/HomeBody";
 
 const HomePage = () => {
-    return (
-        <Box display={"grid"} placeContent={"center"} height={"100%"}>
-            <Heading>
-                Home Page
-            </Heading>
-        </Box>
-    )
-}
+  return (
+    <Box display={"grid"} placeContent={"center"} height={"100%"}>
+      <HomeBody />
+    </Box>
+  );
+};
 
 export default HomePage;
