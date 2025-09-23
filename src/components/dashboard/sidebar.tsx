@@ -28,7 +28,7 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
             p={2}
             height={"100vh"}
             maxWidth={320}
-            bg={"green.900"}
+            bg={"whiteAlpha.900"}
             position={"relative"}
         >
             <Box>
@@ -39,12 +39,12 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
                     as="h1"
                     size={"lg"}
                     textAlign="center"
-                    color={"whiteAlpha.900"}
+                    color={"black"}
                 >
                     Avianca Playwright
                 </Heading>
                 <Box p="1">
-                    <Text mt={2} color="gray.300" textAlign="center">
+                    <Text mt={2} color="black" textAlign="center">
                         Visualiza y gestiona tus workflows
                     </Text>
                     <Divider mt={5} />
@@ -54,7 +54,7 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
                             width="100%"
                             display="flex"
                             flexDirection="column"
-                            color={"whiteAlpha.900"}
+                            color={"black"}
                         >
                             {
                                 childrens.map((child, item) => (
@@ -70,7 +70,7 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
                     bottom={0}
                 >
                     <Divider />
-                    <Text mt={3} mb={3} width="100%" textAlign="center" color={"whiteAlpha.900"}>Avianca Evolutivos - {new Date().getFullYear()}</Text>
+                    <Text mt={3} mb={3} width="100%" textAlign="center" color={"black"}>Avianca Evolutivos - {new Date().getFullYear()}</Text>
                 </Box>
             </Box>
         </VStack>

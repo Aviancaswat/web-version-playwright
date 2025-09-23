@@ -1,4 +1,4 @@
-import { Box, Button, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
+import { Box, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
 import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube, Timer } from "lucide-react"
 import type { CardDetailsDashProps } from "../components/dashboard/card-details"
 import CardDetailsDash from "../components/dashboard/card-details"
@@ -45,12 +45,11 @@ const DashboardPage = () => {
                 </VStack>
                 <Menu>
                     <MenuButton
-                        as={Button}
-                        bg={"green.900"}
-                        color={"white"}
-                        _hover={{
-                            bg: "green.600"
-                        }}
+                        aria-label="Abrir menú"
+                        color="gray.700"
+                        _hover={{ bg: "gray.100" }}
+                        _active={{ bg: "gray.200" }}
+                        _focusVisible={{ boxShadow: "0 0 0 2px var(--chakra-colors-gray-300)" }}
                     >
                         <AlignJustify />
                     </MenuButton>
