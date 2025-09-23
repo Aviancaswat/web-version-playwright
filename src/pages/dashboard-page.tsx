@@ -1,8 +1,10 @@
 import { Box, Button, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
+import { PDFDownloadLink } from '@react-pdf/renderer'
 import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { CardDetailsDashProps } from "../components/dashboard/card-details"
 import CardDetailsDash from "../components/dashboard/card-details"
+import InformDocument from "../components/dashboard/inform-document"
 import TableWorkflowsDash from "../components/dashboard/table-workflows"
 import { useTestStore } from "../store/test-store"
 
@@ -62,6 +64,10 @@ const DashboardPage = () => {
         }
     }, [dataWorkflows])
 
+    const handleDownloadPDF = () => {
+
+    }
+
     return (
         <Box height={"100%"}>
             <HStack justify={"space-between"}>
@@ -81,7 +87,17 @@ const DashboardPage = () => {
                         <AlignJustify />
                     </MenuButton>
                     <MenuList>
-                        <MenuItem icon={<FileChartLine />}>Exportar informe a PDF</MenuItem>
+
+                        <PDFDownloadLink document={<InformDocument />} fileName="informe-avianca-playwright.pdf">
+                            {({ loading }) => (loading ? 'Generando PDF...' : (
+                                <MenuItem
+                                    icon={<FileChartLine />}
+                                >
+                                    Exportar Informe PDF
+
+                                </MenuItem>
+                            ))}
+                        </PDFDownloadLink>
                         <MenuDivider />
                         <MenuItem pointerEvents={"none"} color={"gray.500"} textAlign={"center"} width={"100%"}>Avianca Evolutivos</MenuItem>
                     </MenuList>
