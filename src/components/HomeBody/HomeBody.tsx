@@ -131,6 +131,7 @@ const HomeBody = () => {
               width="40px"
             />
           </Box>
+          
           <Heading as="h4" fontSize="lg" mb={2} color="#1b1b1b">
             Reducir errores manuales
           </Heading>
