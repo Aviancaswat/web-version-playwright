@@ -17,7 +17,7 @@ const CreateWorkflowBody: React.FC = () => {
       px={{ base: 4, lg: 0 }}
     >
       <Box
-        w={{ base: "unset", lg: "1004px" }}
+        w={{ base: "unset", lg: "100%" }}
         display="grid"
         gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }}
         alignItems="stretch"

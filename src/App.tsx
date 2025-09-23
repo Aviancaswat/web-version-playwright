@@ -1,6 +1,8 @@
-import './App.css';
 import LayoutApp from './layout/layout-app';
 import RoutesApp from './routes/routes-app';
+
+//Styles
+import './App.css';
 
 const App = () => {
   return (

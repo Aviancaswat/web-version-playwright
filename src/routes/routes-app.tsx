@@ -1,4 +1,6 @@
 import { Route, Routes } from "react-router-dom"
+
+//Components
 import DashboardPage from "../pages/dashboard-page"
 import HomePage from "../pages/home-page"
 import NotFoundPage from "../pages/not-found-page"
