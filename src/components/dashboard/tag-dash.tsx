@@ -17,8 +17,9 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
         const getColor = (): { color: string, text: string, icon: LucideIconType } => {
             switch (type) {
                 case "success":
-                case "completed":
                     return { color: "green", text: "Exitoso", icon: CircleCheck };
+                case "completed":
+                    return { color: "green", text: "Completado", icon: CircleCheck };
                 case "failure":
                     return { color: "red", text: "Error", icon: CircleX }
                 case "in_progress":

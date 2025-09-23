@@ -1,7 +1,7 @@
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ReactElement } from "react";
-import { downLoadReportHTML, getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
@@ -21,6 +21,9 @@ type TableWorkflowItemsProps = {
 const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 
     const toast = useToast();
+    const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
+    const [isLoadingScreenshots, setIsLoadingScreenshots] = useState<boolean>(false);
+    const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
 
     const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
         switch (value) {
@@ -46,6 +49,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
     const handleDownloadReport = async (workflowId: number) => {
         console.log(`Descargando reporte para el workflow ${workflowId}`);
         try {
+            setIsLoadingReport(true)
             await downLoadReportHTML(workflowId);
             toast({
                 status: "success",
@@ -61,12 +65,16 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
             })
             throw error;
         }
+        finally {
+            setIsLoadingReport(false)
+        }
     }
 
     const handleDownloadScreenshots = async (workflowId: number) => {
         console.log(`Descargando imagenes para el workflow ${workflowId}`);
 
         try {
+            setIsLoadingScreenshots(true)
             await downLoadReportHTML(workflowId, "only-screenshots");
             toast({
                 status: "success",
@@ -82,6 +90,34 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                 description: error instanceof Error ? error.message : "Ocurrió un error al descargar las imagenes",
             })
             throw error;
+        }
+        finally {
+            setIsLoadingScreenshots(false)
+        }
+    }
+
+    const handleRunWorkflow = async (workflowId: number) => {
+        console.log(`Volviendo a ejecutar el workflow ${workflowId}`);
+        try {
+            setIsLoadingRun(true)
+            await runWorkflowById(workflowId);
+            toast({
+                status: "success",
+                title: "Workflow ejecutado",
+                description: `El workflow se está ejecutando correctamente`,
+            })
+        }
+        catch (error) {
+            console.error(`Error al ejecutar el workflow ${workflowId}:`, error);
+            toast({
+                status: "error",
+                title: "Error",
+                description: error instanceof Error ? error.message : "Ocurrió un error al ejecutar el workflow",
+            })
+            throw error;
+        }
+        finally {
+            setIsLoadingRun(false)
         }
     }
 
@@ -100,14 +136,17 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                 </MenuButton>
                                 <MenuList>
                                     <MenuItem
-                                        icon={<FolderDown />}
+                                        icon={isLoadingReport ? <Spinner size="sm" /> : <FolderDown />}
                                         onClick={() => handleDownloadReport(row.id)}
                                     >Descargar Reporte</MenuItem>
                                     <MenuItem
-                                        icon={<ImageDown />}
+                                        icon={isLoadingScreenshots ? <Spinner size="sm" /> : <ImageDown />}
                                         onClick={() => handleDownloadScreenshots(row.id)}
                                     >Descargar Imagenes</MenuItem>
-                                    <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
+                                    <MenuItem
+                                        icon={isLoadingRun ? <Spinner size="sm" /> : <RefreshCw />}
+                                        onClick={() => handleRunWorkflow(row.id)}
+                                    >Volver a ejecutar workflow</MenuItem>
                                 </MenuList>
                             </Menu>
                         </Td>

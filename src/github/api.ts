@@ -271,3 +271,24 @@ export const getRunsByRepo = async () => {
         throw error;
     }
 };
+
+export const runWorkflowById = async (runId: number) => {
+
+    if (!runId) throw new Error("No hay run id asignado")
+
+    try {
+
+        const response = await octokit.request('POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun', {
+            owner: owner,
+            repo: repo,
+            run_id: runId,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28',
+            }
+        })
+        return response;
+    } catch (error) {
+        console.error(`Ha ocurrido un error al ejecutar el workflow ${error}`);
+        throw error;
+    }
+}
