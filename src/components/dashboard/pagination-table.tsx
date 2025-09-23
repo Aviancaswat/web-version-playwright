@@ -26,8 +26,8 @@ const PaginationTableDash: React.FC<PaginationProps> = ({
         }
 
         const range = [];
-        const start = Math.max(currentPage - 3, 1);
-        const end = Math.min(currentPage + 3, totalPages);
+        const start = Math.max(currentPage - 1, 1);
+        const end = Math.min(currentPage + 5, totalPages);
 
         for (let i = start; i <= end; i++) {
             range.push(i);

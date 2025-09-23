@@ -1,4 +1,4 @@
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ReactElement } from "react";
 import { getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
@@ -134,14 +134,9 @@ const TableWorkflowsDash: React.FC = () => {
                                 display={"flex"}
                                 justifyContent={"center"}
                                 alignItems={"center"}
+                                mt={5}
                             >
-                                <Spinner
-                                    thickness='4px'
-                                    speed='0.65s'
-                                    emptyColor='gray.200'
-                                    color='green.500'
-                                    size='xl'
-                                />
+                               <Text>Cargando...</Text> <Spinner ml={2} />
                             </Box>
                         ) : (
                             currentItems.length > 0 && (
