@@ -229,19 +229,41 @@ export const getAllWorkflowsByRepo = async () => {
 }
 
 export const getRunsByRepo = async () => {
+    let allRuns: any[] = [];
+    let page = 1;
+    const perPage = 100; // Puedes ajustar el número de resultados por página (máximo 100)
+    let hasNextPage = true;
+
     try {
-        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs', {
-            owner: owner,
-            repo: repo,
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-            }
-        })
-        console.log("Data runs by repo: ", data)
-        return data;
+        while (hasNextPage) {
+            // Hacemos la solicitud por cada página
+            const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs', {
+                owner: owner,
+                repo: repo,
+                page: page,  // Página actual
+                per_page: perPage, // Número de resultados por página
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+
+            console.log(`Data for page ${page}: `, data);
+
+            // Agregar los runs de esta página al array de todos los runs
+            allRuns = [...allRuns, ...data.workflow_runs];
+
+            // Verificar si hay más páginas
+            hasNextPage = data.workflow_runs.length === perPage;
+
+            // Incrementar la página
+            page++;
+        }
+
+        console.log("All workflow runs: ", allRuns);
+        return allRuns; // Devuelve todos los runs obtenidos
     }
     catch (error) {
-        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo ${error}`)
+        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo: ${error}`);
         throw error;
     }
-}
+};

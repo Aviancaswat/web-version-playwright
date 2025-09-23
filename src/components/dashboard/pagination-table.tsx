@@ -7,27 +7,73 @@ type PaginationProps = {
     paginate: (pageNumber: number) => void;
 };
 
-const PaginationTableDash: React.FC<PaginationProps> = ({ totalItems, itemsPerPage, currentPage, paginate }) => {
-    const pageNumbers = [];
+const PaginationTableDash: React.FC<PaginationProps> = ({
+    totalItems,
+    itemsPerPage,
+    currentPage,
+    paginate,
+}) => {
+    const pageNumbers: any[] = [];
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+    for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
     }
 
+    const showPages = () => {
+        if (totalPages <= 10) {
+            return pageNumbers;
+        }
+
+        const range = [];
+        const start = Math.max(currentPage - 3, 1);
+        const end = Math.min(currentPage + 3, totalPages);
+
+        for (let i = start; i <= end; i++) {
+            range.push(i);
+        }
+
+        if (start > 1) range.unshift("...");
+        if (end < totalPages) range.push("...");
+
+        return range;
+    };
+
     return (
-        <Box display="flex" float={"left"}>
-            {pageNumbers.map(number => (
+        <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
+            <Button
+                onClick={() => paginate(currentPage - 1)}
+                isDisabled={currentPage === 1}
+                size="xs"
+                m={1}
+                variant="outline"
+            >
+                {"<"}
+            </Button>
+
+            {showPages().map((page, index) => (
                 <Button
-                    key={number}
-                    onClick={() => paginate(number)}
-                    colorScheme={currentPage === number ? "green" : "gray"}
+                    key={index}
+                    onClick={() => paginate(page === "..." ? currentPage : page)}
+                    colorScheme={currentPage === page ? "green" : "gray"}
                     variant="solid"
                     size={"xs"}
                     m={1}
+                    isDisabled={page === "..."}
                 >
-                    {number}
+                    {page}
                 </Button>
             ))}
+
+            <Button
+                onClick={() => paginate(currentPage + 1)}
+                isDisabled={currentPage === totalPages}
+                size="xs"
+                m={1}
+                variant="outline"
+            >
+                {">"}
+            </Button>
         </Box>
     );
 };

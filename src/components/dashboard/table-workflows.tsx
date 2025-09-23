@@ -1,4 +1,4 @@
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ReactElement } from "react";
 import { getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
@@ -78,15 +78,15 @@ const TableWorkflowsDash: React.FC = () => {
         const getWorkflows = async () => {
             setLoading(true);
             try {
-                const { workflow_runs, total_count } = await getRunsByRepo();
-                if (total_count === 0) throw new Error("No hay workflows");
+                const runs = await getRunsByRepo();
+                if (runs.length === 0) throw new Error("No hay workflows");
 
-                const newData: DataWorkflows[] = workflow_runs.map(workflow => ({
+                const newData: DataWorkflows[] = runs.map(workflow => ({
                     id: workflow.id,
                     display_title: workflow.display_title,
                     status: workflow.status,
                     conclusion: workflow.conclusion,
-                    total_count: total_count
+                    total_count: workflow.total_count
                 }));
 
                 setDataWorkflows(newData);
@@ -107,6 +107,7 @@ const TableWorkflowsDash: React.FC = () => {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     return (
+        <Box width={"100%"} mt={5} display={"flex"} flexDirection={"column"} alignItems={"center"} gap={3}>
         <TableContainer
             p={1}
             boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
@@ -152,20 +153,15 @@ const TableWorkflowsDash: React.FC = () => {
                             )
                         )}
                 </Tbody>
-                <Tfoot>
-                    <Tr m={0} p={0}>
-                        <Th m={0} p={0}>
-                            <PaginationTableDash
-                                totalItems={dataWorkflows.length}
-                                itemsPerPage={itemsPerPage}
-                                currentPage={currentPage}
-                                paginate={paginate}
-                            />
-                        </Th>
-                    </Tr>
-                </Tfoot>
             </Table>
         </TableContainer>
+        <PaginationTableDash
+                    totalItems={dataWorkflows.length}
+                    itemsPerPage={itemsPerPage}
+                    currentPage={currentPage}
+                    paginate={paginate}
+                />
+        </Box>
     );
 };
 
