@@ -55,7 +55,10 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                     <GripHorizontal />
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem icon={<FolderDown />}>Descargar Reporte</MenuItem>
+                                    <MenuItem 
+                                        icon={<FolderDown />}
+                                        onClick={() => console.log("Click en download file")}
+                                        >Descargar Reporte</MenuItem>
                                     <MenuItem icon={<ImageDown />}>Descargar Imagenes</MenuItem>
                                     <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
                                 </MenuList>
@@ -113,7 +116,6 @@ const TableWorkflowsDash: React.FC = () => {
             boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
             borderRadius={"md"}
             width={"100%"}
-            position="relative"
         >
             <Table size='sm' variant={"striped"} colorScheme="green" width={"100%"}>
                 <Thead>
@@ -124,7 +126,7 @@ const TableWorkflowsDash: React.FC = () => {
                         <Th>Acciones</Th>
                     </Tr>
                 </Thead>
-                <Tbody width={"100%"} height={100} position="relative">
+                <Tbody width={"100%"} height={100}>
                     {
                         isLoading ? (
                             <Box
@@ -132,12 +134,6 @@ const TableWorkflowsDash: React.FC = () => {
                                 display={"flex"}
                                 justifyContent={"center"}
                                 alignItems={"center"}
-                                position={"absolute"}
-                                top={0}
-                                left={0}
-                                right={0}
-                                bottom={0}
-                                zIndex={1}
                             >
                                 <Spinner
                                     thickness='4px'
