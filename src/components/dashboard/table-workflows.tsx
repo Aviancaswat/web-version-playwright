@@ -1,7 +1,7 @@
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react";
 import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ReactElement } from "react";
-import { getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { downLoadReportHTML, getRunsByRepo, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
@@ -19,6 +19,8 @@ type TableWorkflowItemsProps = {
 }
 
 const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
+
+    const toast = useToast();
 
     const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
         switch (value) {
@@ -41,6 +43,48 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
         }
     }
 
+    const handleDownloadReport = async (workflowId: number) => {
+        console.log(`Descargando reporte para el workflow ${workflowId}`);
+        try {
+            await downLoadReportHTML(workflowId);
+            toast({
+                status: "success",
+                title: "Reporte descargado",
+                description: `El reporte se descargó correctamente`,
+            })
+        } catch (error) {
+            console.error(`Error al descargar el reporte para el workflow ${workflowId}:`, error);
+            toast({
+                status: "error",
+                title: "Error",
+                description: error instanceof Error ? error.message : "Ocurrió un error al descargar el reporte",
+            })
+            throw error;
+        }
+    }
+
+    const handleDownloadScreenshots = async (workflowId: number) => {
+        console.log(`Descargando imagenes para el workflow ${workflowId}`);
+
+        try {
+            await downLoadReportHTML(workflowId, "only-screenshots");
+            toast({
+                status: "success",
+                title: "Imagenes descargadas",
+                description: `Las imagenes se descargaron correctamente`,
+            })
+        }
+        catch (error) {
+            console.error(`Error al descargar las imagenes para el workflow ${workflowId}:`, error);
+            toast({
+                status: "error",
+                title: "Error",
+                description: error instanceof Error ? error.message : "Ocurrió un error al descargar las imagenes",
+            })
+            throw error;
+        }
+    }
+
     return (
         <>
             {
@@ -55,11 +99,14 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                     <GripHorizontal />
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem 
+                                    <MenuItem
                                         icon={<FolderDown />}
-                                        onClick={() => console.log("Click en download file")}
-                                        >Descargar Reporte</MenuItem>
-                                    <MenuItem icon={<ImageDown />}>Descargar Imagenes</MenuItem>
+                                        onClick={() => handleDownloadReport(row.id)}
+                                    >Descargar Reporte</MenuItem>
+                                    <MenuItem
+                                        icon={<ImageDown />}
+                                        onClick={() => handleDownloadScreenshots(row.id)}
+                                    >Descargar Imagenes</MenuItem>
                                     <MenuItem icon={<RefreshCw />}>Volver a ejecutar workflow</MenuItem>
                                 </MenuList>
                             </Menu>
@@ -111,47 +158,47 @@ const TableWorkflowsDash: React.FC = () => {
 
     return (
         <Box width={"100%"} mt={5} display={"flex"} flexDirection={"column"} alignItems={"center"} gap={3}>
-        <TableContainer
-            p={1}
-            boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
-            borderRadius={"md"}
-            width={"100%"}
-        >
-            <Table size='sm' variant={"striped"} colorScheme="green" width={"100%"}>
-                <Thead>
-                    <Tr>
-                        <Th>Nombre del workflow</Th>
-                        <Th>Status</Th>
-                        <Th>Resultado</Th>
-                        <Th>Acciones</Th>
-                    </Tr>
-                </Thead>
-                <Tbody width={"100%"} height={100}>
-                    {
-                        isLoading ? (
-                            <Box
-                                width={"100%"}
-                                display={"flex"}
-                                justifyContent={"center"}
-                                alignItems={"center"}
-                                mt={5}
-                            >
-                               <Text>Cargando...</Text> <Spinner ml={2} />
-                            </Box>
-                        ) : (
-                            currentItems.length > 0 && (
-                                <TableWorkflowItems data={currentItems} />
-                            )
-                        )}
-                </Tbody>
-            </Table>
-        </TableContainer>
-        <PaginationTableDash
-                    totalItems={dataWorkflows.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    paginate={paginate}
-                />
+            <TableContainer
+                p={1}
+                boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
+                borderRadius={"md"}
+                width={"100%"}
+            >
+                <Table size='sm' variant={"striped"} colorScheme="green" width={"100%"}>
+                    <Thead>
+                        <Tr>
+                            <Th>Nombre del workflow</Th>
+                            <Th>Status</Th>
+                            <Th>Resultado</Th>
+                            <Th>Acciones</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody width={"100%"} height={100}>
+                        {
+                            isLoading ? (
+                                <Box
+                                    width={"100%"}
+                                    display={"flex"}
+                                    justifyContent={"center"}
+                                    alignItems={"center"}
+                                    mt={5}
+                                >
+                                    <Text>Cargando...</Text> <Spinner ml={2} />
+                                </Box>
+                            ) : (
+                                currentItems.length > 0 && (
+                                    <TableWorkflowItems data={currentItems} />
+                                )
+                            )}
+                    </Tbody>
+                </Table>
+            </TableContainer>
+            <PaginationTableDash
+                totalItems={dataWorkflows.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                paginate={paginate}
+            />
         </Box>
     );
 };

@@ -172,18 +172,33 @@ export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWor
     }
 }
 
-export const downLoadReportHTML = async (workflowRunId?: number) => {
+export const downLoadReportHTML = async (workflowRunId?: number, typeReport: "playwright" | "only-screenshots" = "playwright") => {
     console.log("workflowRunId pasado a download report: ", workflowRunId)
     if (!workflowRunId) throw new Error("No hay workflow id asignado")
 
     try {
         const { artifacts, total_count } = await getArtefactsByRepo()
 
-        if (total_count === 0) return;
-        const artifactFound = artifacts.find(e => e.name === "playwright-report" && (e.workflow_run && e.workflow_run.id === workflowRunId));
-        console.log("artifactFound: ", artifactFound)
-        if (!artifactFound) return;
-        const artifactId = artifactFound.id;
+        console.log("artifacts: ", artifacts)
+
+        if (total_count === 0) throw new Error("No se encontraron reportes asociados al workflow");
+
+        let artifactId: number = 0;
+        let reports: any[] = [];
+
+        if (typeReport === "playwright") {
+            reports = artifacts.filter(e => e.name === "playwright-report");
+        }
+        else if (typeReport === "only-screenshots") {
+            reports = artifacts.filter(e => e.name === "results-by-test");
+        }
+
+        const reportFound = reports.find(e => e.workflow_run && e.workflow_run.id === workflowRunId);
+        console.log("reportFound: ", reportFound);
+        if (!reportFound) throw new Error("No se encontró ningun reporte asociado al workflow");
+        artifactId = reportFound.id;
+
+        console.log("artifactId: ", artifactId)
         const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
             owner: owner,
             repo: repo,
@@ -198,7 +213,7 @@ export const downLoadReportHTML = async (workflowRunId?: number) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `reporte-html-${getTimestamp()}.zip`;
+        a.download = typeReport === "playwright" ? `reporte-html-${getTimestamp()}.zip` : `reporte-screenshots-${getTimestamp()}.zip`;
         a.click();
         URL.revokeObjectURL(url);
         console.log("Reponse download: ", data)
