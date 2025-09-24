@@ -117,26 +117,6 @@ export const replaceDataforNewTest = async (newTestData: string): Promise<string
     }
 };
 
-export const getArtefactsByRepo = async () => {
-
-    try {
-
-        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
-            owner: owner,
-            repo: repo,
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-            }
-        })
-        console.log("Data artefacts: ", data)
-        return data;
-    }
-    catch (error) {
-        console.error(`Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`)
-        throw error;
-    }
-}
-
 export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
 
     console.log("commitSHA Function: ", commitSHA)
@@ -293,10 +273,43 @@ export const runWorkflowById = async (runId: number) => {
     }
 }
 
-export const deleteAllArtefacts = async () => {
+export const getArtefactsByRepo = async () => {
+
+    let allRuns: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    let hasNextPage = true;
+
     try {
 
+        while (hasNextPage) {
+            const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+                owner: owner,
+                repo: repo,
+                page: page,
+                per_page: perPage,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            allRuns = [...allRuns, ...data.artifacts];
+            hasNextPage = data.artifacts.length === perPage;
+            page++;
+        }
+
+        return { artifacts: allRuns, total_count: allRuns.length };
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`)
+        throw error;
+    }
+}
+
+export const deleteAllArtefacts = async () => {
+
+    try {
         const { artifacts } = await getArtefactsByRepo()
+        console.log("artifacts to delete: ", artifacts)
         if (artifacts.length === 0) throw new Error("No hay artefactos para eliminar")
 
         for (const artifact of artifacts) {

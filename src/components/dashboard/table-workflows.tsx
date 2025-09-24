@@ -1,7 +1,7 @@
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 import { FolderDown, FolderX, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
-import { downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { deleteAllArtefacts, downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
@@ -160,7 +160,9 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 const TableWorkflowsDash: React.FC = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const toast = useToast();
     const [isLoading, setLoading] = useState<boolean>(false);
+    const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
     const { setDataWorkflows, dataWorkflows } = useTestStore()
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 3;
@@ -218,6 +220,30 @@ const TableWorkflowsDash: React.FC = () => {
         }
     }, [dataWorkflows]);
 
+    const handleDeleteAllArtifacts = async () => {
+        setIsLoadingDelete(true);
+        try {
+            await deleteAllArtefacts();
+            toast({
+                status: "success",
+                title: "Artefactos eliminados",
+                description: "Se han eliminado todos los artefactos correctamente"
+            })
+        } catch (error) {
+            console.log(error);
+            toast({
+                status: "error",
+                title: "Error",
+                description: error instanceof Error ? error.message : "Ocurrió un error al eliminar los artefactos"
+            })
+            throw error;
+        }
+        finally {
+            setIsLoadingDelete(false);
+            onClose()
+        }
+    }
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = dataWorkflows.slice(indexOfFirstItem, indexOfLastItem);
@@ -244,11 +270,13 @@ const TableWorkflowsDash: React.FC = () => {
                             color={"black"}
                             borderRadius={"md"}
                         >
-                            <Button 
-                                onClick={handleReloadTable} 
+                            <Button
+                                onClick={handleReloadTable}
                                 size={"xs"}
                                 isDisabled={isLoading}
-                                >
+                                colorScheme="green"
+                                variant={"solid"}
+                            >
                                 <RefreshCw size={16} />
                             </Button>
                         </Tooltip>
@@ -258,11 +286,13 @@ const TableWorkflowsDash: React.FC = () => {
                             color={"black"}
                             borderRadius={"md"}
                         >
-                            <Button 
-                                onClick={onOpen} 
+                            <Button
+                                onClick={onOpen}
                                 size={"xs"}
                                 isDisabled={isLoading}
-                                >
+                                colorScheme="green"
+                                variant={"solid"}
+                            >
                                 <FolderX size={16} />
                             </Button>
                             <AlertDialog
@@ -284,9 +314,11 @@ const TableWorkflowsDash: React.FC = () => {
                                             </Button>
                                             <Button
                                                 colorScheme='red'
-                                                onClick={onClose}
+                                                onClick={handleDeleteAllArtifacts}
                                                 ml={3}
                                                 variant={"solid"}
+                                                isLoading={isLoadingDelete}
+                                                loadingText="Eliminando reportes..."
                                             >
                                                 Eliminar
                                             </Button>
