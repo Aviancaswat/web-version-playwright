@@ -64,10 +64,6 @@ const DashboardPage = () => {
         }
     }, [dataWorkflows])
 
-    const handleDownloadPDF = () => {
-
-    }
-
     return (
         <Box height={"100%"}>
             <HStack justify={"space-between"}>
