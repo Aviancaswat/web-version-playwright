@@ -1,11 +1,14 @@
 import {
     Box,
+    Center,
     Divider,
     Heading,
+    Image,
     Text,
     VStack
 } from '@chakra-ui/react'
-import type { LucideProps } from 'lucide-react'
+import { type LucideProps } from 'lucide-react'
+import avLogo from "../../assets/avianca-logo-desk.png"
 import { RouterButton } from './router-button'
 
 export type ChildrenSideBarDashboardProps = {
@@ -24,25 +27,27 @@ export const SideBarDashboard: React.FC<SideBarDashboardProps> = ({ childrens })
         <VStack
             p={2}
             height={"100vh"}
-            maxWidth={350}
-            bg={"blackAlpha.900"}
+            maxWidth={320}
+            bg={"green.900"}
             position={"relative"}
         >
             <Box>
+                <Center>
+                    <Image src={avLogo} width={85} height={85} />
+                </Center>
                 <Heading
                     as="h1"
                     size={"lg"}
                     textAlign="center"
                     color={"whiteAlpha.900"}
-                    mt={5}
                 >
                     Avianca Playwright
                 </Heading>
                 <Box p="1">
                     <Text mt={2} color="gray.300" textAlign="center">
-                        Gestiona tus workflows de forma automática y
-                        visualiza el historial completo
+                        Visualiza y gestiona tus workflows
                     </Text>
+                    <Divider mt={5} />
                     <Box mt={10}>
                         <VStack
                             spacing={0}

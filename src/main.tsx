@@ -7,12 +7,12 @@ import App from './App.tsx'
 
 //Styles
 import './index.css'
-import theme from './utils/utils.ts'
+import theme from './utils/theme.ts'
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
-    <ChakraProvider theme={theme}>
+  <ChakraProvider theme={theme}>
+    <BrowserRouter>
       <App />
-    </ChakraProvider>
-  </BrowserRouter>
+    </BrowserRouter>
+  </ChakraProvider>
 )
