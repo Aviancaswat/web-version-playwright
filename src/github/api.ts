@@ -331,7 +331,7 @@ export const deleteAllArtefacts = async () => {
 
 export const deleteArtefactById = async (workflowId: number) => {
 
-    if (!workflowId) throw new Error("No hay artifact id asignado")
+    if (!workflowId) throw new Error("No hay workflow id asignado")
 
     try {
 
@@ -340,7 +340,7 @@ export const deleteArtefactById = async (workflowId: number) => {
         const artifactsFound = artifacts.filter(e => e.workflow_run?.id === workflowId)
         if (artifactsFound.length === 0) throw new Error("No se encontró reportes asociados al workflow")
 
-        for (let artifact of artifactsFound) {
+        for (const artifact of artifactsFound) {
             await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
                 owner: owner,
                 repo: repo,
