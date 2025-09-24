@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 
 //Components
-import HomeBody from "../components/HomeBody/HomeBody";
+import HomeBody from "../../components/HomeBody/HomeBody";
 
 const HomePage = () => {
   return (

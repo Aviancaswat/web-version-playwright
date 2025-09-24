@@ -1,7 +1,7 @@
 import { Box, Text } from "@chakra-ui/react";
 
 //Store
-import useLoadingStore from "../../store/useLoadingStore";
+import useLoadingStore from "../../store/useLoadingStore/useLoadingStore";
 
 const LoadingScreenComponent: React.FC = () => {
   const { showLoading } = useLoadingStore();

@@ -19,8 +19,8 @@ import {
 import stepFields from "../../json/CreateTestForm/inputData.json";
 
 //Store
-import useTestStore from "../../store/useTestStore";
-import useEditTestStore from "../../store/useEditTestStore";
+import useTestStore from "../../store/useTestStore/useTestStore";
+import useEditTestStore from "../../store/useEditTestStore/useEditTestStore";
 
 //Components
 import SearchableSelectComponent from "../SearchableSelectComponent/SearchableSelectComponent";

@@ -17,9 +17,9 @@ import {
 import { CheckIcon, CloseIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 // Store
-import useTestStore from "../../store/useTestStore";
-import useLoadingStore from "../../store/useLoadingStore";
-import useEditTestStore from "../../store/useEditTestStore";
+import useTestStore from "../../store/useTestStore/useTestStore";
+import useEditTestStore from "../../store/useEditTestStore/useEditTestStore";
+import useLoadingStore from "../../store/useLoadingStore/useLoadingStore";
 
 //Services
 import {
@@ -30,6 +30,7 @@ import {
 
 //Types
 import type { TestResultData } from "./TestListComponent.types";
+import type { Test } from "../../store/useTestStore/useTestStore.types";
 
 const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests, blockForm, unblockForm } =
@@ -54,7 +55,7 @@ const TestListComponent: React.FC = () => {
 
         if (!response) return;
 
-        const { status, result, title, workflowId } = response;
+        const { status, result = "", title, workflowId } = response;
 
         if (status === "completed") {
           clearInterval(intervalId);
@@ -161,7 +162,7 @@ const TestListComponent: React.FC = () => {
           </Text>
         ) : (
           <Accordion allowMultiple maxH="240px" overflowY="auto">
-            {tests.map((test, index) => (
+            {tests.map((test: Test, index: number) => (
               <AccordionItem
                 key={index}
                 border="1px solid"
@@ -187,7 +188,7 @@ const TestListComponent: React.FC = () => {
                             title="Eliminar"
                             icon={<DeleteIcon />}
                             colorScheme="red"
-                            _hover={{borderColor: "#FF0000"}}
+                            _hover={{ borderColor: "#FF0000" }}
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
