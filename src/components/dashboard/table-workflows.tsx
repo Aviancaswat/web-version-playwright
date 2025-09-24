@@ -244,7 +244,11 @@ const TableWorkflowsDash: React.FC = () => {
                             color={"black"}
                             borderRadius={"md"}
                         >
-                            <Button onClick={handleReloadTable} size={"xs"}>
+                            <Button 
+                                onClick={handleReloadTable} 
+                                size={"xs"}
+                                isDisabled={isLoading}
+                                >
                                 <RefreshCw size={16} />
                             </Button>
                         </Tooltip>
@@ -254,7 +258,11 @@ const TableWorkflowsDash: React.FC = () => {
                             color={"black"}
                             borderRadius={"md"}
                         >
-                            <Button onClick={onOpen} size={"xs"}>
+                            <Button 
+                                onClick={onOpen} 
+                                size={"xs"}
+                                isDisabled={isLoading}
+                                >
                                 <FolderX size={16} />
                             </Button>
                             <AlertDialog
