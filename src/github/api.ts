@@ -292,3 +292,48 @@ export const runWorkflowById = async (runId: number) => {
         throw error;
     }
 }
+
+export const deleteAllArtefacts = async () => {
+    try {
+
+        const { artifacts } = await getArtefactsByRepo()
+        if (artifacts.length === 0) throw new Error("No hay artefactos para eliminar")
+
+        for (const artifact of artifacts) {
+            await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
+                owner: owner,
+                repo: repo,
+                artifact_id: artifact.id,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            console.log(`Artefacto con ID ${artifact.id} eliminado.`);
+        }
+    } catch (error) {
+        console.error(`Ha ocurrido un error al eliminar los artefactos ${error}`);
+        throw error;
+    }
+}
+
+export const deleteArtefactById = async (artifactId: number) => {
+
+    if (!artifactId) throw new Error("No hay artifact id asignado")
+
+    try {
+
+        await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
+            owner: owner,
+            repo: repo,
+            artifact_id: artifactId,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        });
+        console.log(`Artefacto con ID ${artifactId} eliminado.`);
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al eliminar el artefacto ${error}`);
+        throw error;
+    }
+}
