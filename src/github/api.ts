@@ -337,19 +337,20 @@ export const deleteArtefactById = async (workflowId: number) => {
 
         const { artifacts, total_count } = await getArtefactsByRepo();
         if (total_count === 0) throw new Error("No se encontró reportes asociados al workflow");
-        const artifactsFound = artifacts.find(e => e.workflow_run?.id === workflowId)
-        if (!artifactsFound) throw new Error("No se encontró reportes asociados al workflow")
-        const artifactId = artifactsFound.id;
+        const artifactsFound = artifacts.filter(e => e.workflow_run?.id === workflowId)
+        if (artifactsFound.length === 0) throw new Error("No se encontró reportes asociados al workflow")
 
-        await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
-            owner: owner,
-            repo: repo,
-            artifact_id: artifactId,
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-            }
-        });
-        console.log(`Artefacto con ID ${artifactId} eliminado.`);
+        for (let artifact of artifactsFound) {
+            await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
+                owner: owner,
+                repo: repo,
+                artifact_id: artifact.id,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            console.log(`Artefacto con ID ${artifact.id} eliminado.`);
+        }
     }
     catch (error) {
         console.error(`Ha ocurrido un error al eliminar el artefacto ${error}`);

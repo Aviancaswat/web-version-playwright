@@ -125,6 +125,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
     const handleDeleteArtifactsByWorkflow = async (workflowId: number) => {
         console.log(`Eliminando reportes del workflow ${workflowId}`);
         try {
+            setIsLoadingDeleteArtifacts(true)
             await deleteArtefactById(workflowId);
             toast({
                 status: "success",
@@ -139,6 +140,9 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                 description: error instanceof Error ? error.message : "Ocurrió un error al eliminar los artefactos"
             })
             throw error;
+        }
+        finally {
+            setIsLoadingDeleteArtifacts(false)
         }
     }
 
