@@ -1,7 +1,7 @@
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-import { FolderDown, FolderX, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
+import { FileX2, FolderDown, FolderX, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
-import { deleteAllArtefacts, downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
+import { deleteAllArtefacts, deleteArtefactById, downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "./pagination-table";
 import TagDash from "./tag-dash";
@@ -24,6 +24,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
     const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
     const [isLoadingScreenshots, setIsLoadingScreenshots] = useState<boolean>(false);
     const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
+    const [isLoadingDeleteArtifacts, setIsLoadingDeleteArtifacts] = useState<boolean>(false);
 
     const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
         switch (value) {
@@ -121,6 +122,26 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
         }
     }
 
+    const handleDeleteArtifactsByWorkflow = async (workflowId: number) => {
+        console.log(`Eliminando reportes del workflow ${workflowId}`);
+        try {
+            await deleteArtefactById(workflowId);
+            toast({
+                status: "success",
+                title: "Artefacto eliminado",
+                description: "Se ha eliminado los artefactos correctamente"
+            })
+        } catch (error) {
+            console.log(error);
+            toast({
+                status: "error",
+                title: "Error",
+                description: error instanceof Error ? error.message : "Ocurrió un error al eliminar los artefactos"
+            })
+            throw error;
+        }
+    }
+
     return (
         <>
             {
@@ -147,6 +168,12 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                                         icon={isLoadingRun ? <Spinner size="sm" /> : <RefreshCw />}
                                         onClick={() => handleRunWorkflow(row.id)}
                                     >Volver a ejecutar workflow</MenuItem>
+                                    <MenuItem
+                                        icon={isLoadingDeleteArtifacts ? <Spinner size="sm" /> : <FileX2 />}
+                                        onClick={() => handleDeleteArtifactsByWorkflow(row.id)}
+                                    >
+                                        Eliminar reportes
+                                    </MenuItem>
                                 </MenuList>
                             </Menu>
                         </Td>
