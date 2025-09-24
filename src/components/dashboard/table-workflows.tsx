@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 import { FolderDown, FolderX, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
 import { downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
@@ -226,64 +226,69 @@ const TableWorkflowsDash: React.FC = () => {
     const cancelRef = useRef<HTMLButtonElement>(null);
 
     return (
-        <Box width={"100%"} mt={5} display={"flex"} flexDirection={"column"} alignItems={"center"} gap={3}>
+        <Box width={"100%"} mt={5} display={"flex"} flexDirection={"column"} alignItems={"center"} gap={1}>
             <Box width={"100%"} p={2} borderRadius={"md"} display={"flex"} alignItems={"center"}>
-                <ButtonGroup
-                    width={"100%"}
-                    size='sm'
-                    variant='outline'
-                    justifyContent={"flex-end"}
-                >
-                    <Tooltip
-                        label="Actualizar tabla"
-                        bg={"white"}
-                        color={"black"}
-                        borderRadius={"md"}
+                <HStack m={0} p={0} justify={"space-between"} width={"100%"}>
+                    <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
+                        Información general de los workflows
+                    </Heading>
+                    <ButtonGroup
+                        width={"100%"}
+                        size='sm'
+                        variant='outline'
+                        justifyContent={"flex-end"}
                     >
-                        <Button onClick={handleReloadTable} size={"xs"}>
-                            <RefreshCw size={16} />
-                        </Button>
-                    </Tooltip>
-                    <Tooltip
-                        label="Eliminar todos los artefactos"
-                        bg={"white"}
-                        color={"black"}
-                        borderRadius={"md"}
-                    >
-                        <Button onClick={onOpen} size={"xs"}>
-                            <FolderX size={16} />
-                        </Button>
-                        <AlertDialog
-                            isOpen={isOpen}
-                            leastDestructiveRef={cancelRef}
-                            onClose={onClose}
+                        <Tooltip
+                            label="Actualizar tabla"
+                            bg={"white"}
+                            color={"black"}
+                            borderRadius={"md"}
                         >
-                            <AlertDialogOverlay>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                        Eliminar todos los artefactos
-                                    </AlertDialogHeader>
-                                    <AlertDialogBody>
-                                        ¿Estás seguro? Esta acción no se puede deshacer.
-                                    </AlertDialogBody>
-                                    <AlertDialogFooter>
-                                        <Button ref={cancelRef} onClick={onClose}>
-                                            Cancelar
-                                        </Button>
-                                        <Button
-                                            colorScheme='red'
-                                            onClick={onClose}
-                                            ml={3}
-                                            variant={"solid"}
-                                        >
-                                            Eliminar
-                                        </Button>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialogOverlay>
-                        </AlertDialog>
-                    </Tooltip>
-                </ButtonGroup>
+                            <Button onClick={handleReloadTable} size={"xs"}>
+                                <RefreshCw size={16} />
+                            </Button>
+                        </Tooltip>
+                        <Tooltip
+                            label="Eliminar todos los artefactos"
+                            bg={"white"}
+                            color={"black"}
+                            borderRadius={"md"}
+                        >
+                            <Button onClick={onOpen} size={"xs"}>
+                                <FolderX size={16} />
+                            </Button>
+                            <AlertDialog
+                                isOpen={isOpen}
+                                leastDestructiveRef={cancelRef}
+                                onClose={onClose}
+                            >
+                                <AlertDialogOverlay>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                            Eliminar todos los artefactos
+                                        </AlertDialogHeader>
+                                        <AlertDialogBody>
+                                            ¿Estás seguro? Esta acción no se puede deshacer.
+                                        </AlertDialogBody>
+                                        <AlertDialogFooter>
+                                            <Button ref={cancelRef} onClick={onClose}>
+                                                Cancelar
+                                            </Button>
+                                            <Button
+                                                colorScheme='red'
+                                                onClick={onClose}
+                                                ml={3}
+                                                variant={"solid"}
+                                            >
+                                                Eliminar
+                                            </Button>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialogOverlay>
+                            </AlertDialog>
+                        </Tooltip>
+                    </ButtonGroup>
+                </HStack>
             </Box>
             <TableContainer
                 p={1}

@@ -119,9 +119,6 @@ const DashboardPage = () => {
                 </HStack>
             </Box>
             <Box mt={5}>
-                <Heading as="h3" size={"md"} mb={5}>
-                    Información general de los workflows
-                </Heading>
                 <Box width={"95%"} margin={"auto"}>
                     <TableWorkflowsDash />
                 </Box>
