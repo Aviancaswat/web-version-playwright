@@ -14,7 +14,6 @@ import checkIcon from "../../assets/ico-check.png";
 import shareIcon from "../../assets/ico-share.png";
 import navigateIcon from "../../assets/ico-navigate.png";
 import logoAvianca from "../../assets/logo-avianca.jpeg";
-
 import { useNavigate } from "react-router-dom";
 
 const HomeBody = () => {

@@ -1,29 +1,31 @@
 import { Box, HStack } from "@chakra-ui/react";
 import { FlaskConical, House, LayoutDashboard } from "lucide-react";
-import SideBarDashboard, {
-  type ChildrenSideBarDashboardProps,
-} from "../components/dashboard/sidebar";
+
+//Data
+import sideBarMenuData from "../json/SideBar/sideBarMenuData.json";
+
+//Components
+import SideBarDashboard from "../components/SideBarComponent/SideBarComponent";
 import LoadingScreenComponent from "../components/LoadingScreenComponent/LoadingScreenComponent";
 
-const routesConfig: ChildrenSideBarDashboardProps[] = [
-  {
-    name: "Home",
-    path: "/",
-    icon: House,
-  },
-  {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Configurar Test",
-    path: "/create-test",
-    icon: FlaskConical,
-  },
-];
+//Types
+import type { ChildrenSideBarDashboardProps } from "../components/SideBarComponent/SideBarComponent.types";
 
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
+  const iconMap: Record<string, ChildrenSideBarDashboardProps["icon"]> = {
+    House,
+    LayoutDashboard,
+    FlaskConical,
+  };
+
+  const routesConfig: ChildrenSideBarDashboardProps[] = sideBarMenuData.map(
+    (item) => ({
+      name: item.name,
+      path: item.path,
+      icon: iconMap[item.icon],
+    })
+  );
+
   return (
     <>
       <LoadingScreenComponent />

@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 
 //Components
-import CreateWorkflowBody from "../components/CreateWorkflowBody/CreateWorkflowBody";
+import CreateWorkflowBody from "../../components/CreateWorkflowBody/CreateWorkflowBody";
 
 const WorkflowsPage = () => {
   return (
