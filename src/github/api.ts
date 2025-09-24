@@ -14,8 +14,8 @@ export interface GitHubContentFile {
   download_url: string;
 }
 
-export type StatusWorkflow = "queued" | "in_progress" | "completed";
-export type ResultWorkflow = "success" | "failure" | "neutral" | "cancelled";
+export type StatusWorkflow = 'queued' | 'in_progress' | 'completed' | undefined
+export type ResultWorkflow = 'success' | 'failure' | 'neutral' | 'cancelled' | undefined
 
 type ResultWorkflowStatus = {
   workflowId?: number;
@@ -78,15 +78,15 @@ const getFileData = async (retries = 3): Promise<any> => {
   }
 };
 
-const getTimestamp = () => {
-  const today = new Date();
-  const day = String(today.getDate()).padStart(2, "0");
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const year = today.getFullYear();
-  const hour = String(today.getHours()).padStart(2, "0");
-  const minute = String(today.getMinutes()).padStart(2, "0");
-  return `${day}-${month}-${year}_${hour}-${minute}`;
-};
+export const getTimestamp = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const hour = String(today.getHours()).padStart(2, '0');
+    const minute = String(today.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hour}:${minute}`;
+}
 
 export const replaceDataforNewTest = async (
   testName: string,
@@ -181,46 +181,123 @@ export const checkWorkflowStatus = async (
   }
 };
 
-export const downLoadReportHTML = async (workflowRunId?: number) => {
-  if (!workflowRunId) throw new Error("No hay workflow id asignado");
+export const downLoadReportHTML = async (workflowRunId?: number, typeReport: "playwright" | "only-screenshots" = "playwright") => {
+    console.log("workflowRunId pasado a download report: ", workflowRunId)
+    if (!workflowRunId) throw new Error("No hay workflow id asignado")
 
   try {
     const { artifacts, total_count } = await getArtefactsByRepo();
 
-    if (total_count === 0) return;
-    const artifactFound = artifacts.find(
-      (e) =>
-        e.name === "playwright-report" &&
-        e.workflow_run &&
-        e.workflow_run.id === workflowRunId
-    );
+        console.log("artifacts: ", artifacts)
 
-    if (!artifactFound) return;
-    const artifactId = artifactFound.id;
-    const { data } = await octokit.request(
-      "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
-      {
-        owner: owner,
-        repo: repo,
-        artifact_id: artifactId,
-        archive_format: "zip",
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      }
-    );
+        if (total_count === 0) throw new Error("No se encontraron reportes asociados al workflow");
 
-    const blob = new Blob([data as ArrayBuffer], { type: "application/zip" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `reporte-html-${getTimestamp()}.zip`;
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error(
-      `Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`
-    );
-    throw error;
-  }
+        let artifactId: number = 0;
+        let reports: any[] = [];
+
+        if (typeReport === "playwright") {
+            reports = artifacts.filter(e => e.name === "playwright-report");
+        }
+        else if (typeReport === "only-screenshots") {
+            reports = artifacts.filter(e => e.name === "results-by-test");
+        }
+
+        const reportFound = reports.find(e => e.workflow_run && e.workflow_run.id === workflowRunId);
+        console.log("reportFound: ", reportFound);
+        if (!reportFound) throw new Error("No se encontró ningun reporte asociado al workflow");
+        artifactId = reportFound.id;
+
+        console.log("artifactId: ", artifactId)
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
+            owner: owner,
+            repo: repo,
+            artifact_id: artifactId,
+            archive_format: 'zip',
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+
+        const blob = new Blob([data as ArrayBuffer], { type: 'application/zip' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = typeReport === "playwright" ? `reporte-html-${getTimestamp()}.zip` : `reporte-screenshots-${getTimestamp()}.zip`;
+        a.click();
+        URL.revokeObjectURL(url);
+        console.log("Reponse download: ", data)
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`)
+        throw error;
+    }
+}
+
+export const getAllWorkflowsByRepo = async () => {
+    try {
+
+        const data = await octokit.request('GET /repos/{owner}/{repo}/actions/workflows', {
+            owner: owner,
+            repo: repo,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+        console.log("Data workflows: ", data)
+        return data;
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo ${error}`)
+        throw error;
+    }
+}
+
+export const getRunsByRepo = async () => {
+    let allRuns: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    let hasNextPage = true;
+
+    try {
+        while (hasNextPage) {
+            const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs', {
+                owner: owner,
+                repo: repo,
+                page: page,
+                per_page: perPage,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            allRuns = [...allRuns, ...data.workflow_runs];
+            hasNextPage = data.workflow_runs.length === perPage;
+            page++;
+        }
+        return allRuns;
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de workflows del repo: ${error}`);
+        throw error;
+    }
 };
+
+export const runWorkflowById = async (runId: number) => {
+
+    if (!runId) throw new Error("No hay run id asignado")
+
+    try {
+
+        const response = await octokit.request('POST /repos/{owner}/{repo}/actions/runs/{run_id}/rerun', {
+            owner: owner,
+            repo: repo,
+            run_id: runId,
+            headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+            }
+        })
+        return response;
+    } catch (error) {
+        console.error(`Ha ocurrido un error al ejecutar el workflow ${error}`);
+        throw error;
+    }
+}
