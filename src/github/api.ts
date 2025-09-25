@@ -124,45 +124,7 @@ export const replaceDataforNewTest = async (
   }
 };
 
-export const getArtefactsByRepo = async () => {
-  try {
-    const { data } = await octokit.request(
-      "GET /repos/{owner}/{repo}/actions/artifacts",
-      {
-        owner: owner,
-        repo: repo,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      }
-    );
-    return data;
-  } catch (error) {
-    console.error(
-      `Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`
-    );
-    throw error;
-  }
-};
-
-export const checkWorkflowStatus = async (
-  commitSHA?: string
-): Promise<ResultWorkflowStatus | undefined> => {
-  if (!commitSHA) return;
-
-  try {
-    const {
-      data: { workflow_runs, total_count },
-    } = await octokit.request("GET /repos/{owner}/{repo}/actions/runs", {
-      owner: owner,
-      repo: repo,
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
-
-    if (total_count === 0) return;
-    const workflow = workflow_runs.find((e) => e.head_sha === commitSHA);
+export const checkWorkflowStatus = async (commitSHA?: string): Promise<ResultWorkflowStatus | undefined> => {
 
     if (!workflow) return;
 
@@ -298,6 +260,91 @@ export const runWorkflowById = async (runId: number) => {
         return response;
     } catch (error) {
         console.error(`Ha ocurrido un error al ejecutar el workflow ${error}`);
+        throw error;
+    }
+}
+
+export const getArtefactsByRepo = async () => {
+
+    let allRuns: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    let hasNextPage = true;
+
+    try {
+
+        while (hasNextPage) {
+            const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/artifacts', {
+                owner: owner,
+                repo: repo,
+                page: page,
+                per_page: perPage,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            allRuns = [...allRuns, ...data.artifacts];
+            hasNextPage = data.artifacts.length === perPage;
+            page++;
+        }
+
+        return { artifacts: allRuns, total_count: allRuns.length };
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`)
+        throw error;
+    }
+}
+
+export const deleteAllArtefacts = async () => {
+
+    try {
+        const { artifacts } = await getArtefactsByRepo()
+        console.log("artifacts to delete: ", artifacts)
+        if (artifacts.length === 0) throw new Error("No hay artefactos para eliminar")
+
+        for (const artifact of artifacts) {
+            await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
+                owner: owner,
+                repo: repo,
+                artifact_id: artifact.id,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            console.log(`Artefacto con ID ${artifact.id} eliminado.`);
+        }
+    } catch (error) {
+        console.error(`Ha ocurrido un error al eliminar los artefactos ${error}`);
+        throw error;
+    }
+}
+
+export const deleteArtefactById = async (workflowId: number) => {
+
+    if (!workflowId) throw new Error("No hay workflow id asignado")
+
+    try {
+
+        const { artifacts, total_count } = await getArtefactsByRepo();
+        if (total_count === 0) throw new Error("No se encontró reportes asociados al workflow");
+        const artifactsFound = artifacts.filter(e => e.workflow_run?.id === workflowId)
+        if (artifactsFound.length === 0) throw new Error("No se encontró reportes asociados al workflow")
+
+        for (const artifact of artifactsFound) {
+            await octokit.request('DELETE /repos/{owner}/{repo}/actions/artifacts/{artifact_id}', {
+                owner: owner,
+                repo: repo,
+                artifact_id: artifact.id,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            console.log(`Artefacto con ID ${artifact.id} eliminado.`);
+        }
+    }
+    catch (error) {
+        console.error(`Ha ocurrido un error al eliminar el artefacto ${error}`);
         throw error;
     }
 }
