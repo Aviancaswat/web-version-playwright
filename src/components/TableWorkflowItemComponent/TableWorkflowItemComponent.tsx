@@ -10,10 +10,17 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState, type ReactElement } from "react";
-import { FolderDown, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
+import {
+  FileX2,
+  FolderDown,
+  GripHorizontal,
+  ImageDown,
+  RefreshCw,
+} from "lucide-react";
 
 //Services
 import {
+  deleteArtefactById,
   downLoadReportHTML,
   runWorkflowById,
   type ResultWorkflow,
@@ -35,6 +42,8 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const [isLoadingScreenshots, setIsLoadingScreenshots] =
     useState<boolean>(false);
   const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
+  const [isLoadingDeleteArtifacts, setIsLoadingDeleteArtifacts] =
+    useState<boolean>(false);
 
   const parserValueWorkflow = (
     value: StatusWorkflow | ResultWorkflow | undefined
@@ -62,7 +71,6 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const handleDownloadReport = async (workflowId: number) => {
     try {
       setIsLoadingReport(true);
-
       await downLoadReportHTML(workflowId);
       toast({
         status: "success",
@@ -141,6 +149,31 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     }
   };
 
+  const handleDeleteArtifactsByWorkflow = async (workflowId: number) => {
+    try {
+      setIsLoadingDeleteArtifacts(true);
+      await deleteArtefactById(workflowId);
+      toast({
+        status: "success",
+        title: "Artefacto eliminado",
+        description: "Se ha eliminado los artefactos correctamente",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        status: "error",
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error al eliminar los artefactos",
+      });
+      throw error;
+    } finally {
+      setIsLoadingDeleteArtifacts(false);
+    }
+  };
+
   return (
     <>
       {data.map((row) => (
@@ -175,6 +208,18 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                   onClick={() => handleRunWorkflow(row.id)}
                 >
                   Volver a ejecutar workflow
+                </MenuItem>
+                <MenuItem
+                  icon={
+                    isLoadingDeleteArtifacts ? (
+                      <Spinner size="sm" />
+                    ) : (
+                      <FileX2 />
+                    )
+                  }
+                  onClick={() => handleDeleteArtifactsByWorkflow(row.id)}
+                >
+                  Eliminar reportes
                 </MenuItem>
               </MenuList>
             </Menu>
