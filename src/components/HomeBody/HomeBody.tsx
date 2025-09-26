@@ -42,14 +42,14 @@ const HomeBody = () => {
         mt={10}
         backgroundColor="#ff0000"
         color="white"
-        overflow="hidden"
+      
       >
         <Flex direction={{ base: "column", md: "row" }} h="100%">
           <Box
             flex={{ base: "unset", md: "0.6" }}
             w={{ base: "100%", md: "auto" }}
             h={{ base: 180, md: "100%" }}
-            overflow="hidden"
+          
             borderTopRadius={{ base: "lg", md: "0" }}
             borderLeftRadius={{ base: "0", md: "lg" }}
           >
