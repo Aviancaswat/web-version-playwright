@@ -111,10 +111,10 @@ const DashboardPage = () => {
     <Box height={"95vh"} overflow={"auto"}>
       <HStack mt={5} justify={"space-between"}>
         <VStack align={"start"}>
-          <Heading as="h1" size={"lg"}>
+          <Heading as="h1" size={"lg"} ml={4}>
             Panel
           </Heading>
-          <Text color={"blackAlpha.900"} fontSize={"sm"}>
+          <Text color={"blackAlpha.900"} fontSize={"sm"} ml={4}>
             Visualiza, analiza y descarga tus informes de Avianca playwright
           </Text>
         </VStack>
