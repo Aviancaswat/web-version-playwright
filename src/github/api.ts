@@ -22,10 +22,13 @@ export type ResultWorkflow =
   | "cancelled"
   | undefined;
 
+type TitleWorkflow = string;
+
 type ResultWorkflowStatus = {
   workflowId?: number;
   //buscar la manera de obtener este id para mejorar la descarga del reporte.
   // que la descarga del reporte sea igual al workflow que se eeta ejecutando en tiempo real
+  title: TitleWorkflow;
   status: StatusWorkflow;
   result: ResultWorkflow;
 };
@@ -93,22 +96,20 @@ export const getTimestamp = () => {
 };
 
 export const replaceDataforNewTest = async (
+  testListName: string,
   newTestData: string
 ): Promise<string | undefined> => {
-  console.log("newTestData: ", newTestData);
   if (!newTestData || newTestData === "") return;
 
   try {
-    console.log(`\n--- Procesando commit ---`);
     let fileData = await getFileData();
-    console.log(`SHA actual para el commit: `, fileData.sha);
+
     let fileContent = atob(fileData.content);
-    console.log("fileContent: ", fileContent);
+
     const updatedContent = fileContent.replace(
       /\[\s*{[\s\S]*?}\s*]/,
       newTestData
     );
-    console.log("Update content: ", updatedContent);
 
     const {
       data: { commit },
@@ -116,13 +117,12 @@ export const replaceDataforNewTest = async (
       owner: owner,
       repo: repo,
       path: path,
-      message: `Descargar reporte - ${getTimestamp()}`,
+      message: `${testListName} - ${getTimestamp()}`,
       content: btoa(updatedContent),
       sha: fileData.sha,
       branch: branchRef,
     });
 
-    console.log(`✅ Commit realizado exitosamente`);
     const commitSHA = commit.sha;
     return commitSHA;
   } catch (error) {
@@ -134,7 +134,6 @@ export const replaceDataforNewTest = async (
 export const checkWorkflowStatus = async (
   commitSHA?: string
 ): Promise<ResultWorkflowStatus | undefined> => {
-  console.log("commitSHA Function: ", commitSHA);
   if (!commitSHA) return;
 
   try {
@@ -155,10 +154,12 @@ export const checkWorkflowStatus = async (
 
     const statusWorkflow = workflow.status as StatusWorkflow;
     const resultWorkflow = workflow.conclusion as ResultWorkflow;
+    const titleWorkflow = workflow.display_title as TitleWorkflow;
 
     return {
       status: statusWorkflow,
       result: resultWorkflow,
+      title: titleWorkflow,
       workflowId: workflow.id,
     };
   } catch (error) {
