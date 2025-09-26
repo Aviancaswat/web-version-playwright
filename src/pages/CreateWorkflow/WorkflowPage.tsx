@@ -5,7 +5,7 @@ import CreateWorkflowBody from "../../components/CreateWorkflowBody/CreateWorkfl
 
 const WorkflowsPage = () => {
   return (
-    <Box height={"100%"} display={"grid"} placeContent={"center"}>
+    <Box height={"100%"} placeContent={"center"}>
       <CreateWorkflowBody />
     </Box>
   );

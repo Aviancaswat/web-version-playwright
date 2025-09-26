@@ -5,7 +5,7 @@ import HomeBody from "../../components/HomeBody/HomeBody";
 
 const HomePage = () => {
   return (
-    <Box display={"grid"} placeContent={"center"} height={"100%"}>
+    <Box placeContent={"center"} height={"100%"}>
       <HomeBody />
     </Box>
   );
