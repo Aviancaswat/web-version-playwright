@@ -18,6 +18,8 @@ type TableWorkflowItemsProps = {
     data: DataWorkflows[];
 }
 
+type typeStatusWorkflow = StatusWorkflow | ResultWorkflow | undefined;
+
 const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
 
     const toast = useToast();
@@ -26,7 +28,7 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
     const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
     const [isLoadingDeleteArtifacts, setIsLoadingDeleteArtifacts] = useState<boolean>(false);
 
-    const parserValueWorkflow = (value: StatusWorkflow | ResultWorkflow | undefined): ReactElement => {
+    const parserValueWorkflow = (value: typeStatusWorkflow): ReactElement => {
         switch (value) {
             case "success":
                 return <TagDash key={new Date().getTime()} type="success" />
@@ -152,7 +154,10 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
                 data.map((row) => (
                     <Tr key={row.id}>
                         <Td>
-                            <Text maxWidth={400} noOfLines={1}>{row.display_title}</Text></Td>
+                            <Text maxWidth={400} noOfLines={1}>
+                                {row.display_title}
+                            </Text>
+                        </Td>
                         <Td>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
                         <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
                         <Td>
