@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Skeleton, Spinner, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 import { FileX2, FolderDown, FolderX, GripHorizontal, ImageDown, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
 import { deleteAllArtefacts, deleteArtefactById, downLoadReportHTML, getRunsByRepo, runWorkflowById, type ResultWorkflow, type StatusWorkflow } from "../../github/api";
@@ -270,7 +270,6 @@ const TableWorkflowsDash: React.FC = () => {
                 if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
                     setDataWorkflows(newData);
                 }
-
             } catch (error) {
                 console.log(error);
                 throw error;
@@ -278,20 +277,31 @@ const TableWorkflowsDash: React.FC = () => {
                 setLoading(false);
             }
         };
-
         getWorkflows();
     }, [dataWorkflows]);
 
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const cancelRef = useRef<HTMLButtonElement>(null);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = dataWorkflows.slice(indexOfFirstItem, indexOfLastItem);
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-    const cancelRef = useRef<HTMLButtonElement>(null);
-
     return (
-        <Box width={"100%"} mt={5} display={"flex"} flexDirection={"column"} alignItems={"center"} gap={1}>
-            <Box width={"100%"} p={2} borderRadius={"md"} display={"flex"} alignItems={"center"}>
+        <Box
+            width={"100%"}
+            mt={5}
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            gap={1}
+        >
+            <Box
+                width={"100%"}
+                p={2}
+                borderRadius={"md"}
+                display={"flex"}
+                alignItems={"center"}
+            >
                 <HStack m={0} p={0} justify={"space-between"} width={"100%"}>
                     <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
                         Información general de los workflows
@@ -383,18 +393,25 @@ const TableWorkflowsDash: React.FC = () => {
                             <Th>Acciones</Th>
                         </Tr>
                     </Thead>
-                    <Tbody width={"100%"} height={100}>
+                    <Tbody height={100}>
                         {
                             isLoading ? (
-                                <Box
-                                    width={"100%"}
-                                    display={"flex"}
-                                    justifyContent={"center"}
-                                    alignItems={"center"}
-                                    mt={5}
-                                >
-                                    <Text>Cargando...</Text> <Spinner ml={2} />
-                                </Box>
+                                [...Array(3)].map((_, index) => (
+                                    <Tr key={index}>
+                                        <Td>
+                                            <Skeleton height="20px" />
+                                        </Td>
+                                        <Td>
+                                            <Skeleton height="20px" />
+                                        </Td>
+                                        <Td>
+                                            <Skeleton height="20px" />
+                                        </Td>
+                                        <Td>
+                                            <Skeleton height="20px" />
+                                        </Td>
+                                    </Tr>
+                                ))
                             ) : (
                                 currentItems.length > 0 && (
                                     <TableWorkflowItems data={currentItems} />
