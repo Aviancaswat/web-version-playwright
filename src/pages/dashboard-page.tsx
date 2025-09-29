@@ -1,69 +1,15 @@
 import { Box, Button, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, VStack } from "@chakra-ui/react"
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { AlignJustify, Bug, CirclePause, FileChartLine, TestTube } from "lucide-react"
-import { useEffect, useState } from "react"
-import type { CardDetailsDashProps } from "../components/dashboard/card-details"
-import CardDetailsDash from "../components/dashboard/card-details"
+import { AlignJustify, FileChartLine } from "lucide-react"
+import { lazy, Suspense } from "react"
 import InformDocument from "../components/dashboard/inform-document"
-import TableWorkflowsDash from "../components/dashboard/table-workflows"
-import { useTestStore } from "../store/test-store"
+import SkeletonCards from "../components/dashboard/skeleton-cards"
+import SkeletonTable from "../components/dashboard/skeleton-table"
 
-const dataCardsDetailsDash: CardDetailsDashProps[] = [
-    {
-        icon: TestTube,
-        title: "Total exitosas",
-        value: 0,
-        type: "success",
-        stat: 0
-    },
-    {
-        icon: Bug,
-        title: "Total fallidas",
-        value: 0,
-        type: "error",
-        stat: 0
-    },
-    {
-        icon: CirclePause,
-        title: "Total canceladas",
-        value: 0,
-        type: "cancelled",
-        stat: 0
-    }
-]
+const CardsDashboardComponent = lazy(() => import('../components/dashboard/card-details'))
+const TableGithubDashboardComponent = lazy(() => import('../components/dashboard/table-workflows'))
 
 const DashboardPage = () => {
-
-    const { dataWorkflows } = useTestStore()
-    const [data, setDataCardsDetailsDash] = useState<CardDetailsDashProps[]>([])
-
-    useEffect(() => {
-        if (dataWorkflows.length > 0) {
-
-            const successWorkflows = dataWorkflows.filter(item => item.conclusion === "success").length;
-            const failureWorkflows = dataWorkflows.filter(item => item.conclusion === "failure").length;
-            const cancelledWorkflows = dataWorkflows.filter(item => item.conclusion === "cancelled").length;
-            const totalWorkflows = dataWorkflows.length;
-
-            const newData = dataCardsDetailsDash.map(card => {
-                switch (card.title) {
-                    case "Total exitosas":
-                        return { ...card, value: successWorkflows, stat: ((successWorkflows / totalWorkflows) * 100).toFixed(2) }
-                    case "Total fallidas":
-                        return { ...card, value: failureWorkflows, stat: ((failureWorkflows / totalWorkflows) * 100).toFixed(2) }
-                    case "Total canceladas":
-                        return { ...card, value: cancelledWorkflows, stat: ((cancelledWorkflows / totalWorkflows) * 100).toFixed(2) }
-                    case "Total tiempo":
-                        return { ...card, value: totalWorkflows, stat: ((totalWorkflows / totalWorkflows) * 100).toFixed(2) }
-                    default:
-                        return card
-                }
-            })
-
-            setDataCardsDetailsDash(newData)
-        }
-    }, [dataWorkflows])
-
     return (
         <Box height={"100%"}>
             <HStack justify={"space-between"}>
@@ -83,7 +29,6 @@ const DashboardPage = () => {
                         <AlignJustify />
                     </MenuButton>
                     <MenuList>
-
                         <PDFDownloadLink document={<InformDocument />} fileName="informe-avianca-playwright.pdf">
                             {({ loading }) => (loading ? 'Generando PDF...' : (
                                 <MenuItem
@@ -107,16 +52,16 @@ const DashboardPage = () => {
                     width={"100%"}
                     flexWrap={"wrap"}
                 >
-                    {
-                        data.map((data, index) => (
-                            <CardDetailsDash key={index} {...data} />
-                        ))
-                    }
+                    <Suspense fallback={<SkeletonCards />}>
+                        <CardsDashboardComponent key={new Date().getTime()} />
+                    </Suspense>
                 </HStack>
             </Box>
             <Box mt={5}>
                 <Box width={"95%"} margin={"auto"}>
-                    <TableWorkflowsDash />
+                    <Suspense fallback={<SkeletonTable />}>
+                        <TableGithubDashboardComponent />
+                    </Suspense>
                 </Box>
             </Box>
         </Box>

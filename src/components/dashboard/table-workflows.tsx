@@ -198,35 +198,6 @@ const TableWorkflowsDash: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 3;
 
-    useEffect(() => {
-        const getWorkflows = async () => {
-            setLoading(true);
-            try {
-                const runs = await getRunsByRepo();
-                if (runs.length === 0) throw new Error("No hay workflows");
-
-                const newData: DataWorkflows[] = runs.map(workflow => ({
-                    id: workflow.id,
-                    display_title: workflow.display_title,
-                    status: workflow.status,
-                    conclusion: workflow.conclusion,
-                    total_count: workflow.total_count
-                }));
-
-                if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
-                    setDataWorkflows(newData);
-                }
-
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getWorkflows();
-    }, [dataWorkflows]);
-
     const handleReloadTable = useCallback(async () => {
         setLoading(true);
         try {
@@ -274,6 +245,36 @@ const TableWorkflowsDash: React.FC = () => {
             onClose()
         }
     }
+
+    useEffect(() => {
+        const getWorkflows = async () => {
+            setLoading(true);
+            try {
+                const runs = await getRunsByRepo();
+                if (runs.length === 0) throw new Error("No hay workflows");
+
+                const newData: DataWorkflows[] = runs.map(workflow => ({
+                    id: workflow.id,
+                    display_title: workflow.display_title,
+                    status: workflow.status,
+                    conclusion: workflow.conclusion,
+                    total_count: workflow.total_count
+                }));
+
+                if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
+                    setDataWorkflows(newData);
+                }
+
+            } catch (error) {
+                console.log(error);
+                throw error;
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getWorkflows();
+    }, [dataWorkflows]);
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
