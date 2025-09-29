@@ -151,7 +151,8 @@ const TableWorkflowItems: React.FC<TableWorkflowItemsProps> = ({ data }) => {
             {
                 data.map((row) => (
                     <Tr key={row.id}>
-                        <Td>{row.display_title}</Td>
+                        <Td>
+                            <Text maxWidth={400} noOfLines={1}>{row.display_title}</Text></Td>
                         <Td>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
                         <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
                         <Td>

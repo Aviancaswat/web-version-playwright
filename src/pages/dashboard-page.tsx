@@ -35,7 +35,6 @@ const DashboardPage = () => {
                                     icon={<FileChartLine />}
                                 >
                                     Exportar Informe PDF
-
                                 </MenuItem>
                             ))}
                         </PDFDownloadLink>
