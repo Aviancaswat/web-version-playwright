@@ -1,0 +1,23 @@
+[
+  {
+    "icon": "TestTube",
+    "title": "Total exitosas",
+    "value": 0,
+    "type": "success",
+    "stat": 0
+  },
+  {
+    "icon": "Bug",
+    "title": "Total fallidas",
+    "value": 0,
+    "type": "error",
+    "stat": 0
+  },
+  {
+    "icon": "CirclePause",
+    "title": "Total canceladas",
+    "value": 0,
+    "type": "cancelled",
+    "stat": 0
+  }
+]

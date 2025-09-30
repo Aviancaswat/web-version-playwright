@@ -1,0 +1,265 @@
+[
+  {
+    "key": 0,
+    "stepTitle": "Configuración",
+    "input": [
+      {
+        "name": "id",
+        "label": "Nombre prueba:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false
+      },
+      {
+        "name": "targetPage",
+        "label": "Página objetivo:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "home", "label": "Home", "stepKey": 1 },
+          { "value": "booking", "label": "Booking", "stepKey": 2 }
+        ]
+      },
+      {
+        "name": "targetMethod",
+        "label": "Método objetivo:",
+        "type": "select",
+        "isRequired": true,
+        "option": []
+      },
+      {
+        "name": "homeIdioma",
+        "label": "Idioma:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "es", "label": "Español" },
+          { "value": "en", "label": "Inglés" },
+          { "value": "pt", "label": "Portugués" },
+          { "value": "fr", "label": "Francés" }
+        ]
+      },
+      {
+        "name": "position",
+        "label": "País:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "AR", "label": "Argentina" },
+          { "value": "BR", "label": "Brasil" },
+          { "value": "CO", "label": "Colombia" },
+          { "value": "ES", "label": "España" },
+          { "value": "MX", "label": "México" },
+          { "value": "US", "label": "Estados Unidos" },
+          { "value": "CA", "label": "Canadá" },
+          { "value": "FR", "label": "Francia" },
+          { "value": "IT", "label": "Italia" },
+          { "value": "DE", "label": "Alemania" },
+          { "value": "GB", "label": "Reino Unido" },
+          { "value": "PT", "label": "Portugal" },
+          { "value": "CL", "label": "Chile" },
+          { "value": "PE", "label": "Perú" },
+          { "value": "VE", "label": "Venezuela" },
+          { "value": "JP", "label": "Japón" },
+          { "value": "KR", "label": "Corea del Sur" },
+          { "value": "AU", "label": "Australia" },
+          { "value": "IN", "label": "India" },
+          { "value": "RU", "label": "Rusia" }
+        ]
+      },
+      {
+        "name": "description",
+        "label": "Descripción:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": true,
+        "placeholderText": "BOG-MED"
+      }
+    ]
+  },
+  {
+    "key": 1,
+    "stepTitle": "Home",
+    "method": [
+      { "value": "none", "label": "No aplica" },
+      { "value": "homeSeleccionarOrigen", "label": "Seleccionar Origen" },
+      { "value": "homeSeleccionarDestino", "label": "Seleccionar Destino" },
+      {
+        "value": "homeSeleccionarFechaSalida",
+        "label": "Seleccionar Fecha de Salida"
+      },
+      {
+        "value": "homeSeleccionarFechaLlegada",
+        "label": "Seleccionar Fecha de Llegada"
+      },
+      {
+        "value": "homeSeleccionarPasajeros",
+        "label": "Seleccionar Pasajeros"
+      }
+    ],
+    "input": [
+      {
+        "name": "homeCiudadOrigen",
+        "label": "Origen: ",
+        "type": "searchable-select",
+        "isRequired": true,
+        "option": [
+          { "value": "AUC", "label": "Arauca (AUC)" },
+          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CTG", "label": "Cartagena (CTG)" },
+          { "value": "MTR", "label": "Monteria (MTR)" },
+          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "PEI", "label": "Pereira (PEI)" },
+          { "value": "VUP", "label": "Valledupar (VUP)" },
+          { "value": "AXM", "label": "Armenia (AXM)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+        ]
+      },
+      {
+        "name": "homeCiudadDestino",
+        "label": "Destino: ",
+        "type": "searchable-select",
+        "isRequired": true,
+        "option": [
+          { "value": "AUC", "label": "Arauca (AUC)" },
+          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CTG", "label": "Cartagena (CTG)" },
+          { "value": "MTR", "label": "Monteria (MTR)" },
+          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "PEI", "label": "Pereira (PEI)" },
+          { "value": "VUP", "label": "Valledupar (VUP)" },
+          { "value": "AXM", "label": "Armenia (AXM)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+        ]
+      },
+      {
+        "name": "homeisActiveOptionOutbound",
+        "label": "Tipo de vuelo*: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "false", "label": "Ida y vuelta" },
+          { "value": "true", "label": "Solo ida" }
+        ]
+      },
+      {
+        "name": "homeFechaSalida",
+        "label": "Ida: ",
+        "type": "date",
+        "isRequired": true
+      },
+      {
+        "name": "homeFechaLlegada",
+        "label": "Vuelta",
+        "type": "date",
+        "isRequired": true,
+        "showIf": {
+          "field": "homeisActiveOptionOutbound",
+          "equals": "false"
+        }
+      },
+      {
+        "name": "homePassengerAdults",
+        "label": "Adultos: ",
+        "type": "number",
+        "isRequired": true,
+        "hasDefaultValue": true,
+        "defaultValue": 1
+      },
+      {
+        "name": "homePassengerYouths",
+        "label": "Jóvenes",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0
+      },
+      {
+        "name": "homePassengerChildren",
+        "label": "Niños",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0
+      },
+      {
+        "name": "homePassengerInfant",
+        "label": "Bebés",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0
+      }
+    ]
+  },
+  {
+    "key": 2,
+    "stepTitle": "Booking",
+    "method": [
+      {
+        "value": "bookingSeleccionarVueloIda",
+        "label": "Seleccionar Vuelo de Ida en Reserva"
+      },
+      {
+        "value": "bookingSeleccionarVueloVuelta",
+        "label": "Seleccionar Vuelo de Vuelta en Reserva"
+      }
+    ],
+    "input": [
+      {
+        "name": "bookingNumeroVueloIda",
+        "label": "Número vuelo de ida: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0
+      },
+      {
+        "name": "bookingNumeroVueloRegreso",
+        "label": "Número vuelo de vuelta: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "homeisActiveOptionOutbound",
+          "equals": "false"
+        }
+      },
+      {
+        "name": "bookingTarifaIda",
+        "label": "Tarifa de ida*: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "light", "label": "Light" },
+          { "value": "basic", "label": "Basic" },
+          { "value": "classic", "label": "Classic" },
+          { "value": "flex", "label": "Flex" },
+          { "value": "business", "label": "Business" },
+          { "value": "insignia", "label": "Insignia" }
+        ]
+      },
+      {
+        "name": "bookingTarifaVuelta",
+        "label": "Tarifa de vuelta*: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "light", "label": "Light" },
+          { "value": "basic", "label": "Basic" },
+          { "value": "classic", "label": "Classic" },
+          { "value": "flex", "label": "Flex" },
+          { "value": "business", "label": "Business" },
+          { "value": "insignia", "label": "Insignia" }
+        ],
+        "showIf": {
+          "field": "homeisActiveOptionOutbound",
+          "equals": "false"
+        }
+      }
+    ]
+  }
+]
