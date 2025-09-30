@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Inicio",
+    "path": "/",
+    "icon": "House"
+  },
+  {
+    "name": "Panel",
+    "path": "/dashboard",
+    "icon": "LayoutDashboard"
+  },
+  {
+    "name": "Crear prueba",
+    "path": "/create-test",
+    "icon": "FlaskConical"
+  }
+]

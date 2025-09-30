@@ -1,13 +1,16 @@
-import './App.css';
-import LayoutApp from './layout/layout-app';
-import RoutesApp from './routes/routes-app';
+//Components
+import LayoutApp from "./layout/LayoutApp";
+import RoutesApp from "./routes/RoutesApp";
+
+//Styles
+import "./App.css";
 
 const App = () => {
   return (
     <LayoutApp>
       <RoutesApp />
     </LayoutApp>
-  )
-}
+  );
+};
 
-export default App
+export default App;
