@@ -1,4 +1,4 @@
-import type { Test } from "./useTestStore.types";
+import type { Test } from "../useTestStore/useTestStore.types";
 
 export interface EditTestStore {
   editTest: Test | null;
