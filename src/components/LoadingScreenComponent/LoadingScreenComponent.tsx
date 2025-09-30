@@ -26,7 +26,7 @@ const LoadingScreenComponent: React.FC = () => {
         <img
           width={"150px"}
           height={"auto"}
-          src="/public/plane-loader.gif"
+          src="/plane-loader.gif"
           alt="loader plane image"
         />
         <Text color="blackAlpha.900">
