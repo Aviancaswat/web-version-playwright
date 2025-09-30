@@ -7,6 +7,7 @@ const HomePage = () => {
   return (
     <Box placeContent={"center"} height={"100%"}>
       <HomeBody />
+      
     </Box>
   );
 };
