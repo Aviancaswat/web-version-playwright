@@ -10,41 +10,31 @@ import {
   ButtonGroup,
   Heading,
   HStack,
-  Spinner,
+  Skeleton,
   Table,
   TableContainer,
   Tbody,
-  Text,
+  Td,
   Th,
   Thead,
   Tooltip,
   Tr,
   useDisclosure,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { FolderX, RefreshCw } from "lucide-react";
-
-//Services
+import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
-
-//Store
 import { useTestStore } from "../../store/test-store";
-
-//Components
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
-
-//Types
 import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const TableWorkflowsDash: React.FC = () => {
-  const { setDataWorkflows, dataWorkflows } = useTestStore();
 
   const toast = useToast();
-
+  const { setDataWorkflows, dataWorkflows } = useTestStore();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const [isLoading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -276,21 +266,29 @@ const TableWorkflowsDash: React.FC = () => {
             </Tr>
           </Thead>
           <Tbody width={"100%"} height={100}>
-            {isLoading ? (
-              <Box
-                width={"100%"}
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                mt={5}
-              >
-                <Text>Cargando...</Text> <Spinner ml={2} />
-              </Box>
-            ) : (
-              currentItems.length > 0 && (
-                <TableWorkflowItemComponent data={currentItems} />
-              )
-            )}
+            {
+              isLoading ? (
+                [...Array(3)].map((_, index) => (
+                  <Tr key={index}>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                  </Tr>
+                ))
+              ) : (
+                currentItems.length > 0 && (
+                  <TableWorkflowItemComponent data={currentItems} />
+                )
+              )}
           </Tbody>
         </Table>
       </TableContainer>
