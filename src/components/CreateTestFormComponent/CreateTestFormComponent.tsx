@@ -28,9 +28,8 @@ import SearchableSelectComponent from "../SearchableSelectComponent/SearchableSe
 //Types
 import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 
-//TODO: Cuando seleccione pasajeros o flujo superior en el paso de pasajeros, mostrar texto explicativo: "El formulario se va rellenar."
-//TODO: Mostrar mensaje en paso de asientos: "Se va seleccionar un asiento al azar."
-//TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
+//TODO: Quitar persistencia en session storage
+//TODO: Agregar campos para el flujo de servicios
 
 const CreateTestFormComponent: React.FC = () => {
   const { addTest, isBlocked, updateTest } = useTestStore();
@@ -64,6 +63,26 @@ const CreateTestFormComponent: React.FC = () => {
     if (editTest) {
       const updatedData: typeof formData = { ...editTest };
 
+      Object.entries(editTest).forEach(([key, value]) => {
+        if (typeof value === "object" && value !== null) {
+          const isActive = Object.values(value).some((value) => {
+            if (typeof value === "boolean") return value === true;
+            if (typeof value === "number") return value > 0;
+            if (typeof value === "string")
+              return value.trim() !== "" && value !== "false";
+            return false;
+          });
+
+          updatedData[key] = String(isActive);
+
+          Object.entries(value).forEach(([innerKey, innerValue]) => {
+            updatedData[innerKey] = String(innerValue);
+          });
+        } else if (typeof value === "boolean" || typeof value === "number") {
+          updatedData[key] = String(value);
+        }
+      });
+
       stepFields.forEach((step) => {
         step.input.forEach((field) => {
           if (field.type === "date" && updatedData[field.name]) {
@@ -74,6 +93,7 @@ const CreateTestFormComponent: React.FC = () => {
       });
 
       setFormData(updatedData);
+
       if (editTest.targetPage) {
         applyTargetPageFunction(editTest.targetPage);
       }
@@ -95,7 +115,6 @@ const CreateTestFormComponent: React.FC = () => {
       step.input.forEach((field) => {
         if ("showIf" in field) {
           const inputField = field as InputTypes;
-
           const dependencyValue = formData[inputField.showIf?.field ?? ""];
 
           if (
@@ -192,6 +211,79 @@ const CreateTestFormComponent: React.FC = () => {
       });
     });
 
+    const serviceGroups: Record<string, string[]> = {
+      servicesEquipajeManoBodega: [
+        "servicesEquipajeManoIda",
+        "servicesEquipajeManoVuelta",
+        "servicesEquipajeBodegaIda",
+        "servicesEquipajeBodegaVuelta",
+      ],
+      servicesEquipajeDeportivo: [
+        "servicesDeportivoBicicletaIda",
+        "servicesDeportivoBicicletaVuelta",
+        "servicesDeportivoGolfIda",
+        "servicesDeportivoGolfVuelta",
+        "servicesDeportivoBuceoIda",
+        "servicesDeportivoBuceoVuelta",
+        "servicesDeportivoSurfIda",
+        "servicesDeportivoSurfVuelta",
+        "servicesDeportivoEsquiarIda",
+        "servicesDeportivoEsquiarVuelta",
+      ],
+      servicesAbordajePrioritario: [
+        "servicesAbordajePrioritarioIda",
+        "servicesAbordajePrioritarioVuelta",
+      ],
+      servicesAviancaLounges: [
+        "servicesLoungesPrioritarioIda",
+        "servicesLoungesPrioritarioVuelta",
+      ],
+      servicesAsistenciaEspecial: [
+        "servicesAsistenciaDiscapacidadVisualIda",
+        "servicesAsistenciaDiscapacidadVisualVuelta",
+        "servicesAsistenciaDiscapacidadAuditivaIda",
+        "servicesAsistenciaDiscapacidadAuditivaVuelta",
+        "servicesAsistenciaDiscapacidadIntelectualIda",
+        "servicesAsistenciaDiscapacidadIntelectualVuelta",
+        "servicesAsistenciaPerroServicioIda",
+        "servicesAsistenciaPerroServicioVuelta",
+        "servicesAsistenciaDiscapacidadFisicaIda",
+        "servicesAsistenciaDiscapacidadFisicaVuelta",
+      ],
+    };
+
+    const services: Record<string, any> = {};
+
+    Object.entries(serviceGroups).forEach(([mainKey, children]) => {
+      if (transformedData[mainKey] === "true") {
+        const nested: Record<string, any> = {};
+
+        children.forEach((child) => {
+          if (child in transformedData) {
+            const value = transformedData[child];
+            if (value === "true" || value === "false") {
+              nested[child] = value === "true";
+            } else if (!isNaN(Number(value))) {
+              nested[child] = Number(value);
+            } else {
+              nested[child] = value;
+            }
+            delete transformedData[child];
+          }
+        });
+        services[mainKey] = nested;
+      }
+    });
+
+    if (transformedData.servicesAsistenciaViaje) {
+      services.servicesAsistenciaViaje =
+        transformedData.servicesAsistenciaViaje === "true";
+
+      delete transformedData.servicesAsistenciaViaje;
+    }
+
+    Object.assign(transformedData, services);
+
     if (editTest && testIndexToEdit !== null) {
       updateTest(testIndexToEdit, transformedData);
       cleanEditTest();
@@ -205,8 +297,11 @@ const CreateTestFormComponent: React.FC = () => {
     setCurrentStep(0);
   };
 
-  const currentStepFields =
-    stepFields.find((step) => step.key === steps[currentStep])?.input || [];
+  const currentStepConfig = stepFields.find(
+    (step) => step.key === steps[currentStep]
+  );
+
+  const currentStepFields = currentStepConfig?.input || [];
 
   const isStepComplete = (stepKey: Option["stepKey"]) => {
     const step = stepFields.find((step) => step.key === stepKey);
@@ -371,92 +466,101 @@ const CreateTestFormComponent: React.FC = () => {
         </HStack>
       </Box>
       <Box flex="1 1 auto" minH={0} maxH="100%" overflowY="auto" pr={1}>
-        <Grid templateColumns="repeat(2, 1fr)" alignItems="end" gap={4}>
-          {currentStepFields
-            .filter((field) => shouldShowField(field))
-            .map((field, index, array) => (
-              <GridItem
-                key={field.name}
-                colSpan={
-                  array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1
-                }
-              >
-                <FormControl isRequired={field.isRequired}>
-                  <FormLabel>{field.label}</FormLabel>
+        {currentStepConfig?.hasOnlyText ? (
+          <Text fontSize="md" textAlign={"center"} color="gray.700" p={4}>
+            {currentStepConfig.infoText}
+          </Text>
+        ) : (
+          <Grid templateColumns="repeat(2, 1fr)" alignItems="end" gap={4}>
+            {currentStepFields
+              .filter((field) => shouldShowField(field))
+              .map((field, index, array) => (
+                <GridItem
+                  key={field.name}
+                  colSpan={
+                    array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1
+                  }
+                >
+                  <FormControl isRequired={field.isRequired}>
+                    <FormLabel>{field.label}</FormLabel>
 
-                  {field.type === "select" && (
-                    <Select
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleInputChange}
-                      disabled={isBlocked}
-                    >
-                      <option value="">Selecciona una opción</option>
-                      {(
-                        dependentFieldOption[field.name] ||
-                        field.option ||
-                        []
-                      ).map((option: Option, i: number) => (
-                        <option key={i} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
-
-                  {field.type === "searchable-select" && field.option && (
-                    <SearchableSelectComponent
-                      options={
-                        field.name === "homeCiudadDestino" &&
-                        formData["homeCiudadOrigen"]
-                          ? field.option.filter(
-                              (option) =>
-                                option.value !== formData["homeCiudadOrigen"]
-                            )
-                          : field.option
-                      }
-                      value={formData[field.name] || ""}
-                      onChange={(val) =>
-                        setFormData((prev) => ({ ...prev, [field.name]: val }))
-                      }
-                    />
-                  )}
-
-                  {field.type !== "select" &&
-                    field.type !== "searchable-select" && (
-                      <Input
-                        type={field.type}
-                        min={new Date().toISOString().split("T")[0]}
+                    {field.type === "select" && (
+                      <Select
                         name={field.name}
+                        value={formData[field.name] || ""}
+                        onChange={handleInputChange}
                         disabled={isBlocked}
-                        placeholder={
-                          "placeholderText" in field
-                            ? field?.placeholderText
-                            : ""
+                      >
+                        <option value="">Selecciona una opción</option>
+                        {(
+                          dependentFieldOption[field.name] ||
+                          field.option ||
+                          []
+                        ).map((option: Option, i: number) => (
+                          <option key={i} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+
+                    {field.type === "searchable-select" && field.option && (
+                      <SearchableSelectComponent
+                        options={
+                          field.name === "homeCiudadDestino" &&
+                          formData["homeCiudadOrigen"]
+                            ? field.option.filter(
+                                (option) =>
+                                  option.value !== formData["homeCiudadOrigen"]
+                              )
+                            : field.option
                         }
-                        value={
-                          formData[field.name] ??
-                          ("defaultValue" in field ? field.defaultValue : "")
+                        value={formData[field.name] || ""}
+                        onChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            [field.name]: val,
+                          }))
                         }
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          if (field.type === "number") {
-                            if (value === "" || Number(value) >= 0) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                [field.name]: value,
-                              }));
-                            }
-                          } else {
-                            handleInputChange(e);
-                          }
-                        }}
                       />
                     )}
-                </FormControl>
-              </GridItem>
-            ))}
-        </Grid>
+
+                    {field.type !== "select" &&
+                      field.type !== "searchable-select" && (
+                        <Input
+                          type={field.type}
+                          min={new Date().toISOString().split("T")[0]}
+                          name={field.name}
+                          disabled={isBlocked}
+                          placeholder={
+                            "placeholderText" in field
+                              ? field?.placeholderText
+                              : ""
+                          }
+                          value={
+                            formData[field.name] ??
+                            ("defaultValue" in field ? field.defaultValue : "")
+                          }
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            if (field.type === "number") {
+                              if (value === "" || Number(value) >= 0) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  [field.name]: value,
+                                }));
+                              }
+                            } else {
+                              handleInputChange(e);
+                            }
+                          }}
+                        />
+                      )}
+                  </FormControl>
+                </GridItem>
+              ))}
+          </Grid>
+        )}
       </Box>
 
       <ButtonGroup justifyContent="space-between" mt="auto" pt={4} w="100%">

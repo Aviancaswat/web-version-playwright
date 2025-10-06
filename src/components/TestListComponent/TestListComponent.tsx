@@ -54,7 +54,7 @@ const TestListComponent: React.FC = () => {
         const response = await checkWorkflowStatus(commitSHA);
 
         if (!response) return;
-        
+
         const { status, result = "", title, workflowId } = response;
 
         if (status === "completed") {
@@ -98,6 +98,7 @@ const TestListComponent: React.FC = () => {
 
   const handleCleanList = () => {
     clearTests();
+    unblockForm();
   };
 
   const handleCleanAll = () => {
