@@ -4,6 +4,10 @@ export type DataWorkflows = {
   status: string | null;
   conclusion: string | null;
   total_count: number;
+  actor: {
+    autorname: string,
+    avatar: string
+  }
 };
 
 export type TableWorkflowItemsProps = {

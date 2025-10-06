@@ -11,6 +11,7 @@ import {
   Heading,
   HStack,
   Skeleton,
+  SkeletonCircle,
   Table,
   TableContainer,
   Tbody,
@@ -55,9 +56,14 @@ const TableWorkflowsDash: React.FC = () => {
       try {
         const runs = await getRunsByRepo();
         if (runs.length === 0) throw new Error("No hay workflows");
+        console.log("Data workflows: ", runs)
 
         const newData: DataWorkflows[] = runs.map((workflow) => ({
           id: workflow.id,
+          actor: {
+            autorname: workflow?.head_commit?.author?.name,
+            avatar: workflow?.actor?.avatar_url,
+          },
           display_title: workflow.display_title,
           status: workflow.status,
           conclusion: workflow.conclusion,
@@ -84,6 +90,10 @@ const TableWorkflowsDash: React.FC = () => {
 
         const newData: DataWorkflows[] = runs.map((workflow) => ({
           id: workflow.id,
+          actor: {
+            autorname: workflow?.head_commit?.author?.name,
+            avatar: workflow?.actor?.avatar_url,
+          },
           display_title: workflow.display_title,
           status: workflow.status,
           conclusion: workflow.conclusion,
@@ -111,6 +121,10 @@ const TableWorkflowsDash: React.FC = () => {
       if (runs.length === 0) throw new Error("No hay workflows");
       const newData: DataWorkflows[] = runs.map((workflow) => ({
         id: workflow.id,
+        actor: {
+          autorname: workflow?.head_commit?.author?.name,
+          avatar: workflow?.actor?.avatar_url,
+        },
         display_title: workflow.display_title,
         status: workflow.status,
         conclusion: workflow.conclusion,
@@ -189,8 +203,11 @@ const TableWorkflowsDash: React.FC = () => {
                 onClick={handleReloadTable}
                 size={"xs"}
                 isDisabled={isLoading}
-                colorScheme="blackAlpha"
-                variant={"solid"}
+                bg={"black"}
+                color={"white"}
+                _hover={{
+                  bg: "gray",
+                }}
               >
                 <RefreshCw size={16} />
               </Button>
@@ -205,8 +222,11 @@ const TableWorkflowsDash: React.FC = () => {
                 onClick={onOpen}
                 size={"xs"}
                 isDisabled={isLoading}
-                colorScheme="blackAlpha"
-                variant={"solid"}
+                bg={"black"}
+                color={"white"}
+                _hover={{
+                  bg: "gray",
+                }}
               >
                 <FolderX size={16} />
               </Button>
@@ -259,6 +279,7 @@ const TableWorkflowsDash: React.FC = () => {
         >
           <Thead>
             <Tr>
+              <Th>Autor</Th>
               <Th>Nombre del workflow</Th>
               <Th>Status</Th>
               <Th>Resultado</Th>
@@ -270,6 +291,9 @@ const TableWorkflowsDash: React.FC = () => {
               isLoading ? (
                 [...Array(3)].map((_, index) => (
                   <Tr key={index}>
+                    <Td>
+                      <SkeletonCircle height="32px" width={"32px"} />
+                    </Td>
                     <Td>
                       <Skeleton height="20px" />
                     </Td>

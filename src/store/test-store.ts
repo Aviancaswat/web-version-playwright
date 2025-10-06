@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ResultWorkflow, StatusWorkflow } from "../github/api";
 import type { DataWorkflows } from "../components/TableWorkflowComponent/TableWorkflowComponent.types";
+import type { ResultWorkflow, StatusWorkflow } from "../github/api";
 
 type State = {
   statusWorkflow: StatusWorkflow;

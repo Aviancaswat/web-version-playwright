@@ -1,4 +1,4 @@
-import { Heading, Skeleton, SkeletonText, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Heading, Skeleton, SkeletonCircle, SkeletonText, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 
 const SkeletonTable = () => {
     return (
@@ -20,6 +20,7 @@ const SkeletonTable = () => {
                     <Thead>
                         <Tr>
                             <Th><Skeleton height="20px" width="150px" /></Th>
+                            <Th><Skeleton height="20px" width="150px" /></Th>
                             <Th><Skeleton height="20px" width="100px" /></Th>
                             <Th><Skeleton height="20px" width="100px" /></Th>
                             <Th><Skeleton height="20px" width="100px" /></Th>
@@ -29,6 +30,9 @@ const SkeletonTable = () => {
                     <Tbody>
                         {[...Array(3)].map((_, rowIndex) => (
                             <Tr key={rowIndex}>
+                                <Td>
+                                    <SkeletonCircle height="32px" width="32px" />
+                                </Td>
                                 <Td>
                                     <Skeleton height="35px" width="150px" />
                                 </Td>
