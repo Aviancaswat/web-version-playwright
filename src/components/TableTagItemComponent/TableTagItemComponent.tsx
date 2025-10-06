@@ -8,8 +8,6 @@ import {
   RefreshCwOff,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-//Types
 import type { LucideIconType, TagDashProps } from "./TableTagItemComponent.types";
 
 const TagDash: React.FC<TagDashProps> = ({ type }) => {
@@ -49,7 +47,7 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
   }, []);
 
   return (
-    <Tag variant={"outline"} colorScheme={params?.color} p={2} minW={"100%"}>
+    <Tag variant={"subtle"} colorScheme={params?.color} p={2} minW={"100%"}>
       <TagLeftIcon as={params?.icon} />
       {params?.text}
     </Tag>
