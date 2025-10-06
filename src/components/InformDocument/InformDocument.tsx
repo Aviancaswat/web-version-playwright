@@ -138,8 +138,6 @@ const InformDocument = () => {
     const errors = dataWorkflows.filter(e => e.conclusion === "failure").length;
     const cancelled = dataWorkflows.filter(e => e.conclusion === "cancelled").length;
 
-    console.log("dataWorkflows document: ", dataWorkflows);
-
     return (
         <Document>
             <Page style={styles.body}>
