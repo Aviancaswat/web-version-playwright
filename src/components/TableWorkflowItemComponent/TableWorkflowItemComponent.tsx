@@ -181,8 +181,8 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
       {data.map((row) => (
         <Tr key={row.id}>
           <Td>
-            <Tooltip key={row.id} label={row.actor.autorname} placement="top" bg={"white"} color={"black"}>
-              <Avatar key={row.id} size='sm' name='Ryan Florence' src={row.actor?.avatar} />
+            <Tooltip key={row.id} label={row?.actor?.autorname} placement="top" bg={"white"} color={"black"}>
+              <Avatar key={row.id} size='sm' name='Ryan Florence' src={row?.actor?.avatar} />
             </Tooltip>
           </Td>
           <Td maxWidth={300} isTruncated>{row.display_title}</Td>
