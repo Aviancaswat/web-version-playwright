@@ -52,7 +52,8 @@ const PaginationTableDash: React.FC<PaginationProps> = ({
         <Button
           key={index}
           onClick={() => paginate(page === "..." ? currentPage : page)}
-          colorScheme={currentPage === page ? "blackAlpha" : "gray"}
+          bg={currentPage === page ? "black" : "white"}
+          color={currentPage === page ? "white": "black"}
           variant="solid"
           size={"xs"}
           m={1}
