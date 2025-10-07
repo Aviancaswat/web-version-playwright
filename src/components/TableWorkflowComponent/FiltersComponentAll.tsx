@@ -14,7 +14,6 @@ const FiltersComponentAll: React.FC = () => {
     const [dataFilters, setDataFilters] = useState<FilterProps[]>([])
 
     useEffect(() => {
-        console.log("Dataworkflows filters: ", dataWorkflows)
         if (dataWorkflows.length === 0) return;
         const dataActors = new Set(dataWorkflows.map(e => e.actor?.autorname))
         const dataNamesWorkflows = new Set(dataWorkflows.map(e => e.display_title))
@@ -28,19 +27,23 @@ const FiltersComponentAll: React.FC = () => {
         const dataFilterCompleted: FilterProps[] = [
             {
                 title: "Autores",
-                data: actors
+                data: actors,
+                type: 'autor'
             },
             {
-                title: "Nombre del workflows",
-                data: workflows
+                title: "Nombre del workflow",
+                data: workflows,
+                type: 'workflow'
             },
             {
                 title: "Status",
-                data: status
+                data: status,
+                type: 'status'
             },
             {
-                title: "Resultados",
-                data: results
+                title: "Resultado",
+                data: results,
+                type: 'result'
             }
         ]
         console.log("dataFilterCompleted: ", dataFilterCompleted)
@@ -68,15 +71,15 @@ const FiltersComponentAll: React.FC = () => {
                 >Aplicar</Button>
                 <Tooltip label="Borrar filtros" bg={"white"} color={"black"} placement="top" borderRadius={"md"}>
                     <Button
-                    bg={"black"}
-                    color={"white"}
-                    size={"xs"}
-                    _hover={{
-                        bg: "gray.700"
-                    }}
-                >
-                    <SearchX size={20} />
-                </Button>
+                        bg={"black"}
+                        color={"white"}
+                        size={"xs"}
+                        _hover={{
+                            bg: "gray.700"
+                        }}
+                    >
+                        <SearchX size={20} />
+                    </Button>
                 </Tooltip>
             </HStack>
         </Box>
