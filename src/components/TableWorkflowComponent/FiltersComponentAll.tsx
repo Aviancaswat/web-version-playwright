@@ -68,7 +68,9 @@ const FiltersComponentAll: React.FC = () => {
                     _hover={{
                         bg: "gray.700"
                     }}
-                >Aplicar</Button>
+                >
+                    Aplicar
+                </Button>
                 <Tooltip label="Borrar filtros" bg={"white"} color={"black"} placement="top" borderRadius={"md"}>
                     <Button
                         bg={"black"}

@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Checkbox, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner, Tag, TagLabel, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button, Checkbox, HStack, Input, Menu, MenuButton, MenuItem, MenuList, Spinner, Tag, TagLabel, Text } from "@chakra-ui/react";
 import { ChevronDownIcon } from "lucide-react";
 import { useTestStore } from "../../store/test-store";
 
@@ -85,6 +85,13 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                 maxHeight={200}
                 overflowY={"auto"}
             >
+                <Box width={"90%"} m="0px auto 10px auto">
+                    {
+                        type === "workflow" && (
+                            <Input placeholder='Escribe el nombre' size='sm' borderRadius={"md"} />
+                        )
+                    }
+                </Box>
                 {
                     data.length > 0 ? (
                         data.map((item, idx) => (
@@ -113,7 +120,6 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                                                 )
                                             }
                                         </>
-
                                         <Text maxWidth={300} isTruncated>
                                             {
                                                 (type === "status" || type === "result") ? parseValues(item) : item
