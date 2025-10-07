@@ -88,7 +88,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                 <Box width={"90%"} m="0px auto 10px auto">
                     {
                         type === "workflow" && (
-                            <Input placeholder='Escribe el nombre' size='sm' borderRadius={"md"} />
+                            <Input variant={"filled"} placeholder='Escribe el nombre' size='sm' borderRadius={"md"} />
                         )
                     }
                 </Box>
