@@ -21,7 +21,8 @@ import {
   Tooltip,
   Tr,
   useDisclosure,
-  useToast
+  useToast,
+  VStack
 } from "@chakra-ui/react";
 import { FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -29,6 +30,7 @@ import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
+import FiltersComponentAll from "./FiltersComponentAll";
 import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const TableWorkflowsDash: React.FC = () => {
@@ -45,9 +47,7 @@ const TableWorkflowsDash: React.FC = () => {
   const currentItems = dataWorkflows.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
-
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   const getWorkflows = async () => {
@@ -128,9 +128,14 @@ const TableWorkflowsDash: React.FC = () => {
         alignItems={"center"}
       >
         <HStack m={0} p={0} justify={"space-between"} width={"100%"}>
-          <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
-            Información general de los workflows
-          </Heading>
+          <VStack gap={2} width={"100%"}>
+            <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
+              Información general de los workflows
+            </Heading>
+            <Box width={"100%"}>
+              <FiltersComponentAll />
+            </Box>
+          </VStack>
           <ButtonGroup
             width={"100%"}
             size="sm"
