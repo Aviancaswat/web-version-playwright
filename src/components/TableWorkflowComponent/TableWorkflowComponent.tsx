@@ -61,7 +61,7 @@ const TableWorkflowsDash: React.FC = () => {
         const newData: DataWorkflows[] = runs.map((workflow) => ({
           id: workflow.id,
           actor: {
-            autorname: workflow?.head_commit?.author?.name,
+            autorname: workflow?.actor?.login,
             avatar: workflow?.actor?.avatar_url,
           },
           display_title: workflow.display_title,
@@ -91,7 +91,7 @@ const TableWorkflowsDash: React.FC = () => {
         const newData: DataWorkflows[] = runs.map((workflow) => ({
           id: workflow.id,
           actor: {
-            autorname: workflow?.head_commit?.author?.name,
+            autorname: workflow?.actor?.login,
             avatar: workflow?.actor?.avatar_url,
           },
           display_title: workflow.display_title,
@@ -122,7 +122,7 @@ const TableWorkflowsDash: React.FC = () => {
       const newData: DataWorkflows[] = runs.map((workflow) => ({
         id: workflow.id,
         actor: {
-          autorname: workflow?.head_commit?.author?.name,
+          autorname: workflow?.actor?.login,
           avatar: workflow?.actor?.avatar_url,
         },
         display_title: workflow.display_title,
