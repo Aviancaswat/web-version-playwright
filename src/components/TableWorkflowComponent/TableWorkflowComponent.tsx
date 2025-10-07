@@ -50,75 +50,13 @@ const TableWorkflowsDash: React.FC = () => {
 
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const getWorkflows = async () => {
-      setLoading(true);
-      try {
-        const runs = await getRunsByRepo();
-        if (runs.length === 0) throw new Error("No hay workflows");
-        console.log("Data workflows: ", runs)
-
-        const newData: DataWorkflows[] = runs.map((workflow) => ({
-          id: workflow.id,
-          actor: {
-            autorname: workflow?.actor?.login,
-            avatar: workflow?.actor?.avatar_url,
-          },
-          display_title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          total_count: workflow.total_count,
-        }));
-
-        setDataWorkflows(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWorkflows();
-  }, []);
-
-  useEffect(() => {
-    const getWorkflows = async () => {
-      setLoading(true);
-      try {
-        const runs = await getRunsByRepo();
-        if (runs.length === 0) throw new Error("No hay workflows");
-
-        const newData: DataWorkflows[] = runs.map((workflow) => ({
-          id: workflow.id,
-          actor: {
-            autorname: workflow?.actor?.login,
-            avatar: workflow?.actor?.avatar_url,
-          },
-          display_title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          total_count: workflow.total_count,
-        }));
-
-        if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
-          setDataWorkflows(newData);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWorkflows();
-  }, [dataWorkflows]);
-
-  const handleReloadTable = useCallback(async () => {
+  const getWorkflows = async () => {
     setLoading(true);
-
     try {
       const runs = await getRunsByRepo();
       if (runs.length === 0) throw new Error("No hay workflows");
+      console.log("Data workflows: ", runs)
+
       const newData: DataWorkflows[] = runs.map((workflow) => ({
         id: workflow.id,
         actor: {
@@ -131,15 +69,21 @@ const TableWorkflowsDash: React.FC = () => {
         total_count: workflow.total_count,
       }));
 
-      if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
-        setDataWorkflows(newData);
-      }
+      setDataWorkflows(newData);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [dataWorkflows]);
+  };
+
+  useEffect(() => {
+    getWorkflows();
+  }, []);
+
+  const handleReloadTable = useCallback(async () => {
+    getWorkflows()
+  }, []);
 
   const handleDeleteAllArtifacts = async () => {
     setIsLoadingDelete(true);
