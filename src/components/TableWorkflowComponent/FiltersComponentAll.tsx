@@ -61,6 +61,7 @@ const FiltersComponentAll: React.FC = () => {
             </Box>
             <HStack spacing={1}>
                 <Button
+                    isDisabled={dataWorkflows.length === 0}
                     bg={"black"}
                     color={"white"}
                     size={"xs"}
@@ -73,6 +74,7 @@ const FiltersComponentAll: React.FC = () => {
                 </Button>
                 <Tooltip label="Borrar filtros" bg={"white"} color={"black"} placement="top" borderRadius={"md"}>
                     <Button
+                        isDisabled={dataWorkflows.length === 0}
                         bg={"black"}
                         color={"white"}
                         size={"xs"}

@@ -1,5 +1,7 @@
 import { Avatar, Box, Button, Checkbox, HStack, Input, Menu, MenuButton, MenuItem, MenuList, Spinner, Tag, TagLabel, Text } from "@chakra-ui/react";
+import { debounce } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useTestStore } from "../../store/test-store";
 
 export type FilterProps = {
@@ -9,10 +11,30 @@ export type FilterProps = {
 }
 
 const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
+    const { dataWorkflows } = useTestStore();
+    const [dataFilter, setDataFilter] = useState<string[]>(data);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const { dataWorkflows } = useTestStore()
+    // Función de búsqueda que se ejecuta después de un debounce
+    const handleSearch = useCallback(
+        debounce((value: string) => {
+            const filteredItems = data.filter(item =>
+                item.toLowerCase().includes(value.toLowerCase())
+            );
+            setDataFilter(filteredItems);
+        }, 300), // 300 ms de espera después de dejar de escribir
+        [data]
+    );
+
+    useEffect(() => {
+        // Limpiar el filtro cuando se limpia el searchTerm
+        if (!searchTerm) {
+            setDataFilter(data);
+        }
+    }, [searchTerm, data]);
+
     const parseValues = (value: string | undefined): React.ReactElement | string => {
-        let values: Record<string, React.ReactElement> = {
+        const values: Record<string, React.ReactElement> = {
             "queued": (
                 <Tag size={"md"} variant='subtle' colorScheme='gray'>
                     <Box h={2} w={2} borderRadius={"full"} bg={"gray"} mr={2} />
@@ -38,12 +60,10 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                 </Tag>
             ),
             "failure": (
-                (
-                    <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='red'>
-                        <Box h={2} w={2} borderRadius={"full"} bg={"red"} mr={2} />
-                        <TagLabel>Fallido</TagLabel>
-                    </Tag>
-                )
+                <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='red'>
+                    <Box h={2} w={2} borderRadius={"full"} bg={"red"} mr={2} />
+                    <TagLabel>Fallido</TagLabel>
+                </Tag>
             ),
             "neutral": (
                 <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='gray'>
@@ -52,22 +72,25 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                 </Tag>
             ),
             "cancelled": (
-                (
-                    <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='orange'>
-                        <Box h={2} w={2} borderRadius={"full"} bg={"orange"} mr={2} />
-                        <TagLabel>Cancelado</TagLabel>
-                    </Tag>
-                )
+                <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='orange'>
+                    <Box h={2} w={2} borderRadius={"full"} bg={"orange"} mr={2} />
+                    <TagLabel>Cancelado</TagLabel>
+                </Tag>
             ),
-        }
+        };
         return value && values.hasOwnProperty(value) ? values[value] : "Por definir";
-    }
+    };
 
     const findUserAvatar = (username: string) => {
-        const findUser = dataWorkflows.find(e => e?.actor?.autorname === username)
-        if (!findUser) return undefined;
-        return findUser?.actor?.avatar
-    }
+        const findUser = dataWorkflows.find(e => e?.actor?.autorname === username);
+        return findUser?.actor?.avatar;
+    };
+
+    const handleKeyUpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchTerm(value); // Actualizamos el término de búsqueda
+        handleSearch(value); // Iniciamos el debounce
+    };
 
     return (
         <Menu closeOnSelect={false}>
@@ -81,64 +104,57 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
             >
                 {title}
             </MenuButton>
-            <MenuList
-                maxHeight={200}
-                overflowY={"auto"}
-            >
+            <MenuList maxHeight={200} overflowY={"auto"}>
                 <Box width={"90%"} m="0px auto 10px auto">
-                    {
-                        type === "workflow" && (
-                            <Input variant={"filled"} placeholder='Escribe el nombre' size='sm' borderRadius={"md"} />
-                        )
-                    }
+                    {type === "workflow" && (
+                        <Input
+                            variant={"filled"}
+                            placeholder='Escribe el nombre'
+                            size='sm'
+                            borderRadius={"md"}
+                            value={searchTerm}
+                            onChange={handleKeyUpInput}
+                        />
+                    )}
                 </Box>
-                {
-                    data.length > 0 ? (
-                        data.map((item, idx) => (
-                            <MenuItem
-                                key={idx}
-                                border={"none"}
-                                _hover={{
-                                    background: "gray.100",
-                                    border: "none",
-                                    outline: "none",
-                                }}
-                                _focus={{
-                                    outline: "none",
-                                }}
-                            >
-                                <Checkbox
-                                    size='md'
-                                    colorScheme="blackAlpha"
-                                    width={"100%"}
-                                >
-                                    <HStack>
-                                        <>
-                                            {
-                                                type === "autor" && (
-                                                    <Avatar size='xs' name='' src={findUserAvatar(item)} />
-                                                )
-                                            }
-                                        </>
-                                        <Text maxWidth={300} isTruncated>
-                                            {
-                                                (type === "status" || type === "result") ? parseValues(item) : item
-                                            }
-                                        </Text>
-                                    </HStack>
-                                </Checkbox>
-                            </MenuItem>
-                        ))
-                    ) :
-                        (
-                            <Box minHeight={100} display={"grid"} placeContent={"center"}>
-                                <Spinner />
-                            </Box>
-                        )
-                }
+                {dataFilter.length > 0 ? (
+                    dataFilter.map((item, idx) => (
+                        <MenuItem
+                            key={idx}
+                            border={"none"}
+                            _hover={{
+                                background: "gray.100",
+                                border: "none",
+                                outline: "none",
+                            }}
+                            _focus={{
+                                outline: "none",
+                            }}
+                        >
+                            <Checkbox size='md' colorScheme="blackAlpha" width={"100%"}>
+                                <HStack>
+                                    {type === "autor" && (
+                                        <Avatar size='xs' name='' src={findUserAvatar(item)} />
+                                    )}
+                                    <Text maxWidth={300} isTruncated>
+                                        {type === "status" || type === "result" ? parseValues(item) : item}
+                                    </Text>
+                                </HStack>
+                            </Checkbox>
+                        </MenuItem>
+                    ))
+                ) : (
+                    (type === "workflow" && searchTerm.length !== 0) ? (
+                        <Text height={50} display={"grid"} placeContent={"center"}>Sin resultados</Text>
+                    ) : (
+                        <Box minHeight={100} display={"grid"} placeContent={"center"}>
+                            <Spinner />
+                        </Box>
+                    )
+                )}
             </MenuList>
-        </Menu>
-    )
-}
+        </Menu >
+    );
+};
 
 export default FilterComponent;
