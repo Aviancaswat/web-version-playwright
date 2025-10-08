@@ -123,14 +123,15 @@ const FiltersComponentAll: React.FC = () => {
                 </Button>
                 <Button
                     isDisabled={dataWorkflows.length === 0}
-                    bg={"black"}
-                    color={"white"}
+                    variant={"ghost"}
                     size={"xs"}
                     _hover={{
-                        bg: "gray.700"
+                        bg: "black",
+                        color: "white"
                     }}
                     onClick={clearFilter}
                     rightIcon={isLoading ? <Spinner size={"sm"} /> : <SearchX size={20} />}
+                    
                 >
                     Limpiar
                 </Button>
