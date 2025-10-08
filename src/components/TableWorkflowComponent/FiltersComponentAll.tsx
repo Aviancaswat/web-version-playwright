@@ -50,6 +50,10 @@ const FiltersComponentAll: React.FC = () => {
         setDataFilters(dataFilterCompleted)
     }, [dataWorkflows])
 
+    const handleFilterTable = () => {
+        
+    }
+
     return (
         <Box display={"flex"} gap={2}>
             <Box display={"flex"} gap={2}>
@@ -69,6 +73,7 @@ const FiltersComponentAll: React.FC = () => {
                     _hover={{
                         bg: "gray.700"
                     }}
+                    onClick={handleFilterTable}
                 >
                     Aplicar
                 </Button>

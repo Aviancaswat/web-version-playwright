@@ -2,32 +2,32 @@ import { Avatar, Box, Button, Checkbox, HStack, Input, Menu, MenuButton, MenuIte
 import { debounce } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useTestStore } from "../../store/test-store";
+import { useTestStore, type FilterGeneric } from "../../store/test-store";
+
+export type FilterType = 'autor' | 'workflow' | 'status' | 'result'
 
 export type FilterProps = {
     title: string,
     data: string[],
-    type: 'autor' | 'workflow' | 'status' | 'result'
+    type: FilterType
 }
 
 const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
-    const { dataWorkflows } = useTestStore();
+    const { dataWorkflows, selectedFilters, setSelectedFilters } = useTestStore();
     const [dataFilter, setDataFilter] = useState<string[]>(data);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    // Función de búsqueda que se ejecuta después de un debounce
     const handleSearch = useCallback(
         debounce((value: string) => {
             const filteredItems = data.filter(item =>
                 item.toLowerCase().includes(value.toLowerCase())
             );
             setDataFilter(filteredItems);
-        }, 300), // 300 ms de espera después de dejar de escribir
+        }, 300),
         [data]
     );
 
     useEffect(() => {
-        // Limpiar el filtro cuando se limpia el searchTerm
         if (!searchTerm) {
             setDataFilter(data);
         }
@@ -88,9 +88,37 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
 
     const handleKeyUpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setSearchTerm(value); // Actualizamos el término de búsqueda
-        handleSearch(value); // Iniciamos el debounce
+        setSearchTerm(value);
+        handleSearch(value);
     };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let newValue: FilterGeneric[] = []
+        const value = e.target.value;
+        const typeFilter = type;
+
+        newValue.push({ type: typeFilter, values: [value] })
+
+        const exists = selectedFilters.some(
+            (filter) => filter.type === type && filter.values.includes(value)
+        );
+
+        let newFilters: FilterGeneric[];
+
+        if (exists) {
+            newFilters = selectedFilters.filter(
+                (filter) => !(filter.type === type && filter.values.includes(value))
+            );
+        } else {
+            newFilters = [...selectedFilters, ...newValue];
+        }
+
+        setSelectedFilters(newFilters);
+    };
+
+    useEffect(() => {
+        console.log("selectedFilters: ", selectedFilters);
+    }, [selectedFilters])
 
     return (
         <Menu closeOnSelect={false}>
@@ -128,13 +156,20 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                                 outline: "none",
                             }}
                             _focus={{
-                                outline: "none",
+                                outline: "none"
                             }}
                         >
-                            <Checkbox size='md' colorScheme="blackAlpha" width={"100%"}>
+                            <Checkbox
+                                size='md'
+                                colorScheme="blackAlpha"
+                                width={"100%"}
+                                isChecked={selectedFilters.some(e => e.values.includes(item))}
+                                onChange={handleFilterChange}
+                                value={item}
+                            >
                                 <HStack>
                                     {type === "autor" && (
-                                        <Avatar size='xs' name='' src={findUserAvatar(item)} />
+                                        <Avatar size='xs' name={item} src={findUserAvatar(item)} />
                                     )}
                                     <Text maxWidth={300} isTruncated>
                                         {type === "status" || type === "result" ? parseValues(item) : item}
@@ -145,7 +180,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                     ))
                 ) : (
                     (type === "workflow" && searchTerm.length !== 0) ? (
-                        <Text height={50} display={"grid"} placeContent={"center"}>Sin resultados</Text>
+                        <Text minHeight={100} display={"grid"} placeContent={"center"}>Sin resultados</Text>
                     ) : (
                         <Box minHeight={100} display={"grid"} placeContent={"center"}>
                             <Spinner />
@@ -153,7 +188,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                     )
                 )}
             </MenuList>
-        </Menu >
+        </Menu>
     );
 };
 

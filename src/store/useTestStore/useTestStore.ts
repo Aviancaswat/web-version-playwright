@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-//Types
 import type { TestStore } from "./useTestStore.types";
 
 const useTestStore = create<TestStore>()(
