@@ -31,7 +31,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
         if (!searchTerm) {
             setDataFilter(data);
         }
-    }, [searchTerm, data]);
+    }, [searchTerm, data, dataWorkflows, selectedFilters]);
 
     const parseValues = (value: string | undefined): React.ReactElement | string => {
         const values: Record<string, React.ReactElement> = {
@@ -93,32 +93,43 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
     };
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let newValue: FilterGeneric[] = []
         const value = e.target.value;
-        const typeFilter = type;
-
-        newValue.push({ type: typeFilter, values: [value] })
+        const findType = selectedFilters.find(e => e.type === type);
+        let newFilters: FilterGeneric[];
 
         const exists = selectedFilters.some(
             (filter) => filter.type === type && filter.values.includes(value)
         );
-
-        let newFilters: FilterGeneric[];
-
-        if (exists) {
-            newFilters = selectedFilters.filter(
-                (filter) => !(filter.type === type && filter.values.includes(value))
-            );
+        if (!findType) {
+            newFilters = [...selectedFilters, { type, values: [value] }];
         } else {
-            newFilters = [...selectedFilters, ...newValue];
+            const updatedValues = [...findType.values];
+            const index = selectedFilters.findIndex((filter) => filter.type === type);
+
+            if (exists) {
+                const newValues = updatedValues.filter(val => val !== value);
+                newFilters = newValues.length > 0
+                    ? [
+                        ...selectedFilters.slice(0, index),
+                        { type, values: newValues },
+                        ...selectedFilters.slice(index + 1)
+                    ]
+                    : [
+                        ...selectedFilters.slice(0, index),
+                        ...selectedFilters.slice(index + 1)
+                    ];
+            } else {
+                updatedValues.push(value);
+                newFilters = [
+                    ...selectedFilters.slice(0, index),
+                    { type, values: updatedValues },
+                    ...selectedFilters.slice(index + 1),
+                ];
+            }
         }
 
         setSelectedFilters(newFilters);
     };
-
-    useEffect(() => {
-        console.log("selectedFilters: ", selectedFilters);
-    }, [selectedFilters])
 
     return (
         <Menu closeOnSelect={false}>
@@ -145,48 +156,50 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                         />
                     )}
                 </Box>
-                {dataFilter.length > 0 ? (
-                    dataFilter.map((item, idx) => (
-                        <MenuItem
-                            key={idx}
-                            border={"none"}
-                            _hover={{
-                                background: "gray.100",
-                                border: "none",
-                                outline: "none",
-                            }}
-                            _focus={{
-                                outline: "none"
-                            }}
-                        >
-                            <Checkbox
-                                size='md'
-                                colorScheme="blackAlpha"
-                                width={"100%"}
-                                isChecked={selectedFilters.some(e => e.values.includes(item))}
-                                onChange={handleFilterChange}
-                                value={item}
+                {
+                    dataFilter.length > 0 ? (
+                        dataFilter.map((item, idx) => (
+                            <MenuItem
+                                key={idx}
+                                border={"none"}
+                                _hover={{
+                                    background: "gray.100",
+                                    border: "none",
+                                    outline: "none",
+                                }}
+                                _focus={{
+                                    outline: "none"
+                                }}
                             >
-                                <HStack>
-                                    {type === "autor" && (
-                                        <Avatar size='xs' name={item} src={findUserAvatar(item)} />
-                                    )}
-                                    <Text maxWidth={300} isTruncated>
-                                        {type === "status" || type === "result" ? parseValues(item) : item}
-                                    </Text>
-                                </HStack>
-                            </Checkbox>
-                        </MenuItem>
-                    ))
-                ) : (
-                    (type === "workflow" && searchTerm.length !== 0) ? (
-                        <Text minHeight={100} display={"grid"} placeContent={"center"}>Sin resultados</Text>
+                                <Checkbox
+                                    size='md'
+                                    colorScheme="blackAlpha"
+                                    width={"100%"}
+                                    isChecked={selectedFilters.some(e => e.values.includes(item))}
+                                    onChange={handleFilterChange}
+                                    value={item}
+                                >
+                                    <HStack>
+                                        {type === "autor" && (
+                                            <Avatar size='xs' name={item} src={findUserAvatar(item)} />
+                                        )}
+                                        <Text maxWidth={300} isTruncated>
+                                            {type === "status" || type === "result" ? parseValues(item) : item}
+                                        </Text>
+                                    </HStack>
+                                </Checkbox>
+                            </MenuItem>
+                        ))
                     ) : (
-                        <Box minHeight={100} display={"grid"} placeContent={"center"}>
-                            <Spinner />
-                        </Box>
+                        (type === "workflow" && searchTerm.length !== 0) ? (
+                            <Text minHeight={100} display={"grid"} placeContent={"center"}>Sin resultados</Text>
+                        ) : (
+                            <Box minHeight={100} display={"grid"} placeContent={"center"}>
+                                <Spinner />
+                            </Box>
+                        )
                     )
-                )}
+                }
             </MenuList>
         </Menu>
     );
