@@ -109,7 +109,7 @@ const FiltersComponentAll: React.FC = () => {
             </Box>
             <HStack spacing={1}>
                 <Button
-                    isDisabled={dataWorkflows.length === 0}
+                    isDisabled={dataWorkflows.length === 0 || isLoading}
                     bg={"black"}
                     color={"white"}
                     size={"xs"}
