@@ -235,7 +235,7 @@ const TableWorkflowsDash: React.FC = () => {
               <Th>Acciones</Th>
             </Tr>
           </Thead>
-          <Tbody width={"100%"} height={100}>
+          <Tbody width={"100%"} height={50}>
             {
               isLoading ? (
                 [...Array(3)].map((_, index) => (

@@ -1,17 +1,16 @@
-import { Box, Button, HStack, Tooltip } from "@chakra-ui/react";
+import { Box, Button, HStack, Spinner } from "@chakra-ui/react";
 import { SearchX, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTestStore } from "../../store/test-store";
+import { getRunsByRepo } from "../../github/api";
+import { useTestStore, type FilterGeneric } from "../../store/test-store";
 import FilterComponent, { type FilterProps } from "./FilterComponent";
+import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const FiltersComponentAll: React.FC = () => {
 
-    const { dataWorkflows } = useTestStore()
-    const [actors, setActors] = useState<string[]>([])
-    const [workflows, setWorkflows] = useState<string[]>([])
-    const [status, setStatus] = useState<string[]>([])
-    const [results, setResults] = useState<string[]>([])
+    const { setDataWorkflows, dataWorkflows, selectedFilters, setSelectedFilters } = useTestStore()
     const [dataFilters, setDataFilters] = useState<FilterProps[]>([])
+    const [isLoading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (dataWorkflows.length === 0) return;
@@ -19,41 +18,86 @@ const FiltersComponentAll: React.FC = () => {
         const dataNamesWorkflows = new Set(dataWorkflows.map(e => e.display_title))
         const dataStatus = new Set(dataWorkflows.map(e => e.status !== null ? e.status : ""))
         const dataResults = new Set(dataWorkflows.map(e => e.conclusion !== null ? e.conclusion : ""))
-        setActors([...dataActors])
-        setWorkflows([...dataNamesWorkflows])
-        setStatus([...dataStatus])
-        setResults([...dataResults])
 
         const dataFilterCompleted: FilterProps[] = [
             {
                 title: "Autores",
-                data: actors,
+                data: [...dataActors],
                 type: 'autor'
             },
             {
                 title: "Nombre del workflow",
-                data: workflows,
+                data: [...dataNamesWorkflows],
                 type: 'workflow'
             },
             {
                 title: "Status",
-                data: status,
+                data: [...dataStatus],
                 type: 'status'
             },
             {
                 title: "Resultado",
-                data: results,
+                data: [...dataResults],
                 type: 'result'
             }
         ]
+        console.log("dataWorkflows: ", dataWorkflows)
         console.log("dataFilterCompleted: ", dataFilterCompleted)
         setDataFilters(dataFilterCompleted)
     }, [dataWorkflows])
 
     const handleFilterTable = () => {
-        
+        console.log("Se filtra: ", selectedFilters)
+        console.log("De la data: ", dataWorkflows)
+        const dataTable = dataWorkflows;
+        const applyFilters = (filters: FilterGeneric[]) => {
+            return dataTable.filter(item => {
+                return filters.every(filter => {
+                    let itemValue: any;
+                    if (filter.type === "autor") {
+                        itemValue = item.actor.autorname;
+                    } else if (filter.type === "status") {
+                        itemValue = item.status;
+                    } else if (filter.type === "result") {
+                        itemValue = item.conclusion;
+                    } else if (filter.type === "workflow") {
+                        itemValue = item.display_title;
+                    }
+                    return filter.values.includes(itemValue);
+                });
+            });
+        };
+        const dataFilter = applyFilters(selectedFilters)
+        setDataWorkflows(dataFilter)
     }
 
+    const clearFilter = () => {
+        setSelectedFilters([])
+        const getWorkflows = async () => {
+            setLoading(true);
+            try {
+                const runs = await getRunsByRepo();
+                if (runs.length === 0) throw new Error("No hay workflows");
+                const newData: DataWorkflows[] = runs.map((workflow) => ({
+                    id: workflow.id,
+                    actor: {
+                        autorname: workflow?.actor?.login,
+                        avatar: workflow?.actor?.avatar_url,
+                    },
+                    display_title: workflow.display_title,
+                    status: workflow.status,
+                    conclusion: workflow.conclusion,
+                    total_count: workflow.total_count,
+                }));
+                setDataWorkflows(newData);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getWorkflows()
+    }
     return (
         <Box display={"flex"} gap={2}>
             <Box display={"flex"} gap={2}>
@@ -77,19 +121,19 @@ const FiltersComponentAll: React.FC = () => {
                 >
                     Aplicar
                 </Button>
-                <Tooltip label="Borrar filtros" bg={"white"} color={"black"} placement="top" borderRadius={"md"}>
-                    <Button
-                        isDisabled={dataWorkflows.length === 0}
-                        bg={"black"}
-                        color={"white"}
-                        size={"xs"}
-                        _hover={{
-                            bg: "gray.700"
-                        }}
-                    >
-                        <SearchX size={20} />
-                    </Button>
-                </Tooltip>
+                <Button
+                    isDisabled={dataWorkflows.length === 0}
+                    bg={"black"}
+                    color={"white"}
+                    size={"xs"}
+                    _hover={{
+                        bg: "gray.700"
+                    }}
+                    onClick={clearFilter}
+                    rightIcon={isLoading ? <Spinner size={"sm"} /> : <SearchX size={20} />}
+                >
+                    Limpiar
+                </Button>
             </HStack>
         </Box>
     )
