@@ -17,23 +17,14 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
     const [dataFilter, setDataFilter] = useState<string[]>(data);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const handleSearch = useCallback(
-        debounce((value: string) => {
-            const filteredItems = data.filter(item =>
-                item.toLowerCase().includes(value.toLowerCase())
-            );
-            setDataFilter(filteredItems);
-        }, 300),
-        [data]
-    );
-
     useEffect(() => {
         if (!searchTerm) {
             setDataFilter(data);
         }
-    }, [searchTerm, data, dataWorkflows, selectedFilters]);
+        console.log("Data filterComponent: ", data)
+    }, [searchTerm, data]);
 
-    const parseValues = (value: string | undefined): React.ReactElement | string => {
+    const parseStateToWords = (value: string | undefined): React.ReactElement | string => {
         const values: Record<string, React.ReactElement> = {
             "queued": (
                 <Tag size={"md"} variant='subtle' colorScheme='gray'>
@@ -85,6 +76,16 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
         const findUser = dataWorkflows.find(e => e?.actor?.autorname === username);
         return findUser?.actor?.avatar;
     };
+    
+    const handleSearch = useCallback(
+        debounce((value: string) => {
+            const filteredItems = data.filter(item =>
+                item.toLowerCase().includes(value.toLowerCase())
+            );
+            setDataFilter(filteredItems);
+        }, 300),
+        [data]
+    );
 
     const handleKeyUpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -184,7 +185,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                                             <Avatar size='xs' name={item} src={findUserAvatar(item)} />
                                         )}
                                         <Text maxWidth={300} isTruncated>
-                                            {type === "status" || type === "result" ? parseValues(item) : item}
+                                            {type === "status" || type === "result" ? parseStateToWords(item) : item}
                                         </Text>
                                     </HStack>
                                 </Checkbox>
