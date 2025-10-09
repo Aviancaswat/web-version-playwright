@@ -181,7 +181,7 @@ export const downLoadReportHTML = async (
     console.log("artifacts: ", artifacts);
 
     if (total_count === 0)
-      throw new Error("No se encontraron reportes asociados al workflow");
+      throw new Error("No hay reporte asociado al workflow");
 
     let artifactId: number = 0;
     let reports: any[] = [];
@@ -197,7 +197,7 @@ export const downLoadReportHTML = async (
     );
     console.log("reportFound: ", reportFound);
     if (!reportFound)
-      throw new Error("No se encontró ningun reporte asociado al workflow");
+      throw new Error("No hay reporte asociado al workflow");
     artifactId = reportFound.id;
 
     console.log("artifactId: ", artifactId);
@@ -377,12 +377,12 @@ export const deleteArtefactById = async (workflowId: number) => {
   try {
     const { artifacts, total_count } = await getArtefactsByRepo();
     if (total_count === 0)
-      throw new Error("No se encontró reportes asociados al workflow");
+      throw new Error("No hay reporte asociado al workflow");
     const artifactsFound = artifacts.filter(
       (e) => e.workflow_run?.id === workflowId
     );
     if (artifactsFound.length === 0)
-      throw new Error("No se encontró reportes asociados al workflow");
+      throw new Error("No hay reporte asociado al workflow");
 
     for (const artifact of artifactsFound) {
       await octokit.request(

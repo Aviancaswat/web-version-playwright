@@ -1,13 +1,9 @@
-import 'react-toastify/dist/ReactToastify.css';
-import { toast, type ToasterProps } from 'sonner';
-import { v4 as uuid } from "uuid";
+import { toast, type ExternalToast } from 'sonner';
 
 class AviancaToast {
 
-    static show(message: string, type = 'info', options: ToasterProps = {}) {
-        const toastOptions: ToasterProps = {
-            id: uuid(),
-            position: 'top-right',
+    static show(message: string, type = 'info', options: ExternalToast) {
+        const toastOptions: ExternalToast = {
             duration: 5000,
             ...options,
         };
@@ -29,19 +25,19 @@ class AviancaToast {
         }
     }
 
-    static success(message: string, options: ToasterProps = {}) {
+    static success(message: string, options: ExternalToast = {}) {
         this.show(message, 'success', options);
     }
 
-    static error(message: string, options: ToasterProps = {}) {
+    static error(message: string, options: ExternalToast = {}) {
         this.show(message, 'error', options);
     }
 
-    static warn(message: string, options: ToasterProps = {}) {
+    static warn(message: string, options: ExternalToast = {}) {
         this.show(message, 'warn', options);
     }
 
-    static info(message: string, options: ToasterProps = {}) {
+    static info(message: string, options: ExternalToast = {}) {
         this.show(message, 'info', options);
     }
 }

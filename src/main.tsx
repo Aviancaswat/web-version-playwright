@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
   <ChakraProvider theme={theme}>
     <BrowserRouter>
       <App />
-      <Toaster />      
+      <Toaster expand={true} closeButton/>      
     </BrowserRouter>
   </ChakraProvider>
 )
