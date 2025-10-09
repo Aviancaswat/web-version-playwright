@@ -21,7 +21,6 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
         if (!searchTerm) {
             setDataFilter(data);
         }
-        console.log("Data filterComponent: ", data)
     }, [searchTerm, data]);
 
     const parseStateToWords = (value: string | undefined): React.ReactElement | string => {
@@ -76,7 +75,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
         const findUser = dataWorkflows.find(e => e?.actor?.autorname === username);
         return findUser?.actor?.avatar;
     };
-    
+
     const handleSearch = useCallback(
         debounce((value: string) => {
             const filteredItems = data.filter(item =>
