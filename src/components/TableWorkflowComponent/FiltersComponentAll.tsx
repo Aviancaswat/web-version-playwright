@@ -41,14 +41,11 @@ const FiltersComponentAll: React.FC = () => {
                 type: 'result'
             }
         ]
-        console.log("dataWorkflows: ", dataWorkflows)
-        console.log("dataFilterCompleted: ", dataFilterCompleted)
+
         setDataFilters(dataFilterCompleted)
     }, [dataWorkflows])
 
     const handleFilterTable = () => {
-        console.log("Se filtra: ", selectedFilters)
-        console.log("De la data: ", dataWorkflows)
         const dataTable = dataWorkflows;
         const applyFilters = (filters: FilterGeneric[]) => {
             return dataTable.filter(item => {
@@ -98,6 +95,7 @@ const FiltersComponentAll: React.FC = () => {
         };
         getWorkflows()
     }
+
     return (
         <Box display={"flex"} gap={2}>
             <Box display={"flex"} gap={2}>
@@ -109,7 +107,7 @@ const FiltersComponentAll: React.FC = () => {
             </Box>
             <HStack spacing={1}>
                 <Button
-                    isDisabled={dataWorkflows.length === 0 || isLoading}
+                    isDisabled={isLoading}
                     bg={"black"}
                     color={"white"}
                     size={"xs"}
@@ -122,7 +120,6 @@ const FiltersComponentAll: React.FC = () => {
                     Aplicar
                 </Button>
                 <Button
-                    isDisabled={dataWorkflows.length === 0}
                     variant={"ghost"}
                     size={"xs"}
                     _hover={{
@@ -131,7 +128,6 @@ const FiltersComponentAll: React.FC = () => {
                     }}
                     onClick={clearFilter}
                     rightIcon={isLoading ? <Spinner size={"sm"} /> : <SearchX size={20} />}
-                    
                 >
                     Limpiar
                 </Button>
