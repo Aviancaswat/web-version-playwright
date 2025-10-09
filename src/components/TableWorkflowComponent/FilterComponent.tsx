@@ -24,6 +24,11 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
     }, [searchTerm, data]);
 
     const parseStateToWords = (value: string | undefined): React.ReactElement | string => {
+        const forDenition = <Tag size={"md"} borderRadius={"full"} variant='subtle' colorScheme='blackAlpha'>
+            <Box h={2} w={2} borderRadius={"full"} bg={"black"} mr={2} />
+            <TagLabel>Por definir</TagLabel>
+        </Tag>
+
         const values: Record<string, React.ReactElement> = {
             "queued": (
                 <Tag size={"md"} variant='subtle' colorScheme='gray'>
@@ -68,7 +73,7 @@ const FilterComponent: React.FC<FilterProps> = ({ title, data, type }) => {
                 </Tag>
             ),
         };
-        return value && values.hasOwnProperty(value) ? values[value] : "Por definir";
+        return value && values.hasOwnProperty(value) ? values[value] : forDenition;
     };
 
     const findUserAvatar = (username: string) => {
