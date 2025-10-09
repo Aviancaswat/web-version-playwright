@@ -8,8 +8,7 @@ import {
   Spinner,
   Td,
   Tooltip,
-  Tr,
-  useToast,
+  Tr
 } from "@chakra-ui/react";
 import {
   FileX2,
@@ -33,13 +32,14 @@ import {
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 
 //Types
+import { toast } from "sonner";
 import AviancaToast from "../../utils/AviancaToast";
+import { ToastCustom } from "../../utils/ToastCustom";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   data,
 }) => {
-  const toast = useToast();
 
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
   const [isLoadingScreenshots, setIsLoadingScreenshots] =
@@ -75,17 +75,27 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingReport(true);
       await downLoadReportHTML(workflowId);
-      toast({
-        status: "success",
-        title: "Reporte descargado",
-        description: `El reporte se descargó correctamente`,
-      });
+      AviancaToast.success("Reporte descargado", {
+        position: "bottom-center",
+        description: "El reporte se descargó correctamente"
+      })
     } catch (error) {
       console.error(
         `Error al descargar el reporte para el workflow ${workflowId}:`,
         error
       );
-      AviancaToast.error((error as Error).message)
+      // AviancaToast.error("Reporte no encontrado", {
+      //   description: (error as Error).message,
+      //   position: "bottom-center",
+      // })
+      toast.error(<ToastCustom
+        key={new Date().getTime()}
+        title="Reporte no encontrado"
+        message={(error as Error).message}
+      />, {
+        position: "bottom-center",
+        duration: 300000
+      })
       throw error;
     } finally {
       setIsLoadingReport(false);
@@ -96,24 +106,11 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingScreenshots(true);
       await downLoadReportHTML(workflowId, "only-screenshots");
-      toast({
-        status: "success",
-        title: "Imagenes descargadas",
-        description: `Las imagenes se descargaron correctamente`,
-      });
     } catch (error) {
       console.error(
         `Error al descargar las imagenes para el workflow ${workflowId}:`,
         error
       );
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al descargar las imagenes",
-      });
       throw error;
     } finally {
       setIsLoadingScreenshots(false);
@@ -124,21 +121,9 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingRun(true);
       await runWorkflowById(workflowId);
-      toast({
-        status: "success",
-        title: "Workflow ejecutado",
-        description: `El workflow se está ejecutando correctamente`,
-      });
+
     } catch (error) {
       console.error(`Error al ejecutar el workflow ${workflowId}:`, error);
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al ejecutar el workflow",
-      });
       throw error;
     } finally {
       setIsLoadingRun(false);
@@ -149,21 +134,8 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingDeleteArtifacts(true);
       await deleteArtefactById(workflowId);
-      toast({
-        status: "success",
-        title: "Artefacto eliminado",
-        description: "Se ha eliminado los artefactos correctamente",
-      });
     } catch (error) {
       console.log(error);
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al eliminar los artefactos",
-      });
       throw error;
     } finally {
       setIsLoadingDeleteArtifacts(false);
