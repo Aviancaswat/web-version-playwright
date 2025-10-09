@@ -33,6 +33,7 @@ import {
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 
 //Types
+import AviancaToast from "../../utils/AviancaToast";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
@@ -84,14 +85,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
         `Error al descargar el reporte para el workflow ${workflowId}:`,
         error
       );
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al descargar el reporte",
-      });
+      AviancaToast.error((error as Error).message)
       throw error;
     } finally {
       setIsLoadingReport(false);

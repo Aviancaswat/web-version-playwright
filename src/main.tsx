@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 
 //Styles
+import { Toaster } from 'sonner'
 import './index.css'
 import theme from './utils/theme.ts'
 
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
   <ChakraProvider theme={theme}>
     <BrowserRouter>
       <App />
+      <Toaster />      
     </BrowserRouter>
   </ChakraProvider>
 )
