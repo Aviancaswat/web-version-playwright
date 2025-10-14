@@ -108,7 +108,7 @@ const FiltersComponentAll: React.FC = () => {
             </Box>
             <HStack spacing={1}>
                 <Button
-                    isDisabled={isLoading}
+                    isDisabled={isLoading || selectedFilters.length === 0}
                     bg={"black"}
                     color={"white"}
                     size={"xs"}
