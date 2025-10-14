@@ -21,13 +21,13 @@ import {
   Tooltip,
   Tr,
   useDisclosure,
-  useToast,
   VStack
 } from "@chakra-ui/react";
 import { FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
+import AviancaToast from "../../utils/AviancaToast";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
 import FiltersComponentAll from "./FiltersComponentAll";
@@ -35,7 +35,6 @@ import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const TableWorkflowsDash: React.FC = () => {
 
-  const toast = useToast();
   const { setDataWorkflows, dataWorkflows } = useTestStore();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -90,20 +89,13 @@ const TableWorkflowsDash: React.FC = () => {
 
     try {
       await deleteAllArtefacts();
-      toast({
-        status: "success",
-        title: "Artefactos eliminados",
-        description: "Se han eliminado todos los artefactos correctamente",
-      });
+      AviancaToast.success("Artefactos eliminados", {
+        description: "Se han eliminado todos los artefactos correctamente"
+      })
     } catch (error) {
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al eliminar los artefactos",
-      });
+      AviancaToast.error("Upps! no se pudo eliminar", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al elimianr los artefactos"
+      })
       throw error;
     } finally {
       setIsLoadingDelete(false);

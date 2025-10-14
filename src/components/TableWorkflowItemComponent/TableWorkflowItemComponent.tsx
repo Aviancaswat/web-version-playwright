@@ -18,8 +18,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useState, type ReactElement } from "react";
-
-//Services
 import {
   deleteArtefactById,
   downLoadReportHTML,
@@ -27,14 +25,8 @@ import {
   type ResultWorkflow,
   type StatusWorkflow,
 } from "../../github/api";
-
-//Components
-import TagDash from "../TableTagItemComponent/TableTagItemComponent";
-
-//Types
-import { toast } from "sonner";
 import AviancaToast from "../../utils/AviancaToast";
-import { ToastCustom } from "../../utils/ToastCustom";
+import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
@@ -76,25 +68,17 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
       setIsLoadingReport(true);
       await downLoadReportHTML(workflowId);
       AviancaToast.success("Reporte descargado", {
-        position: "bottom-center",
-        description: "El reporte se descargó correctamente"
+        description: "Se ha descargado el reporte correctamente",
+        position: "bottom-center"
       })
     } catch (error) {
       console.error(
         `Error al descargar el reporte para el workflow ${workflowId}:`,
         error
       );
-      // AviancaToast.error("Reporte no encontrado", {
-      //   description: (error as Error).message,
-      //   position: "bottom-center",
-      // })
-      toast.error(<ToastCustom
-        key={new Date().getTime()}
-        title="Reporte no encontrado"
-        message={(error as Error).message}
-      />, {
-        position: "bottom-center",
-        duration: 300000
+      AviancaToast.error("Upps! no existe el reporte", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar el reporte",
+        position: "bottom-center"
       })
       throw error;
     } finally {
@@ -106,11 +90,19 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingScreenshots(true);
       await downLoadReportHTML(workflowId, "only-screenshots");
+      AviancaToast.success("Imágenes descargadas", {
+        description: "Se ha descargado correctamente las imágenes",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.error(
         `Error al descargar las imagenes para el workflow ${workflowId}:`,
         error
       );
+      AviancaToast.error("Upps! No existe reporte", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar las imágenes",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingScreenshots(false);
@@ -121,9 +113,16 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingRun(true);
       await runWorkflowById(workflowId);
-
+      AviancaToast.success("Run ejecutado", {
+        description: "Se ha heco RUN del workflow correctamente",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.error(`Error al ejecutar el workflow ${workflowId}:`, error);
+      AviancaToast.error("Upps! Error al hacer RUN", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al hacer RUN del workflow",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingRun(false);
@@ -134,8 +133,16 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingDeleteArtifacts(true);
       await deleteArtefactById(workflowId);
+      AviancaToast.success("Artefactos eliminados", {
+        description: "Se ha eliminado el artefacto correctamente",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.log(error);
+      AviancaToast.success("Upps! Error al eliminar el artefacto", {
+        description: error instanceof Error ? error.message : "Ocurrió un error al eliminar el artefacto",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingDeleteArtifacts(false);
