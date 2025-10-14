@@ -2,7 +2,20 @@ import { toast, type ExternalToast } from 'sonner';
 import { v4 as uuid } from "uuid";
 import { ToastCustom } from './ToastCustom';
 
-export type ToastType = 'info' | 'warn' | 'error' | 'success' | 'default'
+interface PromiseIExtendedResult extends ExternalToast {
+    message: React.ReactNode;
+}
+type PromiseTExtendedResult<Data = any> = PromiseIExtendedResult | ((data: Data) => PromiseIExtendedResult | Promise<PromiseIExtendedResult>);
+type PromiseTResult<Data = any> = string | React.ReactNode | ((data: Data) => React.ReactNode | string | Promise<React.ReactNode | string>);
+type PromiseExternalToast = Omit<ExternalToast, 'description'>;
+type PromiseData<ToastData = any> = PromiseExternalToast & {
+    loading?: string | React.ReactNode;
+    success?: PromiseTResult<ToastData> | PromiseTExtendedResult<ToastData>;
+    error?: PromiseTResult | PromiseTExtendedResult;
+    description?: PromiseTResult;
+    finally?: () => void | Promise<void>;
+};
+export type ToastType = 'info' | 'warn' | 'error' | 'success' | 'promise' | 'default'
 
 class AviancaToast {
 
@@ -46,10 +59,11 @@ class AviancaToast {
                 break;
             case 'default':
             default:
-                toast(<ToastCustom
-                    key={uuid()}
-                    {...props}
-                />, toastOptions)
+                toast(
+                    <ToastCustom
+                        key={uuid()}
+                        {...props}
+                    />, toastOptions)
         }
     }
 
@@ -69,9 +83,20 @@ class AviancaToast {
         this.show(title, 'info', options);
     }
 
+    static promise(promise: Promise<unknown>, options: PromiseData<unknown> = {}) {
+        toast.promise(promise, {
+            //Nota para el equipo: estos propuiedas se pueden sobreescribir en el objeto options
+            loading: "Procesando...",
+            success: (data: any) => `La petición se resolvió correctamente ${data}`,
+            error: "Upps! Ha ocurrido un error",
+            ...options
+        })
+    }
+
     static default(title: string, options: ExternalToast = {}) {
         this.show(title, 'default', options)
     }
+
 }
 
 export default AviancaToast;
