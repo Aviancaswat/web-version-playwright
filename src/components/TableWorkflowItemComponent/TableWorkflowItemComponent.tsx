@@ -5,7 +5,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
   Td,
   Tooltip,
   Tr
@@ -28,6 +27,7 @@ import {
 import AviancaToast from "../../utils/AviancaToast";
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
+import AnimatedLoader from "../loaders/AnimatedLoader";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   data,
@@ -70,7 +70,6 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
       // AviancaToast.promise(downLoadReportHTML(workflowId), {
       //   loading: "Descargando reporte...",
       //   success: () => "El reporte se ha descargado correctamente",
-      //   error: "Upps! Ha ocurrido un error al descargar el reporte"
       // })
       AviancaToast.success("Reporte descargado", {
         description: "Se ha descargado el reporte correctamente",
@@ -168,13 +167,13 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
           <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
           <Td>
             <Menu closeOnSelect={false}>
-              <MenuButton as={Button} bg="none">
+              <MenuButton as={Button} bg="none" isDisabled={(row.status as StatusWorkflow) === "in_progress"}>
                 <GripHorizontal />
               </MenuButton>
               <MenuList>
                 <MenuItem
                   icon={
-                    isLoadingReport ? <Spinner size="sm" /> : <FolderDown />
+                    isLoadingReport ? <AnimatedLoader /> : <FolderDown />
                   }
                   onClick={() => handleDownloadReport(row.id)}
                 >
@@ -182,14 +181,14 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                 </MenuItem>
                 <MenuItem
                   icon={
-                    isLoadingScreenshots ? <Spinner size="sm" /> : <ImageDown />
+                    isLoadingScreenshots ? <AnimatedLoader /> : <ImageDown />
                   }
                   onClick={() => handleDownloadScreenshots(row.id)}
                 >
                   Descargar Imagenes
                 </MenuItem>
                 <MenuItem
-                  icon={isLoadingRun ? <Spinner size="sm" /> : <RefreshCw />}
+                  icon={isLoadingRun ? <AnimatedLoader /> : <RefreshCw />}
                   onClick={() => handleRunWorkflow(row.id)}
                 >
                   Volver a ejecutar workflow
@@ -197,7 +196,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                 <MenuItem
                   icon={
                     isLoadingDeleteArtifacts ? (
-                      <Spinner size="sm" />
+                      <AnimatedLoader />
                     ) : (
                       <FileX2 />
                     )
