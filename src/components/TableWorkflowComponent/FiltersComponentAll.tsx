@@ -1,8 +1,9 @@
-import { Box, Button, HStack, Spinner } from "@chakra-ui/react";
+import { Box, Button, HStack } from "@chakra-ui/react";
 import { SearchX, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type FilterGeneric } from "../../store/test-store";
+import AnimatedLoader from "../loaders/AnimatedLoader";
 import FilterComponent, { type FilterProps } from "./FilterComponent";
 import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
@@ -127,7 +128,7 @@ const FiltersComponentAll: React.FC = () => {
                         color: "white"
                     }}
                     onClick={clearFilter}
-                    rightIcon={isLoading ? <Spinner size={"sm"} /> : <SearchX size={20} />}
+                    rightIcon={isLoading ?  <AnimatedLoader width={15} height={15}/> : <SearchX size={20} />}
                 >
                     Limpiar
                 </Button>
