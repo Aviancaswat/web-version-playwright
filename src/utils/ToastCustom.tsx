@@ -1,40 +1,29 @@
-import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import { Flex, Image, Text } from "@chakra-ui/react";
 import logoAV from "../assets/avianca-logo-desk.png";
+import type { ToastType } from "./AviancaToast";
 
 type ToastCustomProps = {
-    title?: string,
-    message: string,
+    title: string,
+    type: ToastType
 }
 
-export const ToastCustom: React.FC<ToastCustomProps> = (
-    {
-        title,
-        message
-    }
-) => {
+export const ToastCustom: React.FC<ToastCustomProps> = ({ title, type }) => {
     return (
         <Flex
             align="center"
             borderRadius="md"
             justify={"space-between"}
-            minWidth={300}
+            minWidth={type === "default" ? 320 : 300}
         >
-            <Box display={"flex"} gap={1} flexDirection={"column"}>
-                {
-                    title && (<Text flex="1" fontSize="md" fontWeight={"bold"}>
-                        {title}
-                    </Text>)
-                }
-                <Text flex="1" fontSize="md" color={ title ? "gray.700" : "blackAlpha.900"}>
-                    {message}
-                </Text>
-            </Box>
+            <Text flex="1" fontSize="md" fontWeight={"bold"}>
+                {title}
+            </Text>
             <Image
                 src={logoAV}
-                alt="Logo de la empresa"
+                alt="Logo de la avianca"
+                ml={10}
                 bg={"black"}
                 boxSize="35px"
-                ml="10px"
                 borderRadius={"md"}
             />
         </Flex>
