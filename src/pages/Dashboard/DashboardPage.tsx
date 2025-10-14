@@ -1,23 +1,11 @@
 import {
   Box,
-  Button,
   Heading,
-  HStack,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Text,
-  VStack,
+  HStack
 } from "@chakra-ui/react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import {
-  AlignJustify,
-  FileChartLine
-} from "lucide-react";
 import { lazy, Suspense } from "react";
-import InformDocument from "../../components/InformDocument/InformDocument";
+import { v4 as uuid } from "uuid";
+import ShinyTextAnimation from "../../components/animations/ShinyText/ShinyText";
 import SkeletonCards from "../../components/skeletons/skeleton-card";
 import SkeletonTable from "../../components/skeletons/skeleton-table";
 
@@ -27,8 +15,8 @@ const TableDashLazy = lazy(() => import("../../components/TableWorkflowComponent
 const DashboardPage = () => {
   return (
     <Box height={"95vh"} overflow={"auto"}>
-      <HStack mt={5} justify={"space-between"}>
-        <VStack align={"start"}>
+      {/* <HStack mt={5} justify={"space-between"}>
+        <VStack align={"start"} display={"hidden"}>
           <Heading as="h1" size={"lg"} ml={4}>
             Panel
           </Heading>
@@ -73,8 +61,35 @@ const DashboardPage = () => {
             </MenuItem>
           </MenuList>
         </Menu>
-      </HStack>
-      <Box className="container-dash" mt={5}>
+      </HStack> */}
+      <Box className="container-dash" mt={2}>
+        <Box
+          position={"relative"}
+        >
+          <HStack
+            borderRadius={"md"}
+            p={2}
+            width={"100%"}
+            bg={"#1B1B1B"}
+            height={150}
+            justify={"space-between"}
+            backgroundImage={`
+            radial-gradient(circle at 50% 100%, rgba(70, 85, 110, 0.5) 0%, transparent 60%),
+            radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.4) 0%, transparent 70%),
+            radial-gradient(circle at 50% 100%, rgba(181, 184, 208, 0.3) 0%, transparent 80%)
+          `}
+          display={"grid"}
+          placeContent={"center"}
+          >
+            <Heading color={"white"} textAlign={"center"}>
+              Dashboard <br /> <ShinyTextAnimation
+                key={uuid()}
+                text="Avianca Playwright"
+                speed={3}
+              />
+            </Heading>
+          </HStack>
+        </Box>
         <HStack
           display={"flex"}
           justifyContent={"center"}
