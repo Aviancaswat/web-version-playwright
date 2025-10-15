@@ -45,11 +45,9 @@ const dataCardsDetailsDash: CardDetailsDashProps[] = dashboardCardData.map(
 
 const CardDetailsDash: React.FC = () => {
   const { dataWorkflows } = useTestStore()
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [data, setDataCardsDetailsDash] = useState<CardDetailsDashProps[]>([]);
 
   useEffect(() => {
-    setLoading(true)
     if (dataWorkflows.length > 0) {
       const successWorkflows = dataWorkflows.filter(
         (item) => item.conclusion === "success"
@@ -98,7 +96,6 @@ const CardDetailsDash: React.FC = () => {
 
       setDataCardsDetailsDash(newData);
     }
-    setLoading(false)
   }, [dataWorkflows]);
 
   return (
