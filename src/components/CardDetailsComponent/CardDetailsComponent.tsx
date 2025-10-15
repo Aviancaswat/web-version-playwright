@@ -1,21 +1,21 @@
 import {
-  Box,
   Card,
+  Center,
+  Heading,
   HStack,
   Icon,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-  Stat,
-  StatArrow,
-  StatHelpText,
-  StatNumber,
+  Tag,
+  TagLabel,
+  TagLeftIcon,
   Text,
+  VStack
 } from "@chakra-ui/react";
-import { Bug, CirclePause, TestTube } from "lucide-react";
+import { Bug, CirclePause, MoveDown, MoveUp, MoveUpRight, TestTube } from "lucide-react";
 import { useEffect, useState } from "react";
+import { v4 } from "uuid";
 import dashboardCardData from "../../json/Dashboard/dashboardCardData.json";
 import { useTestStore } from "../../store/test-store";
+import type { LucideIconType } from "../TableTagItemComponent/TableTagItemComponent.types";
 import type { CardDetailsDashProps } from "./CardDetailsComponent.types";
 
 const iconMap: Record<string, CardDetailsDashProps["icon"]> = {
@@ -24,13 +24,22 @@ const iconMap: Record<string, CardDetailsDashProps["icon"]> = {
   CirclePause,
 };
 
+type typeDetails = "success" | "error" | "cancelled"
+
+const iconTypeDetails: Record<typeDetails, LucideIconType> = {
+  success: MoveUp,
+  error: MoveDown,
+  cancelled: MoveUpRight
+}
+
 const dataCardsDetailsDash: CardDetailsDashProps[] = dashboardCardData.map(
   (item) => ({
     icon: iconMap[item.icon],
     title: item.title,
     value: item.value,
-    type: item.type as "success" | "error" | "cancelled",
+    type: item.type as typeDetails,
     stat: item.stat,
+    iconType: iconTypeDetails[item.type as typeDetails]
   })
 );
 
@@ -99,68 +108,31 @@ const CardDetailsDash: React.FC = () => {
           <Card
             key={idx}
             variant={"elevated"}
-            height={150}
             maxWidth={250}
             width={"100%"}
-            p={2}
-            borderBottom={"6px solid black"}
+            p={3}
           >
-            <HStack justify={"space-between"}>
-              <Box>
-                <SkeletonText isLoaded={!isLoading} noOfLines={1} skeletonHeight="3">
-                  <Text fontWeight={500}>{card.title}</Text>
-                </SkeletonText>
-              </Box>
-              <SkeletonCircle isLoaded={!isLoading} width={10} height={10}>
-                <Box
-                  bg="whiteAlpha.900"
-                  width={10}
-                  height={10}
-                  p={1}
-                  display={"grid"}
-                  placeContent={"center"}
-                  borderRadius={"full"}
-                  borderTop={"2px solid black"}
-                >
-                  <Icon as={card.icon} w={7} h={7} />
-                </Box>
-              </SkeletonCircle>
+            <HStack spacing={5} display={"flex"} alignItems={"center"} height={"100%"}>
+              <Center
+                borderRadius={"lg"}
+                bg={card.type === "success" ? "#A3DC9A" : (card.type === "error" ? "#F08787" : "#95BDFF")}
+                p={2}>
+                <Icon as={card.icon} boxSize={7} color={card.type === "success" ? "#5D866C" : (card.type === "error" ? "#AF3E3E" : "#7286D3")} />
+              </Center>
+              <VStack
+                display={"flex"}
+                alignItems={"center"}
+              >
+                <Text>{card.title}</Text>
+                <Heading>{card.value}</Heading>
+                <Center>
+                  <Tag borderRadius={"xl"} size={"md"} key={v4()} variant='subtle' colorScheme='cyan'>
+                    <TagLeftIcon boxSize='12px' as={card.iconType} />
+                    <TagLabel>{card.stat} %</TagLabel>
+                  </Tag>
+                </Center>
+              </VStack>
             </HStack>
-
-            <Skeleton isLoaded={!isLoading} mt={1}>
-              <Stat width={"100%"}>
-                <StatNumber
-                  fontSize={"4xl"}
-                  display={"flex"}
-                  alignItems={"end"}
-                  gap={2}
-                >
-                  {card.value}
-                  <Text fontSize={"md"}>{"pruebas"}</Text>
-                </StatNumber>
-                {
-                  <StatHelpText>
-                    <StatArrow
-                      color={
-                        card.type === "success"
-                          ? "green"
-                          : card.type === "error"
-                            ? "red"
-                            : "gray"
-                      }
-                      type={
-                        card.type === "success"
-                          ? "increase"
-                          : card.type === "error"
-                            ? "decrease"
-                            : "decrease"
-                      }
-                    />
-                    {card.stat}%
-                  </StatHelpText>
-                }
-              </Stat>
-            </Skeleton>
           </Card>
         ))
       }

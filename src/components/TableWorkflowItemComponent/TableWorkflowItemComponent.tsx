@@ -67,10 +67,6 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     try {
       setIsLoadingReport(true);
       await downLoadReportHTML(workflowId);
-      // AviancaToast.promise(downLoadReportHTML(workflowId), {
-      //   loading: "Descargando reporte...",
-      //   success: () => "El reporte se ha descargado correctamente",
-      // })
       AviancaToast.success("Reporte descargado", {
         description: "Se ha descargado el reporte correctamente",
         position: "bottom-center"

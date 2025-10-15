@@ -310,6 +310,27 @@ export const runWorkflowById = async (runId: number) => {
   }
 };
 
+type ArtifactsType = {
+  id: number;
+  node_id: string;
+  name: string;
+  size_in_bytes: number;
+  url: string;
+  archive_download_url: string;
+  expired: boolean;
+  created_at: string | null;
+  expires_at: string | null;
+  updated_at: string | null;
+  digest?: string | null | undefined;
+  workflow_run?: {
+    id?: number | undefined;
+    repository_id?: number | undefined;
+    head_repository_id?: number | undefined;
+    head_branch?: string | undefined;
+    head_sha?: string | undefined;
+  } | null | undefined;
+}
+
 export const getArtefactsByRepo = async () => {
   let allRuns: any[] = [];
   let page = 1;
@@ -317,6 +338,7 @@ export const getArtefactsByRepo = async () => {
   let hasNextPage = true;
 
   try {
+
     while (hasNextPage) {
       const { data } = await octokit.request(
         "GET /repos/{owner}/{repo}/actions/artifacts",
@@ -335,7 +357,7 @@ export const getArtefactsByRepo = async () => {
       page++;
     }
 
-    return { artifacts: allRuns, total_count: allRuns.length };
+    return { artifacts: allRuns as ArtifactsType[], total_count: allRuns.length };
   } catch (error) {
     console.error(
       `Ha ocurrido un error al obtener la lista de artefactos del repo ${error}`
