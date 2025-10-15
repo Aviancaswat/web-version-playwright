@@ -8,12 +8,14 @@ import {
 import { lazy, Suspense } from "react";
 import { v4 as uuid } from "uuid";
 import ShinyTextAnimation from "../../components/animations/ShinyText/ShinyText";
+import SkeletonCardsBilling from "../../components/skeletons/skeleton-billing-card";
 import SkeletonCards from "../../components/skeletons/skeleton-card";
 import SkeletonTable from "../../components/skeletons/skeleton-table";
 
 const CardDetailsDashLazy = lazy(() => import("../../components/CardDetailsComponent/CardDetailsComponent"))
 const TableDashLazy = lazy(() => import("../../components/TableWorkflowComponent/TableWorkflowComponent"))
 const CardBillingActionsMinutes = lazy(() => import("../../components/Billing/CardBillingMinutes"))
+const CardBillingActionsStorage = lazy(() => import("../../components/Billing/CardBillingStorage"))
 
 const DashboardPage = () => {
   return (
@@ -68,6 +70,8 @@ const DashboardPage = () => {
       <Box className="container-dash" mt={2}>
         <Box
           position={"relative"}
+          display={"flex"}
+          gap={3}
         >
           <HStack
             borderRadius={"md"}
@@ -85,7 +89,8 @@ const DashboardPage = () => {
             placeContent={"center"}
           >
             <Heading color={"white"} textAlign={"center"}>
-              Dashboard <br /> <ShinyTextAnimation
+              Dashboard <br />
+              <ShinyTextAnimation
                 key={uuid()}
                 text="Avianca Playwright"
                 speed={3}
@@ -93,9 +98,12 @@ const DashboardPage = () => {
             </Heading>
             <Text color={"gray.400"} textAlign={"center"}>Visualiza, Revisa y gestiona tus workflows</Text>
           </HStack>
-          <VStack>
-            <Suspense fallback={<Text>Cargando datos...</Text>}>
+          <VStack width={"48%"} height={"100%"}>
+            <Suspense fallback={<SkeletonCardsBilling />}>
               <CardBillingActionsMinutes />
+            </Suspense>
+            <Suspense fallback={<SkeletonCardsBilling />}>
+              <CardBillingActionsStorage />
             </Suspense>
           </VStack>
         </Box>
@@ -105,6 +113,7 @@ const DashboardPage = () => {
           alignItems={"center"}
           width={"100%"}
           flexWrap={"wrap"}
+          mt={5}
         >
           <Suspense fallback={<SkeletonCards />}>
             <CardDetailsDashLazy />
