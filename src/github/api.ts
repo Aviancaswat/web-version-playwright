@@ -403,3 +403,21 @@ export const deleteArtefactById = async (workflowId: number) => {
     throw error;
   }
 };
+
+export const GetActionsMinutesBilling = async () => {
+
+  try {
+
+    const { data } = await octokit.request('GET /users/{username}/settings/billing/usage', {
+      username: owner,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+    return data;
+  }
+  catch (error) {
+    console.log("Error api actions: ", error)
+    throw new Error("Ha ocurrido un error al consulta los actions minutes | Error: " + error)
+  }
+}

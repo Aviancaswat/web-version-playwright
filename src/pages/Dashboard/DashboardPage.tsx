@@ -1,7 +1,9 @@
 import {
   Box,
   Heading,
-  HStack
+  HStack,
+  Text,
+  VStack
 } from "@chakra-ui/react";
 import { lazy, Suspense } from "react";
 import { v4 as uuid } from "uuid";
@@ -11,6 +13,7 @@ import SkeletonTable from "../../components/skeletons/skeleton-table";
 
 const CardDetailsDashLazy = lazy(() => import("../../components/CardDetailsComponent/CardDetailsComponent"))
 const TableDashLazy = lazy(() => import("../../components/TableWorkflowComponent/TableWorkflowComponent"))
+const CardBillingActionsMinutes = lazy(() => import("../../components/Billing/CardBillingMinutes"))
 
 const DashboardPage = () => {
   return (
@@ -69,17 +72,17 @@ const DashboardPage = () => {
           <HStack
             borderRadius={"md"}
             p={2}
-            width={"100%"}
+            width={"50%"}
             bg={"#1B1B1B"}
-            height={150}
+            height={200}
             justify={"space-between"}
             backgroundImage={`
             radial-gradient(circle at 50% 100%, rgba(70, 85, 110, 0.5) 0%, transparent 60%),
             radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.4) 0%, transparent 70%),
             radial-gradient(circle at 50% 100%, rgba(181, 184, 208, 0.3) 0%, transparent 80%)
           `}
-          display={"grid"}
-          placeContent={"center"}
+            display={"grid"}
+            placeContent={"center"}
           >
             <Heading color={"white"} textAlign={"center"}>
               Dashboard <br /> <ShinyTextAnimation
@@ -88,7 +91,13 @@ const DashboardPage = () => {
                 speed={3}
               />
             </Heading>
+            <Text color={"gray.400"} textAlign={"center"}>Visualiza, Revisa y gestiona tus workflows</Text>
           </HStack>
+          <VStack>
+            <Suspense fallback={<Text>Cargando datos...</Text>}>
+              <CardBillingActionsMinutes />
+            </Suspense>
+          </VStack>
         </Box>
         <HStack
           display={"flex"}
