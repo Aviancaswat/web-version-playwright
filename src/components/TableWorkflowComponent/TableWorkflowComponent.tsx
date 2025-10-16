@@ -220,11 +220,11 @@ const TableWorkflowsDash: React.FC = () => {
         >
           <Thead>
             <Tr>
-              <Th>Autor</Th>
-              <Th>Nombre del workflow</Th>
-              <Th>Status</Th>
-              <Th>Resultado</Th>
-              <Th>Acciones</Th>
+              <Th textAlign={"center"}>Autor</Th>
+              <Th textAlign={"center"}>Nombre del workflow</Th>
+              <Th textAlign={"center"}>Status</Th>
+              <Th textAlign={"center"}>Resultado</Th>
+              <Th textAlign={"center"}>Acciones</Th>
             </Tr>
           </Thead>
           <Tbody width={"100%"} height={50}>

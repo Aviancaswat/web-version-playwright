@@ -47,7 +47,7 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
   }, []);
 
   return (
-    <Tag variant={"subtle"} colorScheme={params?.color} p={2} minW={"100%"} borderRadius={"full"}>
+    <Tag variant={"subtle"} colorScheme={params?.color} p={2} minW={100} borderRadius={"full"}>
       <HStack width={"100%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
         <Box h={2} w={2} bg={params?.color} borderRadius={"full"} />
         <Text>{params?.text}</Text>

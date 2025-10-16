@@ -17,6 +17,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useState, type ReactElement } from "react";
+import { v4 as uuid } from "uuid";
 import {
   deleteArtefactById,
   downLoadReportHTML,
@@ -45,21 +46,21 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   ): ReactElement => {
     switch (value) {
       case "success":
-        return <TagDash key={new Date().getTime()} type="success" />;
+        return <TagDash key={uuid()} type="success" />;
       case "cancelled":
-        return <TagDash key={new Date().getTime()} type="cancelled" />;
+        return <TagDash key={uuid()} type="cancelled" />;
       case "completed":
-        return <TagDash key={new Date().getTime()} type="completed" />;
+        return <TagDash key={uuid()} type="completed" />;
       case "failure":
-        return <TagDash key={new Date().getTime()} type="failure" />;
+        return <TagDash key={uuid()} type="failure" />;
       case "in_progress":
-        return <TagDash key={new Date().getTime()} type="in_progress" />;
+        return <TagDash key={uuid()} type="in_progress" />;
       case "queued":
-        return <TagDash key={new Date().getTime()} type="queued" />;
+        return <TagDash key={uuid()} type="queued" />;
       case "neutral":
       case undefined:
       default:
-        return <TagDash key={new Date().getTime()} type="neutral" />;
+        return <TagDash key={uuid()} type="neutral" />;
     }
   };
 
@@ -76,7 +77,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
         `Error al descargar el reporte para el workflow ${workflowId}:`,
         error
       );
-      AviancaToast.error("Upps! no existe el reporte", {
+      AviancaToast.error("Upps! el reporte no existe", {
         description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar el reporte",
         position: "bottom-center"
       })
@@ -99,7 +100,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
         `Error al descargar las imagenes para el workflow ${workflowId}:`,
         error
       );
-      AviancaToast.error("Upps! No existe reporte", {
+      AviancaToast.error("Upps! el reporte no existe", {
         description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar las imágenes",
         position: "bottom-center"
       })
@@ -153,15 +154,15 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     <>
       {data.map((row) => (
         <Tr key={row.id}>
-          <Td>
+          <Td textAlign={"center"}>
             <Tooltip key={row.id} label={row?.actor?.autorname} placement="top" bg={"white"} color={"black"}>
               <Avatar key={row.id} size='sm' name='Avianca Playwright' src={row?.actor?.avatar} />
             </Tooltip>
           </Td>
-          <Td maxWidth={300} isTruncated>{row.display_title}</Td>
-          <Td>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
-          <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
-          <Td>
+          <Td textAlign={"center"} maxWidth={300} isTruncated>{row.display_title}</Td>
+          <Td textAlign={"center"}>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
+          <Td textAlign={"center"}>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
+          <Td textAlign={"center"}>
             <Menu closeOnSelect={false}>
               <MenuButton as={Button} bg="none" isDisabled={(row.status as StatusWorkflow) === "in_progress"}>
                 <GripHorizontal />
