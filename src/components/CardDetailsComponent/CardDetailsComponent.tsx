@@ -112,7 +112,7 @@ const CardDetailsDash: React.FC = () => {
             <HStack spacing={5} display={"flex"} alignItems={"center"} height={"100%"}>
               <Center
                 borderRadius={"lg"}
-                bg={card.type === "success" ? "#A3DC9A" : (card.type === "error" ? "#F08787" : "#95BDFF")}
+                bg={card.type === "success" ? "rgba(163, 220, 154, .5)" : (card.type === "error" ? "rgba(240, 135, 135, .5)" : "rgba(149, 189, 255, .5)")}
                 p={2}>
                 <Icon as={card.icon} boxSize={7} color={card.type === "success" ? "#5D866C" : (card.type === "error" ? "#AF3E3E" : "#7286D3")} />
               </Center>

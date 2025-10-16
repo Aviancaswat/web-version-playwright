@@ -31,7 +31,7 @@ const CardBillingStorage = () => {
                 p={2}
             >
                 <HStack spacing={3}>
-                    <Center ml={2} className="logo" borderRadius={"xl"} h={16} w={16} bg={"#BAD8B6"}>
+                    <Center ml={2} className="logo" borderRadius={"xl"} h={16} w={16} bg={"rgba(186, 216, 182, .5)"}>
                         <Database size={35} color="#727D73" />
                     </Center>
                     <Box className="text">
