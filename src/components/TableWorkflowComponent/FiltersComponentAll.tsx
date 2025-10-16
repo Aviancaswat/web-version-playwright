@@ -98,8 +98,8 @@ const FiltersComponentAll: React.FC = () => {
     }
 
     return (
-        <Box display={"flex"} gap={2} flexWrap={{base: "wrap", md: "inherit"}}>
-            <Box display={"flex"} gap={2} flexWrap={{base: "wrap", md: "inherit"}}>
+        <Box display={"flex"} gap={2} flexWrap={{ base: "wrap", md: "inherit" }}>
+            <Box display={"flex"} gap={2} flexWrap={{ base: "wrap", md: "inherit" }}>
                 {
                     dataFilters.map((data, idx) => (
                         <FilterComponent key={idx} {...data} />
@@ -128,7 +128,7 @@ const FiltersComponentAll: React.FC = () => {
                         color: "white"
                     }}
                     onClick={clearFilter}
-                    rightIcon={isLoading ?  <AnimatedLoader width={15} height={15}/> : <SearchX size={20} />}
+                    rightIcon={isLoading ? <AnimatedLoader width={15} height={15} /> : <SearchX size={20} />}
                 >
                     Limpiar
                 </Button>

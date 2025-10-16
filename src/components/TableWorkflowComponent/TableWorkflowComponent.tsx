@@ -23,11 +23,13 @@ import {
   useDisclosure,
   VStack
 } from "@chakra-ui/react";
-import { FolderX, RefreshCw } from "lucide-react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FileChartLine, FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
 import { useTestStore } from "../../store/test-store";
 import AviancaToast from "../../utils/AviancaToast";
+import InformDocument from "../InformDocument/InformDocument";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
 import FiltersComponentAll from "./FiltersComponentAll";
@@ -202,6 +204,35 @@ const TableWorkflowsDash: React.FC = () => {
                   </AlertDialogContent>
                 </AlertDialogOverlay>
               </AlertDialog>
+            </Tooltip>
+            <Tooltip
+              label="Descargar reporte"
+              bg={"white"}
+              color={"black"}
+              borderRadius={"md"}
+            >
+              <PDFDownloadLink
+                document={<InformDocument />}
+                fileName="informe-avianca-playwright.pdf"
+              >
+                {({ loading }) =>
+                  loading ? (
+                    "..."
+                  ) : (
+                    <Button
+                      size={"xs"}
+                      isDisabled={isLoading}
+                      bg={"black"}
+                      color={"white"}
+                      _hover={{
+                        bg: "gray",
+                      }}
+                    >
+                      <FileChartLine size={16} />
+                    </Button>
+                  )
+                }
+              </PDFDownloadLink>
             </Tooltip>
           </ButtonGroup>
         </HStack>
