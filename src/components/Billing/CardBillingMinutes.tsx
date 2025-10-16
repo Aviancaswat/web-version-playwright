@@ -32,7 +32,7 @@ const CardBillingMinutes = () => {
     }, [])
 
     return (
-        <Card minW={250} height={95} width={"100%"}>
+        <Card minW={250} height={{ base: "auto", md: 95 }} width={"100%"}>
             <HStack
                 height={"100%"}
                 spacing={4}
@@ -46,13 +46,13 @@ const CardBillingMinutes = () => {
                     </Center>
                     <Box className="text">
                         <Heading as="h3" size={"sm"}>Minutos usados</Heading>
-                        <Text color={"gray.500"}>Total de minutos consumidos</Text>
+                        <Text color={"gray.500"} display={{base: "none", md: "block"}}>Total de minutos consumidos</Text>
                         <Text>
                             <span style={{ fontWeight: "bold" }}>{minutes}</span> min / <span style={{ fontWeight: "bold" }}>2000</span> min incluidos
                         </Text>
                     </Box>
                 </HStack>
-                <Box height={70} width={70} float={"inline-end"}>
+                <Box height={70} width={70} float={"inline-end"} display={{base: "none", md: "block"}}>
                     <CircleProgress
                         key={uuid()}
                         value={parseInt(((minutes / 2000) * 100).toFixed(0))}

@@ -98,8 +98,8 @@ const FiltersComponentAll: React.FC = () => {
     }
 
     return (
-        <Box display={"flex"} gap={2}>
-            <Box display={"flex"} gap={2}>
+        <Box display={"flex"} gap={2} flexWrap={{base: "wrap", md: "inherit"}}>
+            <Box display={"flex"} gap={2} flexWrap={{base: "wrap", md: "inherit"}}>
                 {
                     dataFilters.map((data, idx) => (
                         <FilterComponent key={idx} {...data} />

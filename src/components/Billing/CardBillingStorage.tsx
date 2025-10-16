@@ -22,7 +22,7 @@ const CardBillingStorage = () => {
     }, [])
 
     return (
-        <Card minW={250} height={95} width={"100%"}>
+        <Card minW={250} height={{ base: "auto", md: 95 }} width={"100%"}>
             <HStack
                 height={"100%"}
                 spacing={4}
@@ -36,13 +36,13 @@ const CardBillingStorage = () => {
                     </Center>
                     <Box className="text">
                         <Heading as="h3" size={"sm"}>Almacenamiento usado</Heading>
-                        <Text color={"gray.500"}>Total de storage consumidos</Text>
+                        <Text color={"gray.500"} display={{base: "none", md: "block"}}>Total de storage consumidos</Text>
                         <Text>
                             <span style={{ fontWeight: "bold" }}>{storage}</span> GB / <span style={{ fontWeight: "bold" }}>0.5</span> GB incluidos
                         </Text>
                     </Box>
                 </HStack>
-                <Box height={70} width={70} float={"inline-end"}>
+                <Box height={70} width={70} float={"inline-end"} display={{base: "none", md: "block"}}>
                     <CircleProgress
                         key={v4()}
                         value={parseInt(((storage / 0.5) * 100).toFixed(0))}
