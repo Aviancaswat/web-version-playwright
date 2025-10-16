@@ -41,7 +41,7 @@ const CardBillingMinutes = () => {
                 p={2}
             >
                 <HStack spacing={3}>
-                    <Center ml={2} className="logo" borderRadius={"xl"} h={16} w={16} bg={"#FFCF9D"}>
+                    <Center ml={2} className="logo" borderRadius={"xl"} h={16} w={16} bg={"rgba(255, 207, 157, .5)"}>
                         <Hourglass size={35} color="#DE8F5F" />
                     </Center>
                     <Box className="text">
