@@ -72,11 +72,12 @@ const DashboardPage = () => {
           position={"relative"}
           display={"flex"}
           gap={3}
+          flexWrap={"wrap"}
         >
           <HStack
             borderRadius={"md"}
             p={2}
-            width={"50%"}
+            width={{base: "100%", md: "50%"}}
             bg={"#1B1B1B"}
             height={200}
             justify={"space-between"}
@@ -98,7 +99,7 @@ const DashboardPage = () => {
             </Heading>
             <Text color={"gray.400"} textAlign={"center"}>Visualiza, Revisa y gestiona tus workflows</Text>
           </HStack>
-          <VStack width={"48%"} height={"100%"}>
+          <VStack width={{base: "100%", md: "48%"}} height={"100%"}>
             <Suspense fallback={<SkeletonCardsBilling />}>
               <CardBillingActionsMinutes />
             </Suspense>
