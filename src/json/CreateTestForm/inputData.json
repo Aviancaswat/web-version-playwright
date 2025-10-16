@@ -18,7 +18,7 @@
         "option": [
           { "value": "home", "label": "Home", "stepKey": 1 },
           { "value": "booking", "label": "Booking", "stepKey": 2 },
-          { "value": "passenger", "label": "Passengers", "stepKey": 3 },
+          { "value": "passenger", "label": "Passenger", "stepKey": 3 },
           { "value": "services", "label": "Services", "stepKey": 4 },
           { "value": "seat", "label": "Seat", "stepKey": 5 },
           { "value": "payment", "label": "Payment", "stepKey": 6 }
@@ -34,7 +34,7 @@
       {
         "name": "homeIdioma",
         "label": "Idioma:",
-        "type": "select",
+        "type": "multi-select",
         "isRequired": true,
         "option": [
           { "value": "es", "label": "Español" },
@@ -236,7 +236,9 @@
         "name": "bookingTarifaIda",
         "label": "Tarifa de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "light",
         "option": [
           { "value": "light", "label": "Light" },
           { "value": "basic", "label": "Basic" },
@@ -250,7 +252,9 @@
         "name": "bookingTarifaVuelta",
         "label": "Tarifa de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "light",
         "option": [
           { "value": "light", "label": "Light" },
           { "value": "basic", "label": "Basic" },
@@ -268,7 +272,7 @@
   },
   {
     "key": 3,
-    "stepTitle": "Passengers",
+    "stepTitle": "Passenger",
     "hasOnlyText": true,
     "infoText": "El formulario se rellenará de manera automática.",
     "method": [
@@ -287,7 +291,9 @@
         "name": "servicesEquipajeManoBodega",
         "label": "Incluir equipaje de mano o bodega: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }
@@ -297,7 +303,7 @@
         "name": "servicesEquipajeManoIda",
         "label": "Equipaje de mano en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -317,7 +323,7 @@
         "name": "servicesEquipajeManoVuelta",
         "label": "Equipaje de mano en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -337,7 +343,7 @@
         "name": "servicesEquipajeBodegaIda",
         "label": "Equipaje de bodega de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -357,7 +363,7 @@
         "name": "servicesEquipajeBodegaVuelta",
         "label": "Equipaje de bodega de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -377,7 +383,9 @@
         "name": "servicesEquipajeDeportivo",
         "label": "Incluir equipaje deportivo: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }
@@ -507,7 +515,9 @@
         "name": "servicesAbordajePrioritario",
         "label": "Incluir abordaje prioritario: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }
@@ -517,7 +527,7 @@
         "name": "servicesAbordajePrioritarioIda",
         "label": "Abordaje prioritario en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -537,7 +547,7 @@
         "name": "servicesAbordajePrioritarioVuelta",
         "label": "Abordaje prioritario en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -557,7 +567,9 @@
         "name": "servicesAviancaLounges",
         "label": "Incluir avianca lounges: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }
@@ -567,7 +579,7 @@
         "name": "servicesLoungesPrioritarioIda",
         "label": "Lounges prioritario en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -587,7 +599,7 @@
         "name": "servicesLoungesPrioritarioVuelta",
         "label": "Lounges prioritario en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -607,7 +619,9 @@
         "name": "servicesAsistenciaEspecial",
         "label": "Incluir asistencia especial: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }
@@ -617,7 +631,7 @@
         "name": "servicesAsistenciaDiscapacidadVisualIda",
         "label": "Asistencia discapacidad visual en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -637,7 +651,7 @@
         "name": "servicesAsistenciaDiscapacidadVisualVuelta",
         "label": "Asistencia discapacidad visual en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -657,7 +671,7 @@
         "name": "servicesAsistenciaDiscapacidadAuditivaIda",
         "label": "Asistencia discapacidad auditiva en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -677,7 +691,7 @@
         "name": "servicesAsistenciaDiscapacidadAuditivaVuelta",
         "label": "Asistencia discapacidad auditiva en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -697,7 +711,7 @@
         "name": "servicesAsistenciaDiscapacidadIntelectualIda",
         "label": "Asistencia discapacidad intelectual en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -717,7 +731,7 @@
         "name": "servicesAsistenciaDiscapacidadIntelectualVuelta",
         "label": "Asistencia discapacidad intelectual en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -737,7 +751,7 @@
         "name": "servicesAsistenciaPerroServicioIda",
         "label": "Asistencia perro en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -757,7 +771,7 @@
         "name": "servicesAsistenciaPerroServicioVuelta",
         "label": "Asistencia perro en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -777,7 +791,7 @@
         "name": "servicesAsistenciaDiscapacidadFisicaIda",
         "label": "Asistencia discapacidad fisica en vuelo de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -797,7 +811,7 @@
         "name": "servicesAsistenciaDiscapacidadFisicaVuelta",
         "label": "Asistencia discapacidad fisica en vuelo de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
         "option": [
           {
             "value": "false",
@@ -817,7 +831,9 @@
         "name": "servicesAsistenciaViaje",
         "label": "Incluir asistencia de viaje: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
         "option": [
           { "value": "false", "label": "No" },
           { "value": "true", "label": "Si" }

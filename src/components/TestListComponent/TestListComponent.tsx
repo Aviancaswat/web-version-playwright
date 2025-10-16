@@ -35,7 +35,6 @@ import type { Test } from "../../store/useTestStore/useTestStore.types";
 const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests, blockForm, unblockForm } =
     useTestStore();
-    
 
   const { setEditTest } = useEditTestStore();
 
@@ -60,6 +59,8 @@ const TestListComponent: React.FC = () => {
 
         if (status === "completed") {
           clearInterval(intervalId);
+
+          sessionStorage.removeItem("test-list");
 
           resolve({
             status,
