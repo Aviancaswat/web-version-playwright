@@ -1,16 +1,23 @@
 import {
   Box,
+  Button,
   Heading,
   HStack,
+  Spinner,
   Text,
   VStack
 } from "@chakra-ui/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FileDown, SquareArrowOutUpRight } from "lucide-react";
 import { lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import ShinyTextAnimation from "../../components/animations/ShinyText/ShinyText";
+import InformDocument from "../../components/InformDocument/InformDocument";
 import SkeletonCardsBilling from "../../components/skeletons/skeleton-billing-card";
 import SkeletonCards from "../../components/skeletons/skeleton-card";
 import SkeletonTable from "../../components/skeletons/skeleton-table";
+import { getGreeting } from "../../utils/getGreetings";
 
 const CardDetailsDashLazy = lazy(() => import("../../components/CardDetailsComponent/CardDetailsComponent"))
 const TableDashLazy = lazy(() => import("../../components/TableWorkflowComponent/TableWorkflowComponent"))
@@ -20,53 +27,56 @@ const CardBillingActionsStorage = lazy(() => import("../../components/Billing/Ca
 const DashboardPage = () => {
   return (
     <Box height={"95vh"} overflow={"auto"}>
-      {/* <HStack mt={5} justify={"space-between"}>
-        <VStack align={"start"} display={"hidden"}>
-          <Heading as="h1" size={"lg"} ml={4}>
-            Panel
-          </Heading>
-          <Text color={"blackAlpha.900"} fontSize={"sm"} ml={4}>
-            Visualiza, analiza y descarga tus informes de Avianca playwright
-          </Text>
-        </VStack>
-        <Menu>
-          <MenuButton
-            as={Button}
-            bg={"gray.900"}
-            color={"white"}
-            _hover={{
-              bg: "gray.600",
-            }}
+      <Box
+        mb={5}
+        display={"flex"}
+        flexWrap={"wrap"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Heading as="h1" size={"lg"} >{getGreeting()}</Heading>
+        <Box display={"flex"} gap={2}>
+          <Link to={"/create-test"}>
+            <Button
+              variant={"outline"}
+              rightIcon={<SquareArrowOutUpRight size={16} />}
+              borderColor={"black"}
+              size={"sm"}
+              _hover={{ bg: "" }}
+            >
+              Crear test
+            </Button>
+          </Link>
+          <PDFDownloadLink
+            document={<InformDocument />}
+            fileName="informe-avianca-playwright.pdf"
           >
-            <AlignJustify />
-          </MenuButton>
-          <MenuList>
-            <PDFDownloadLink
-              document={<InformDocument />}
-              fileName="informe-avianca-playwright.pdf"
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Generando PDF..."
-                ) : (
-                  <MenuItem icon={<FileChartLine />}>
-                    Exportar Informe PDF
-                  </MenuItem>
-                )
-              }
-            </PDFDownloadLink>
-            <MenuDivider />
-            <MenuItem
-              pointerEvents={"none"}
-              color={"gray.500"}
-              textAlign={"center"}
-              width={"100%"}
-            >
-              Avianca Evolutivos
-            </MenuItem>
-          </MenuList>
-        </Menu>
-      </HStack> */}
+            {({ loading }) =>
+              loading ? (
+                <Button
+                  rightIcon={<FileDown size={16} />}
+                  bg={"black"}
+                  color={"white"}
+                  _hover={{ bg: "gray.800" }}
+                  size={"sm"}
+                >
+                  <Spinner size={"sm"} />
+                </Button>
+              ) : (
+                <Button
+                  rightIcon={<FileDown size={16} />}
+                  bg={"black"}
+                  color={"white"}
+                  _hover={{ bg: "gray.800" }}
+                  size={"sm"}
+                >
+                  Reporte
+                </Button>
+              )
+            }
+          </PDFDownloadLink>
+        </Box>
+      </Box>
       <Box className="container-dash" mt={2}>
         <Box
           position={"relative"}
@@ -77,7 +87,7 @@ const DashboardPage = () => {
           <HStack
             borderRadius={"md"}
             p={2}
-            width={{base: "100%", md: "50%"}}
+            width={{ base: "100%", md: "50%" }}
             bg={"#1B1B1B"}
             height={200}
             justify={"space-between"}
@@ -99,7 +109,7 @@ const DashboardPage = () => {
             </Heading>
             <Text color={"gray.400"} textAlign={"center"}>Visualiza, Revisa y gestiona tus workflows</Text>
           </HStack>
-          <VStack width={{base: "100%", md: "48%"}} height={"100%"}>
+          <VStack width={{ base: "100%", md: "48%" }} height={"100%"}>
             <Suspense fallback={<SkeletonCardsBilling />}>
               <CardBillingActionsMinutes />
             </Suspense>
