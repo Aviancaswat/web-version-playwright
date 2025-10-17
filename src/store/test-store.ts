@@ -9,11 +9,20 @@ export type FilterGeneric = {
   values: string[]
 }
 
-export type JSONDashboardAgentAvianca = {
+export interface TopUser {
+  user: string;
+  avatar: string;
+  executions: number;
+  passes: number;
+  failures: number;
+  cancelled: number;
+}
+
+export interface JSONDashboardAgentAvianca {
   users: string[]
   workflowsData: DataWorkflows[]
   recent_failures: DataWorkflows[]
-  top_users: string[]
+  top_users: TopUser[]
   summary: {
     total_workflows: number,
     total_passed: number,
