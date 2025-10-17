@@ -28,7 +28,8 @@ export const formDataNormalizer = ({
             result[field.name] = formatDate(result[field.name], "mm-dd") ?? "";
           } else if (
             field.name === "bookingNumeroVueloIda" ||
-            field.name === "bookingNumeroVueloRegreso"
+            field.name === "bookingNumeroVueloRegreso" ||
+            field.name === "homeisActiveOptionOutbound"
           ) {
             result[field.name] = String(result[field.name]);
           } else if (field.type === "number") {
