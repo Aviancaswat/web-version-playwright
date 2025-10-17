@@ -12,6 +12,7 @@ import { FileDown, SquareArrowOutUpRight } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { v4 as uuid } from "uuid";
+import AgentDashboardUI from "../../components/agent-dashboard-ui/AgentDashboardUI";
 import ShinyTextAnimation from "../../components/animations/ShinyText/ShinyText";
 import InformDocument from "../../components/InformDocument/InformDocument";
 import SkeletonCardsBilling from "../../components/skeletons/skeleton-billing-card";
@@ -26,7 +27,7 @@ const CardBillingActionsStorage = lazy(() => import("../../components/Billing/Ca
 
 const DashboardPage = () => {
   return (
-    <Box height={"95vh"} overflow={"auto"}>
+    <Box height={"95vh"} overflow={"auto"} position={"relative"}>
       <Box
         mb={5}
         display={"flex"}
@@ -126,6 +127,7 @@ const DashboardPage = () => {
           </Suspense>
         </Box>
       </Box>
+      <AgentDashboardUI />
     </Box>
   );
 };
