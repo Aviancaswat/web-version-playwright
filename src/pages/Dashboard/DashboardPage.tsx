@@ -52,27 +52,15 @@ const DashboardPage = () => {
             fileName="informe-avianca-playwright.pdf"
           >
             {({ loading }) =>
-              loading ? (
-                <Button
-                  rightIcon={<FileDown size={16} />}
-                  bg={"black"}
-                  color={"white"}
-                  _hover={{ bg: "gray.800" }}
-                  size={"sm"}
-                >
-                  <Spinner size={"sm"} />
-                </Button>
-              ) : (
-                <Button
-                  rightIcon={<FileDown size={16} />}
-                  bg={"black"}
-                  color={"white"}
-                  _hover={{ bg: "gray.800" }}
-                  size={"sm"}
-                >
-                  Reporte
-                </Button>
-              )
+              <Button
+                rightIcon={<FileDown size={16} />}
+                bg={"black"}
+                color={"white"}
+                _hover={{ bg: "gray.800" }}
+                size={"sm"}
+              >
+                {loading ? <Spinner size={"sm"} /> : "Reporte"}
+              </Button>
             }
           </PDFDownloadLink>
         </Box>
