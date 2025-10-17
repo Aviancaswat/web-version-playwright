@@ -2,7 +2,7 @@
 
 interface ImportMetaEnv {
     VITE_GITHUB_TOKEN: string
-    VITE_AZURE_PERSONAL_ACCESS_TOKEN: string
+    VITE_API_KEY_OPENAI: string
 }
 
 interface ImportMeta {
