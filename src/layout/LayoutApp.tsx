@@ -1,13 +1,13 @@
-import { useState, useMemo } from "react";
 import { Box, HStack, IconButton, Tooltip } from "@chakra-ui/react";
-import { FlaskConical, House, LayoutDashboard, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FlaskConical, House, LayoutDashboard } from "lucide-react";
+import { useMemo, useState } from "react";
 
 // Data
 import sideBarMenuData from "../json/SideBar/sideBarMenuData.json";
 
 // Components
-import SideBarDashboard from "../components/SideBarComponent/SideBarComponent";
 import LoadingScreenComponent from "../components/LoadingScreenComponent/LoadingScreenComponent";
+import SideBarDashboard from "../components/SideBarComponent/SideBarComponent";
 
 // Types
 import type { ChildrenSideBarDashboardProps } from "../components/SideBarComponent/SideBarComponent.types";
