@@ -1,9 +1,8 @@
 import { Route, Routes } from "react-router-dom";
-
-//Components
+import ChatAgentPage from "../pages/Chat/ChatAgentPage";
+import WorkflowsPage from "../pages/CreateWorkflow/WorkflowPage";
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import HomePage from "../pages/Home/HomePage";
-import WorkflowsPage from "../pages/CreateWorkflow/WorkflowPage";
 
 const RoutesApp = () => {
   return (
@@ -11,6 +10,7 @@ const RoutesApp = () => {
       <Route index path="/" element={<HomePage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/create-test" element={<WorkflowsPage />} />
+      <Route path="/chat-ai" element={<ChatAgentPage />} />
       <Route path="*" element={<HomePage />} />
     </Routes>
   );
