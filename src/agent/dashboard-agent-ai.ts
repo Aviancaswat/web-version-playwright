@@ -30,10 +30,38 @@ const dashboardAviancaAgent = new Agent({
     model: 'gpt-5-nano-2025-08-07'
 });
 
-export const RunAgentDashboard = async (fetch_user: string) => {
+export const RunAgentDashboard = async (dataDashboard: string) => {
+
     try {
-        const response = run(dashboardAviancaAgent, fetch_user)
-        return response;
+        const response = await run(
+            dashboardAviancaAgent,
+            `Analiza este estado del dashboard: ${dataDashboard}`,
+            {
+                stream: true
+            })
+
+        let i = 0;
+        for await (const event of response) {
+            console.log(`loop ${i++}`)
+            // these are the raw events from the model
+            if (event.type === 'raw_model_stream_event') {
+                console.log(`${event.type} %o`, event.data);
+                const { type } = event.data;
+                if (type === "output_text_delta") {
+                    
+                }
+            }
+            // agent updated events
+            if (event.type === 'agent_updated_stream_event') {
+                console.log(`${event.type} %s`, event.agent.name);
+            }
+            // Agent SDK specific events
+            if (event.type === 'run_item_stream_event') {
+                console.log(`${event.type} %o`, event.item);
+            }
+        }
+
+        // return await response.completed;
     }
     catch (error) {
         console.error("Ha ocurrido un error al llamar agent ai: ", error)
