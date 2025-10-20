@@ -1,5 +1,5 @@
 import { Box, HStack, IconButton, Tooltip } from "@chakra-ui/react";
-import { ChevronLeft, ChevronRight, FlaskConical, House, LayoutDashboard } from "lucide-react";
+import { Bot, ChevronLeft, ChevronRight, FlaskConical, House, LayoutDashboard } from "lucide-react";
 import { useMemo, useState } from "react";
 
 // Data
@@ -27,6 +27,7 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
     House,
     LayoutDashboard,
     FlaskConical,
+    Bot
   };
 
   const routesConfig: ChildrenSideBarDashboardProps[] = useMemo(

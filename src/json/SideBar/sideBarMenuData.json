@@ -13,5 +13,10 @@
     "name": "Crear prueba",
     "path": "/create-test",
     "icon": "FlaskConical"
+  },
+  {
+    "name": "AI Chat",
+    "path": "/chat-ai",
+    "icon": "Bot"
   }
 ]
