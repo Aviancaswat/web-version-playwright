@@ -40,28 +40,7 @@ export const RunAgentDashboard = async (dataDashboard: string) => {
                 stream: true
             })
 
-        let i = 0;
-        for await (const event of response) {
-            console.log(`loop ${i++}`)
-            // these are the raw events from the model
-            if (event.type === 'raw_model_stream_event') {
-                console.log(`${event.type} %o`, event.data);
-                const { type } = event.data;
-                if (type === "output_text_delta") {
-                    
-                }
-            }
-            // agent updated events
-            if (event.type === 'agent_updated_stream_event') {
-                console.log(`${event.type} %s`, event.agent.name);
-            }
-            // Agent SDK specific events
-            if (event.type === 'run_item_stream_event') {
-                console.log(`${event.type} %o`, event.item);
-            }
-        }
-
-        // return await response.completed;
+        return response;
     }
     catch (error) {
         console.error("Ha ocurrido un error al llamar agent ai: ", error)
