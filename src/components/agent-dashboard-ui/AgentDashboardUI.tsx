@@ -1,6 +1,7 @@
 import { Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, Input, Text, Textarea, useDisclosure } from "@chakra-ui/react"
 import { MessageCircleCode } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { RunAgentDashboard } from "../../agent/dashboard-agent-ai"
 import { useTestStore } from "../../store/test-store"
 
 const AgentDashboardUI: React.FC = () => {
@@ -13,9 +14,9 @@ const AgentDashboardUI: React.FC = () => {
     useEffect(() => {
         setResponseModel("Hola! Bienvenido ¿en que te puedo ayudar hoy?")
         const getResponseModel = async () => {
-            // const result = await RunAgentDashboard(`Analiza este estado del dashboard: ${JSON.stringify(dashboardDataAgentAvianca)}`)
-            // const finalOutput = result.finalOutput;
-            // setResponseModel(finalOutput);
+            await RunAgentDashboard(`${JSON.stringify(dashboardDataAgentAvianca)}`)
+            //const finalOutput = result.finalOutput;
+            //setResponseModel(finalOutput);
         };
         getResponseModel()
     }, [dataWorkflows])
