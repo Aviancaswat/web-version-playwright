@@ -20,7 +20,6 @@ const AgentDashboardUI: React.FC = () => {
         getResponseModel()
     }, [dataWorkflows])
 
-
     return (
         <Box position={"fixed"} bottom={5} right={10}>
             <Button
