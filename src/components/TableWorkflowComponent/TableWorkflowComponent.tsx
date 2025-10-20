@@ -128,8 +128,8 @@ const TableWorkflowsDash: React.FC = () => {
         recent_failures: newData.filter((item) => item.conclusion === "failure").slice(0, 5),
         summary: {
           total_workflows: totalWorkflows,
-          total_failed: successWorkflows,
-          total_passed: failureWorkflows,
+          total_passed: successWorkflows,
+          total_failed: failureWorkflows,
           total_cancelled: cancelledWorkflows,
           pass_rate: ((successWorkflows / totalWorkflows) * 100),
           failure_rate: ((failureWorkflows / totalWorkflows) * 100),
