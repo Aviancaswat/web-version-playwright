@@ -1,0 +1,23 @@
+/* shiny-text.css */
+.shiny-text {
+  font-weight: bold;
+  background: linear-gradient(45deg, #ffffff, #737a7c, #fdfdfd);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shine 3s ease-in-out infinite;
+  text-align: center;
+  display: inline-block;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 400% 0%;
+  }
+  50% {
+    background-position: -400% 0%;
+  }
+  100% {
+    background-position: 400% 0%;
+  }
+}
