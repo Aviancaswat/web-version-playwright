@@ -3,7 +3,6 @@ import { MessageCircleCode } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { RunAgentDashboard } from "../../agent/dashboard-agent-ai"
 import { useTestStore } from "../../store/test-store"
 
 type ResponseStreamModel = {
@@ -19,21 +18,6 @@ const AgentDashboardUI: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [responseModel, setResponseModel] = useState<string | undefined>(undefined)
 
-    useEffect(() => {
-        setResponseModel("Hola! Bienvenido ¿en que te puedo ayudar hoy?")
-        const getResponseModel = async () => {
-            const response = await RunAgentDashboard(`${JSON.stringify(dashboardDataAgentAvianca)}`)
-            for await (const event of response) {
-                if (event.type === 'raw_model_stream_event') {
-                    const { type, delta } = event.data as ResponseStreamModel;
-                    if (type === "output_text_delta") {
-                        setResponseModel(prev => prev + (delta ?? ""))
-                    }
-                }
-            }
-        };
-        getResponseModel()
-    }, [])
 
     useEffect(() => {
         if (textareaRef.current) {
