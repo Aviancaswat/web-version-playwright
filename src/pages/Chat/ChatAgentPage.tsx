@@ -1,7 +1,8 @@
-import { Box, Heading, Spinner, Text, Textarea } from "@chakra-ui/react";
+import { Box, Spinner, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
+import WelcomeAgentDashbaord from "../../components/agent-dashboard-ui/welcomeAgent";
 import { useTestStore } from "../../store/test-store";
 
 type ResponseStreamModel = {
@@ -17,10 +18,9 @@ type Messages = {
 const ChatAgentPage = () => {
     const chatRef = useRef<HTMLDivElement | null>(null);
     const { dashboardDataAgentAvianca } = useTestStore();
-    const [responseModel, setResponseModel] = useState<string>("");  // Para manejar la respuesta del agente
     const [loading, setLoading] = useState<boolean>(false);
-    const [questionUser, setQuestionUser] = useState<string>("");  // Lo que el usuario está escribiendo
-    const [messages, setMessages] = useState<Messages[]>([]);  // El historial de mensajes (usuario + agente)
+    const [questionUser, setQuestionUser] = useState<string>("");
+    const [messages, setMessages] = useState<Messages[]>([]);
 
     useEffect(() => {
         if (chatRef.current) {
@@ -41,7 +41,6 @@ const ChatAgentPage = () => {
             ]);
 
             setLoading(true);
-            setResponseModel("");
 
             const response = await RunAgentDashboard(
                 `${JSON.stringify(dashboardDataAgentAvianca)}`,
@@ -55,7 +54,6 @@ const ChatAgentPage = () => {
                     const { type, delta } = event.data as ResponseStreamModel;
                     if (type === "output_text_delta" && delta) {
                         agentResponse += delta;
-                        setResponseModel(agentResponse);
                     }
                 }
             }
@@ -79,12 +77,7 @@ const ChatAgentPage = () => {
             <Box ref={chatRef} width={"full"} height={"100%"} overflowY="auto" padding="2" flex="1">
                 {
                     messages.length === 0 ? (
-                        <Box height={"100%"} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
-                            <Heading>Bienvenido a Avianca Agent</Heading>
-                            <Text>
-                                Pregunta, analiza la información del dashboard
-                            </Text>
-                        </Box>
+                        <WelcomeAgentDashbaord />
                     ) : (
                         <Box>
                             {messages.map((msg, index) => (
@@ -120,6 +113,8 @@ const ChatAgentPage = () => {
                     placeholder="Preguntar algo..."
                     onKeyDown={getResponseModel}
                     onChange={(e) => setQuestionUser(e.target.value)}
+                    bg={"white"}
+                    color={"black"}
                 />
             </Box>
         </Box>
