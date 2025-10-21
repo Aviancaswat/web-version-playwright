@@ -1,7 +1,9 @@
-import { Box, Spinner, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Spinner, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
+import LogoAv from "../../assets/avianca-logo-desk.png";
 import WelcomeAgentDashbaord from "../../components/agent-dashboard-ui/welcomeAgent";
 import { useTestStore } from "../../store/test-store";
 
@@ -13,6 +15,50 @@ type ResponseStreamModel = {
 type Messages = {
     role: "user" | "agent"
     message: string
+}
+
+const MessageUserUI = (msg: Messages) => {
+    return (
+        <>
+            <Box display={"flex"} gap={2} alignItems={"start"}>
+                <Box
+                    padding={2}
+                    borderRadius="md"
+                    backgroundColor={msg.role === "user" ? "black" : "gray.100"}
+                    color={msg.role === "user" ? "white" : "black"}
+                >
+                    <ReactMarkdown>
+                        {msg.message}
+                    </ReactMarkdown>
+                </Box>
+            </Box>
+        </>
+    )
+}
+
+const MessageAgentUI = (msg: Messages) => {
+    return (
+        <>
+            <Box display={"flex"} gap={2} alignItems={"start"}>
+                <Box
+                    display="flex"
+                    flexDirection={msg.role === "user" ? "row-reverse" : "row"}
+                >
+                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"}/>
+                </Box>
+                <Box
+                    padding={2}
+                    borderRadius="md"
+                    backgroundColor={msg.role === "user" ? "black" : "gray.100"}
+                    color={msg.role === "user" ? "white" : "black"}
+                >
+                    <ReactMarkdown>
+                        {msg.message}
+                    </ReactMarkdown>
+                </Box>
+            </Box>
+        </>
+    )
 }
 
 const ChatAgentPage = () => {
@@ -74,7 +120,14 @@ const ChatAgentPage = () => {
             display={"flex"}
             flexDirection={"column"}
         >
-            <Box ref={chatRef} width={"full"} height={"100%"} overflowY="auto" padding="2" flex="1">
+            <Box
+                ref={chatRef}
+                width={"full"}
+                height={"100%"}
+                overflowY="auto"
+                padding="2"
+                flex="1"
+            >
                 {
                     messages.length === 0 ? (
                         <WelcomeAgentDashbaord />
@@ -88,16 +141,9 @@ const ChatAgentPage = () => {
                                     flexDirection={msg.role === "user" ? "row-reverse" : "row"}
                                     alignItems="flex-start"
                                 >
-                                    <Box
-                                        padding={2}
-                                        borderRadius="md"
-                                        backgroundColor={msg.role === "user" ? "black" : "gray.100"}
-                                        color={msg.role === "user" ? "white" : "black"}
-                                    >
-                                        <ReactMarkdown>
-                                            {msg.message}
-                                        </ReactMarkdown>
-                                    </Box>
+                                    {
+                                        msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
+                                    }
                                 </Box>
                             ))}
                             {loading && <Spinner size={"md"} colorScheme="blackAlpha" />}

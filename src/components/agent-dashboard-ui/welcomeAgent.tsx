@@ -23,7 +23,14 @@ const WelcomeAgentDashbaord = () => {
                 placeContent={"center"}
             >
                 <Stack width={"full"} direction={{ base: "column", lg: "row" }} gap={5}>
-                    <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
+                    <Card
+                        width={{ base: "100%", lg: "100%" }}
+                        borderRadius={"md"}
+                        display={"flex"}
+                        flexDirection={"row"}
+                        gap={3}
+                        alignItems={"center"}
+                    >
                         <Box
                             p={5}
                             bg={"orange.200"}
@@ -62,7 +69,7 @@ const WelcomeAgentDashbaord = () => {
                         </Box>
                         <Box pr={5}>
                             <Heading size={"sm"}>
-                                ¿Cuántas ejecuciones exitosas y fallidas?
+                                Total de ejecuciones exitosas y fallidas
                             </Heading>
                         </Box>
                     </Card>
