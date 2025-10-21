@@ -16,7 +16,7 @@
 
 import { Agent, run, setDefaultOpenAIClient } from '@openai/agents';
 import OpenAI from 'openai';
-import { INTRUCTIONS_MAIN_AGENT } from './instructions';
+import { INTRUCTIONS_MAIN_AGENT, MODEL } from './instructions';
 
 const client = new OpenAI({
     apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
@@ -27,15 +27,8 @@ setDefaultOpenAIClient(client);
 const dashboardAviancaAgent = new Agent({
     name: 'dashboard_avianca_playwright',
     instructions: INTRUCTIONS_MAIN_AGENT,
-    model: 'gpt-5-nano-2025-08-07'
+    model: MODEL
 });
-
-// Responde de la siguiente manera:
-//             1. Proporciona un análisis general sobre la salud del pipeline (tasa de éxito, fallos, cancelaciones, etc.).
-//             2. Analiza el desempeño de los usuarios principales (incluyendo métricas como tasa de éxito, fallos, etc.).
-//             3. Identifica cualquier tendencia o patrón crítico relacionado con los fallos o cualquier otro problema.
-//             4. Resume las métricas clave y cualquier hallazgo importante relacionado con la estabilidad del sistema.
-//             5. Si encuentras algún problema, proporciona recomendaciones para mejorarlo.
 
 export const RunAgentDashboard = async (dataDashboard: string, questionUser: string) => {
 

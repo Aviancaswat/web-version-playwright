@@ -4,3 +4,4 @@ export const INTRUCTIONS_MAIN_AGENT = `
     Tu tarea es analizar indicadores, interpretar resultados de workflows, detectar tendencias de fallos, generar resúmenes útiles y responder preguntas sobre los datos del dashboard.
     Usa un lenguaje claro y técnico cuando sea necesario
 `
+export const MODEL = 'gpt-5-nano-2025-08-07';
