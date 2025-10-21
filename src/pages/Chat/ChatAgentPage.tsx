@@ -1,10 +1,11 @@
-import { Avatar, Box, Spinner, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Text, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
 import LogoAv from "../../assets/avianca-logo-desk.png";
 import WelcomeAgentDashbaord from "../../components/agent-dashboard-ui/welcomeAgent";
+import ShinyTextAgent from "../../components/animations/agent/ShinyTextAgent";
 import { useTestStore } from "../../store/test-store";
 
 type ResponseStreamModel = {
@@ -14,7 +15,7 @@ type ResponseStreamModel = {
 
 type Messages = {
     role: "user" | "agent"
-    message: string
+    message: string,
 }
 
 const MessageUserUI = (msg: Messages) => {
@@ -44,10 +45,10 @@ const MessageAgentUI = (msg: Messages) => {
                     display="flex"
                     flexDirection={msg.role === "user" ? "row-reverse" : "row"}
                 >
-                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"}/>
+                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
                 </Box>
                 <Box
-                    padding={2}
+                    padding={5}
                     borderRadius="md"
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
@@ -146,7 +147,14 @@ const ChatAgentPage = () => {
                                     }
                                 </Box>
                             ))}
-                            {loading && <Spinner size={"md"} colorScheme="blackAlpha" />}
+                            {loading && (
+                                <Box display={"flex"} gap={2} alignItems={"center"}>
+                                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
+                                    <Text>
+                                        <ShinyTextAgent />
+                                    </Text>
+                                </Box>
+                            )}
                         </Box>
                     )
                 }
