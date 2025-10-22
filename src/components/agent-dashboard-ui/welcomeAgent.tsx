@@ -1,7 +1,8 @@
 import { Box, Card, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { Cable, CircleX, LayoutDashboard, Users } from "lucide-react";
+import './agent.css';
 
-const WelcomeAgentDashbaord = () => {
+const WelcomeAgentDashboard = () => {
     return (
         <Box
             height={"100%"}
@@ -79,4 +80,4 @@ const WelcomeAgentDashbaord = () => {
     )
 }
 
-export default WelcomeAgentDashbaord; 
+export default WelcomeAgentDashboard; 
