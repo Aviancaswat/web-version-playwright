@@ -1,5 +1,6 @@
-import { Box, Card, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Card, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
 import { Cable, CircleX, LayoutDashboard, Users } from "lucide-react";
+import LogoAv from "../../assets/avianca-logo-desk.png";
 
 const WelcomeAgentDashboard = () => {
     return (
@@ -10,12 +11,15 @@ const WelcomeAgentDashboard = () => {
             justifyContent={"center"}
             alignItems={"center"}
         >
+            <Box bg={"black"} color={"white"} borderRadius={"2xl"}>
+                <Image src={LogoAv} alt="Avianca Logo" height={20} width={20}/>
+            </Box>
             <Heading size={"xl"}>Bienvenido a Avianca Playwright Agent</Heading>
             <Text>
                 Consulta y analiza los datos del dashboard
             </Text>
             <Box>
-                <Heading size={"md"} mt={10}>
+                <Heading size={"md"} mt={5}>
                     Algunas preguntas que puedes hacerme:
                 </Heading>
             </Box>
