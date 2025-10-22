@@ -14,6 +14,11 @@ const WelcomeAgentDashboard = () => {
             <Text>
                 Consulta y analiza los datos del dashboard
             </Text>
+            <Box>
+                <Heading size={"md"} mt={10}>
+                    Algunas preguntas que puedes hacerme:
+                </Heading>
+            </Box>
             <HStack
                 gap={3}
                 flexWrap={"wrap"}
@@ -64,7 +69,7 @@ const WelcomeAgentDashboard = () => {
                         </Box>
                     </Card>
                     <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
-                        <Box p={5} bg={"pink.200"} color={"pink.600"} borderLeftRadius={"md"}>
+                        <Box p={5} bg={"cyan.200"} color={"cyan.600"} borderLeftRadius={"md"}>
                             <Cable />
                         </Box>
                         <Box pr={5}>

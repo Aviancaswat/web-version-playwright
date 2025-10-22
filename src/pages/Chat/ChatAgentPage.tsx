@@ -1,4 +1,6 @@
-import { Avatar, Box, Center, Heading, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Button, Center, Heading, Textarea, Tooltip, VStack } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { Copy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGFM from "remark-gfm";
@@ -42,7 +44,7 @@ const MessageUserUI = (msg: Messages) => {
 
 const MessageAgentUI = (msg: Messages) => {
     return (
-        <>
+        <VStack>
             <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
                 <Box
                     display="flex"
@@ -61,7 +63,29 @@ const MessageAgentUI = (msg: Messages) => {
                     <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
                 </Box>
             </Box>
-        </>
+            <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{ cursor: 'pointer', marginLeft: 30, alignSelf: "start" }}
+                onClick={() => {
+                    navigator.clipboard.writeText(msg.message);
+                }}
+            >
+                <Tooltip label="Copiar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
+                    <Button
+                        bg={"transparent"}
+                        size={"xs"}
+                        onClick={async () => await navigator.clipboard.writeText(msg.message)}
+                        _hover={{
+                            bg: "none",
+                            border: "none"
+                        }}
+                    >
+                        <Copy size={15} />
+                    </Button>
+                </Tooltip>
+            </motion.div>
+        </VStack>
     )
 }
 
@@ -280,6 +304,7 @@ const ChatAgentPage = () => {
                     onChange={(e) => setQuestionUser(e.target.value)}
                     bg={"white"}
                     color={"black"}
+                    borderRadius={"2xl"}
                 />
             </Box>
         </Box>

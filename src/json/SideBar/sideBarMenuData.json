@@ -15,7 +15,7 @@
     "icon": "FlaskConical"
   },
   {
-    "name": "AI Chat",
+    "name": "AVA Chat",
     "path": "/chat-ai",
     "icon": "Bot"
   }
