@@ -26,7 +26,7 @@ import {
 import { FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
-import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
+import { useTestStore } from "../../store/test-store";
 import AviancaToast from "../../utils/AviancaToast";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
@@ -35,7 +35,7 @@ import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const TableWorkflowsDash: React.FC = () => {
 
-  const { setDataWorkflows, dataWorkflows, setDashboardDataAgentAvianca } = useTestStore();
+  const { setDataWorkflows, dataWorkflows } = useTestStore();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -48,45 +48,6 @@ const TableWorkflowsDash: React.FC = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
-
-  const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
-    const userStats: Record<string, TopUser> = {};
-
-    newData.forEach(workflow => {
-      const username = workflow.actor.autorname;
-      const avatar = workflow.actor.avatar;
-
-      if (!username) return;
-
-      if (!userStats[username]) {
-        userStats[username] = {
-          user: username,
-          avatar: avatar || "",
-          executions: 0,
-          passes: 0,
-          failures: 0,
-          cancelled: 0
-        };
-      }
-      userStats[username].executions++;
-      switch (workflow.conclusion) {
-        case 'success':
-          userStats[username].passes++;
-          break;
-        case 'failure':
-          userStats[username].failures++;
-          break;
-        case 'cancelled':
-          userStats[username].cancelled++;
-          break;
-      }
-    });
-
-    const topUsers = Object.values(userStats).sort(
-      (a, b) => b.executions - a.executions
-    );
-    return topUsers;
-  }
 
   const getWorkflows = async () => {
     setLoading(true);
@@ -107,39 +68,7 @@ const TableWorkflowsDash: React.FC = () => {
         total_count: workflow.total_count
       }));
 
-      const successWorkflows = newData.filter(
-        (item) => item.conclusion === "success"
-      ).length;
-
-      const failureWorkflows = newData.filter(
-        (item) => item.conclusion === "failure"
-      ).length;
-
-      const cancelledWorkflows = newData.filter(
-        (item) => item.conclusion === "cancelled"
-      ).length;
-
-      const totalWorkflows = newData.length;
-
-      let dataJSON: JSONDashboardAgentAvianca = {
-        workflowsData: newData,
-        users: newData.map(e => e.actor?.autorname),
-        top_users: getTopUsers(newData),
-        recent_failures: newData.filter((item) => item.conclusion === "failure").slice(0, 5),
-        summary: {
-          total_workflows: totalWorkflows,
-          total_passed: successWorkflows,
-          total_failed: failureWorkflows,
-          total_cancelled: cancelledWorkflows,
-          pass_rate: ((successWorkflows / totalWorkflows) * 100),
-          failure_rate: ((failureWorkflows / totalWorkflows) * 100),
-          cancel_rate: ((cancelledWorkflows / totalWorkflows) * 100)
-        }
-      }
-
       setDataWorkflows(newData);
-      setDashboardDataAgentAvianca(dataJSON);
-
     } catch (error) {
       console.log(error);
     } finally {

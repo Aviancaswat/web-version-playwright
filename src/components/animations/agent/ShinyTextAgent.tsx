@@ -3,7 +3,7 @@ import './shiny-text.css';
 
 const ShinyTextAgent = () => (
     <motion.h6
-        className="shiny-text"
+        className="shiny-text-agent"
         animate={{ opacity: [0, 1, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
     >

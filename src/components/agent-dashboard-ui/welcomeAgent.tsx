@@ -1,6 +1,5 @@
 import { Box, Card, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { Cable, CircleX, LayoutDashboard, Users } from "lucide-react";
-import './agent.css';
 
 const WelcomeAgentDashboard = () => {
     return (
@@ -11,7 +10,7 @@ const WelcomeAgentDashboard = () => {
             justifyContent={"center"}
             alignItems={"center"}
         >
-            <Heading size={"2xl"}>Bienvenido a Avianca Agent</Heading>
+            <Heading size={"xl"}>Bienvenido a Avianca Playwright Agent</Heading>
             <Text>
                 Consulta y analiza los datos del dashboard
             </Text>
