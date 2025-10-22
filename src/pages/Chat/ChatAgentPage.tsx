@@ -1,4 +1,4 @@
-import { Avatar, Box, Center, Heading, Text, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Center, Heading, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGFM from "remark-gfm";
@@ -8,7 +8,7 @@ import LogoAv from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
 import PulsingBox from "../../components/agent-dashboard-ui/PulseBox";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
-import ShinyTextAgent from "../../components/animations/agent/ShinyTextAgent";
+import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
@@ -262,9 +262,7 @@ const ChatAgentPage = () => {
                             {loading && (
                                 <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
                                     <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
-                                    <Text>
-                                        <ShinyTextAgent />
-                                    </Text>
+                                    <ShinyTextAgent text="Pensando..." />
                                 </Box>
                             )}
                         </Box>
