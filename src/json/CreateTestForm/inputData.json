@@ -108,16 +108,20 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca (AUC)" },
-          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
-          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "BOG", "label": "Bogotá (BOG)" },
+          { "value": "MDE", "label": "Medellín (MDE)" },
           { "value": "CTG", "label": "Cartagena (CTG)" },
-          { "value": "MTR", "label": "Monteria (MTR)" },
-          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "CLO", "label": "Cali (CLO)" },
+          { "value": "SMR", "label": "Santa Marta (SMR)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" },
+          { "value": "ADZ", "label": "San Andrés (ADZ)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CUC", "label": "Cúcuta (CUC)" },
           { "value": "PEI", "label": "Pereira (PEI)" },
-          { "value": "VUP", "label": "Valledupar (VUP)" },
-          { "value": "AXM", "label": "Armenia (AXM)" },
-          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+          { "value": "IAD", "label": "Whashington (IAD)" },
+          { "value": "MIA", "label": "Miami (MIA)" },
+          { "value": "NYC", "label": "Nueva York (NYC)" },
+          { "value": "SAL", "label": "San Salvador (SAL)" }
         ]
       },
       {
@@ -126,16 +130,20 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca (AUC)" },
-          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
-          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "BOG", "label": "Bogotá (BOG)" },
+          { "value": "MDE", "label": "Medellín (MDE)" },
           { "value": "CTG", "label": "Cartagena (CTG)" },
-          { "value": "MTR", "label": "Monteria (MTR)" },
-          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "CLO", "label": "Cali (CLO)" },
+          { "value": "SMR", "label": "Santa Marta (SMR)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" },
+          { "value": "ADZ", "label": "San Andrés (ADZ)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CUC", "label": "Cúcuta (CUC)" },
           { "value": "PEI", "label": "Pereira (PEI)" },
-          { "value": "VUP", "label": "Valledupar (VUP)" },
-          { "value": "AXM", "label": "Armenia (AXM)" },
-          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+          { "value": "IAD", "label": "Whashington (IAD)" },
+          { "value": "MIA", "label": "Miami (MIA)" },
+          { "value": "NYC", "label": "Nueva York (NYC)" },
+          { "value": "SAL", "label": "San Salvador (SAL)" }
         ]
       },
       {
