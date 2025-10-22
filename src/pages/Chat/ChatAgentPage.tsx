@@ -1,12 +1,16 @@
-import { Avatar, Box, Text, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Center, Text, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGFM from "remark-gfm";
 import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
 import LogoAv from "../../assets/avianca-logo-desk.png";
-import WelcomeAgentDashbaord from "../../components/agent-dashboard-ui/welcomeAgent";
+import PulsingBox from "../../components/agent-dashboard-ui/PulseBox";
+import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import ShinyTextAgent from "../../components/animations/agent/ShinyTextAgent";
-import { useTestStore } from "../../store/test-store";
+import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
+import { getRunsByRepo } from "../../github/api";
+import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 
 type ResponseStreamModel = {
     type: string;
@@ -21,16 +25,14 @@ type Messages = {
 const MessageUserUI = (msg: Messages) => {
     return (
         <>
-            <Box display={"flex"} gap={2} alignItems={"start"}>
+            <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
                 <Box
                     padding={2}
                     borderRadius="md"
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
                 >
-                    <ReactMarkdown>
-                        {msg.message}
-                    </ReactMarkdown>
+                    <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
                 </Box>
             </Box>
         </>
@@ -40,7 +42,7 @@ const MessageUserUI = (msg: Messages) => {
 const MessageAgentUI = (msg: Messages) => {
     return (
         <>
-            <Box display={"flex"} gap={2} alignItems={"start"}>
+            <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
                 <Box
                     display="flex"
                     flexDirection={msg.role === "user" ? "row-reverse" : "row"}
@@ -48,14 +50,14 @@ const MessageAgentUI = (msg: Messages) => {
                     <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
                 </Box>
                 <Box
-                    padding={5}
+                    paddingLeft={5}
+                    paddingRight={5}
+                    paddingTop={2}
                     borderRadius="md"
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
                 >
-                    <ReactMarkdown>
-                        {msg.message}
-                    </ReactMarkdown>
+                     <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
                 </Box>
             </Box>
         </>
@@ -63,11 +65,128 @@ const MessageAgentUI = (msg: Messages) => {
 }
 
 const ChatAgentPage = () => {
+
+    const { setDataWorkflows, setDashboardDataAgentAvianca } = useTestStore();
     const chatRef = useRef<HTMLDivElement | null>(null);
     const { dashboardDataAgentAvianca } = useTestStore();
     const [loading, setLoading] = useState<boolean>(false);
+    const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
     const [messages, setMessages] = useState<Messages[]>([]);
+
+    const isMarkdownTable = (text: string) => {
+        const lines = text.split('\n');
+        const hasSeparatorLine = lines.some(line => line.includes('---'));
+        const hasColumnSeparator = lines.some(line => line.includes('|'));
+
+        return hasSeparatorLine && hasColumnSeparator;
+    };
+
+    const formatMarkdownContent = (text: string) => {
+        if (isMarkdownTable(text)) {
+            return text;
+        } else {
+            return text.replace(/\n/g, '  \n');
+        }
+    };
+
+    const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
+        const userStats: Record<string, TopUser> = {};
+
+        newData.forEach(workflow => {
+            const username = workflow.actor.autorname;
+            const avatar = workflow.actor.avatar;
+
+            if (!username) return;
+
+            if (!userStats[username]) {
+                userStats[username] = {
+                    user: username,
+                    avatar: avatar || "",
+                    executions: 0,
+                    passes: 0,
+                    failures: 0,
+                    cancelled: 0
+                };
+            }
+            userStats[username].executions++;
+            switch (workflow.conclusion) {
+                case 'success':
+                    userStats[username].passes++;
+                    break;
+                case 'failure':
+                    userStats[username].failures++;
+                    break;
+                case 'cancelled':
+                    userStats[username].cancelled++;
+                    break;
+            }
+        });
+
+        const topUsers = Object.values(userStats).sort(
+            (a, b) => b.executions - a.executions
+        );
+        return topUsers;
+    }
+
+    const getWorkflows = async () => {
+        setLoadingWorkflows(true);
+        try {
+            const runs = await getRunsByRepo();
+            if (runs.length === 0) throw new Error("No hay workflows");
+            console.log("Data workflows chat ai: ", runs)
+
+            const newData: DataWorkflows[] = runs.map((workflow) => ({
+                id: workflow.id,
+                actor: {
+                    autorname: workflow?.actor?.login,
+                    avatar: workflow?.actor?.avatar_url,
+                },
+                display_title: workflow.display_title,
+                status: workflow.status,
+                conclusion: workflow.conclusion,
+                total_count: workflow.total_count
+            }));
+
+            const successWorkflows = newData.filter(
+                (item) => item.conclusion === "success"
+            ).length;
+
+            const failureWorkflows = newData.filter(
+                (item) => item.conclusion === "failure"
+            ).length;
+
+            const cancelledWorkflows = newData.filter(
+                (item) => item.conclusion === "cancelled"
+            ).length;
+
+            const totalWorkflows = newData.length;
+
+            let dataJSON: JSONDashboardAgentAvianca = {
+                workflowsData: newData,
+                users: newData.map(e => e.actor?.autorname),
+                top_users: getTopUsers(newData),
+                recent_failures: newData.filter((item) => item.conclusion === "failure").slice(0, 5),
+                summary: {
+                    total_workflows: totalWorkflows,
+                    total_passed: successWorkflows,
+                    total_failed: failureWorkflows,
+                    total_cancelled: cancelledWorkflows,
+                    pass_rate: ((successWorkflows / totalWorkflows) * 100),
+                    failure_rate: ((failureWorkflows / totalWorkflows) * 100),
+                    cancel_rate: ((cancelledWorkflows / totalWorkflows) * 100)
+                }
+            }
+
+            setDataWorkflows(newData);
+            setDashboardDataAgentAvianca(dataJSON);
+
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingWorkflows(false);
+        }
+    };
 
     useEffect(() => {
         if (chatRef.current) {
@@ -76,7 +195,12 @@ const ChatAgentPage = () => {
                 chatRef.current.scrollTop = chatRef.current.scrollHeight;
             }
         }
-    }, [messages]);
+    }, []);
+
+    useEffect(() => {
+        console.log("Obteniendo workflows...")
+        getWorkflows()
+    }, [])
 
     const getResponseModel = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -112,7 +236,7 @@ const ChatAgentPage = () => {
 
             setLoading(false);
         }
-    }, [questionUser, dashboardDataAgentAvianca]);
+    }, [questionUser]);
 
     return (
         <Box
@@ -131,7 +255,13 @@ const ChatAgentPage = () => {
             >
                 {
                     messages.length === 0 ? (
-                        <WelcomeAgentDashbaord />
+                        loadingWorkflows ? (
+                            <Center height={"100%"} display={"flex"} flexDirection={"column"}>
+                                {/* <AnimatedLoader key={v4()} height={50} width={50} />
+                                Cargando contexto */}
+                                <PulsingBox />
+                            </Center>
+                        ) : <WelcomeAgentDashboard />
                     ) : (
                         <Box>
                             {messages.map((msg, index) => (
@@ -161,6 +291,7 @@ const ChatAgentPage = () => {
             </Box>
             <Box>
                 <Textarea
+                    isDisabled={loadingWorkflows}
                     value={questionUser}
                     width={"full"}
                     minHeight={100}

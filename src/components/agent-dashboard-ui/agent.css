@@ -1,0 +1,143 @@
+ul {
+  list-style-type: none; 
+  padding-left: 0;
+}
+
+ol {
+  list-style-type: none; 
+  padding-left: 0;
+}
+
+ol li::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url('src/assets/icon-list-agent-3.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 15px 15px;
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+ul li::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url('src/assets/icon-list-agent-2.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 15px 15px;
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+ul li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+ol li {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Para las sublistas (listas dentro de listas) */
+ul ul, ol ol {
+  margin-left: 20px;
+}
+
+/* Estilo para los títulos */
+h1, h2, h3 {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Estilo de negrita */
+strong {
+  font-weight: bold;
+}
+
+/* Estilo de texto en cursiva */
+em {
+  font-style: italic;
+}
+
+/* Estilo para los enlaces */
+a {
+  color: #007BFF;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+p{
+  font-style: italic;
+}
+
+/* Estilos generales para la tabla */
+table {
+  width: 100%;
+  border-collapse: collapse; /* Para evitar espacios entre celdas */
+  margin: 20px 0;
+}
+
+/* Estilos para las celdas */
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #000; /* Borde negro para las celdas */
+}
+
+/* Estilo para las cabeceras */
+th {
+  background-color: #000; /* Fondo negro para las cabeceras */
+  color: white; /* Texto blanco para las cabeceras */
+  font-weight: bold;
+}
+
+/* Estilo para las filas pares (de color blanco) */
+tr:nth-child(even) {
+  background-color: #fff; /* Fondo blanco */
+}
+
+/* Estilo para las filas impares (de color negro claro) */
+tr:nth-child(odd) {
+  background-color: #f2f2f2; /* Fondo gris claro */
+}
+
+/* Hover sobre filas */
+tr:hover {
+  background-color: #ddd; /* Fondo gris claro al pasar el ratón */
+}
+
+/* Estilo para el texto */
+td, th {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+blockquote {
+  background-color: #f9f9f9;
+  border-left: 4px solid #007BFF;
+  padding: 10px;
+  font-style: italic;
+  margin: 20px 0;
+  color: #333;
+}
+
+a::after {
+  content: ' ↗'; 
+  font-size: 0.8em;
+  margin-left: 5px;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+
+a:hover::after {
+  opacity: 1; 
+}

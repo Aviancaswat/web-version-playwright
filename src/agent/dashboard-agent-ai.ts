@@ -1,4 +1,3 @@
-
 // const downloadReportAviancaAgent = new Agent({
 //     name: "download_report_dashboard_avianca_playwright",
 //     instructions: "Accede al dashboard de la aplicación web Avianca, navega hasta la sección de reportes generales y ejecuta la acción necesaria para descargar el reporte completo en el formato disponible (por ejemplo, .csv, .xlsx o .pdf). Asegúrate de esperar a que la descarga finalice correctamente y verifica que el archivo se haya guardado exitosamente."
