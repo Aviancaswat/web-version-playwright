@@ -1,10 +1,11 @@
-import { Avatar, Box, Center, Text, Textarea } from "@chakra-ui/react";
+import { Avatar, Box, Center, Heading, Text, Textarea } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGFM from "remark-gfm";
 import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
 import LogoAv from "../../assets/avianca-logo-desk.png";
+import '../../components/agent-dashboard-ui/agent.css';
 import PulsingBox from "../../components/agent-dashboard-ui/PulseBox";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import ShinyTextAgent from "../../components/animations/agent/ShinyTextAgent";
@@ -57,7 +58,7 @@ const MessageAgentUI = (msg: Messages) => {
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
                 >
-                     <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
+                    <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
                 </Box>
             </Box>
         </>
@@ -73,22 +74,6 @@ const ChatAgentPage = () => {
     const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
     const [messages, setMessages] = useState<Messages[]>([]);
-
-    const isMarkdownTable = (text: string) => {
-        const lines = text.split('\n');
-        const hasSeparatorLine = lines.some(line => line.includes('---'));
-        const hasColumnSeparator = lines.some(line => line.includes('|'));
-
-        return hasSeparatorLine && hasColumnSeparator;
-    };
-
-    const formatMarkdownContent = (text: string) => {
-        if (isMarkdownTable(text)) {
-            return text;
-        } else {
-            return text.replace(/\n/g, '  \n');
-        }
-    };
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -190,10 +175,7 @@ const ChatAgentPage = () => {
 
     useEffect(() => {
         if (chatRef.current) {
-            const isAtBottom = chatRef.current.scrollHeight === chatRef.current.scrollTop + chatRef.current.clientHeight;
-            if (isAtBottom) {
-                chatRef.current.scrollTop = chatRef.current.scrollHeight;
-            }
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
     }, []);
 
@@ -257,9 +239,8 @@ const ChatAgentPage = () => {
                     messages.length === 0 ? (
                         loadingWorkflows ? (
                             <Center height={"100%"} display={"flex"} flexDirection={"column"}>
-                                {/* <AnimatedLoader key={v4()} height={50} width={50} />
-                                Cargando contexto */}
                                 <PulsingBox />
+                                <Heading mt={5} size={"md"}>Avianca Playwright Agent</Heading>
                             </Center>
                         ) : <WelcomeAgentDashboard />
                     ) : (
@@ -271,6 +252,7 @@ const ChatAgentPage = () => {
                                     display="flex"
                                     flexDirection={msg.role === "user" ? "row-reverse" : "row"}
                                     alignItems="flex-start"
+                                    className="chat-ai"
                                 >
                                     {
                                         msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
@@ -278,7 +260,7 @@ const ChatAgentPage = () => {
                                 </Box>
                             ))}
                             {loading && (
-                                <Box display={"flex"} gap={2} alignItems={"center"}>
+                                <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
                                     <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
                                     <Text>
                                         <ShinyTextAgent />
