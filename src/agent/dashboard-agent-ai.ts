@@ -36,13 +36,10 @@ export const RunAgentDashboard = async (dataDashboard: string, questionUser: str
             dashboardAviancaAgent,
             `
             la pregunta del usuario es: ${questionUser}
-            Responde la pregunta del usuario con los datos que te proporciono responde las preguntas del usuario de manera clara y consisa.
+            Responde la pregunta del usuario con los datos que te proporciono, responde las preguntas del usuario de manera clara y consisa.
             Aquí están los datos del dashboard:
             ${JSON.stringify(dataDashboard)}            
-            Asegúrate de ser específico y detallar los puntos más importantes según los datos proporcionados.`,
-            {
-                stream: true
-            }
+            Asegúrate de ser específico y detallar los puntos más importantes según los datos proporcionados.`
         );
 
         return response;
