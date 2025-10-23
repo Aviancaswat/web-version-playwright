@@ -447,12 +447,11 @@ export const GetActionsMinutesBilling = async () => {
 export const getReportHTMLPreview = async (
   workflowRunId?: number
 ) => {
-  console.log("workflowRunId pasado a preview report: ", workflowRunId);
+
   if (!workflowRunId) throw new Error("No hay workflow id asignado");
 
   try {
     const { artifacts, total_count } = await getArtefactsByRepo();
-    console.log("artifacts: ", artifacts);
 
     if (total_count === 0) throw new Error("No hay reporte asociado al workflow");
     let reports = artifacts.filter((e) => e.name === "playwright-report");
@@ -475,15 +474,35 @@ export const getReportHTMLPreview = async (
     );
 
     const zip = await JSZip.loadAsync(data as ArrayBuffer);
-    console.log("File zip: ", zip)
     const htmlFile = Object.keys(zip.files).find((file) =>
       file.endsWith("index.html")
     );
 
     if (!htmlFile) throw new Error("No se encontró index.html dentro del ZIP");
-    const htmlContent = await zip.file(htmlFile)!.async("string");
-    console.log("htmlContent: ", htmlContent)
-    return htmlContent;
+    let htmlContent = await zip.file(htmlFile)!.async("string");
+
+    const injectedScript = `
+            <script>
+            document.addEventListener('click', function(event) {
+                let target = event.target;
+                while (target && target.tagName !== 'A') {
+                target = target.parentElement;
+                }
+                if (target && target.tagName === 'A') {
+                const href = target.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    // Es un enlace interno: evitar navegación que afecte padre
+                    event.preventDefault();
+                    window.location.hash = href;
+                }
+                }
+            }, true);
+            </script>
+    `;
+
+    const modifiedHtml = htmlContent.replace('</body>', `${injectedScript}</body>`);
+    return modifiedHtml;
+
   } catch (error) {
     console.error(
       `Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`

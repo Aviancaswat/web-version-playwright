@@ -1,7 +1,9 @@
-import { Button, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
-import { ScanEye } from "lucide-react";
+import { Box, Button, Center, Heading, Image, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import { Bell, ScanEye } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import logoAv from "../../assets/avianca-logo-desk.png";
 import { getReportHTMLPreview } from "../../github/api";
+import AnimatedLoader from "../loaders/AnimatedLoader";
 
 interface PreviewReportProps {
     workflowID: number;
@@ -13,33 +15,20 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [reporteHTML, setReporteHTML] = useState<string>("");
     const [loadingReporteHTML, setLoadingReporteHTML] = useState<boolean>(false);
+    const [errorLoadingReporteHTML, setErrorLoadingReporteHTML] = useState<boolean>(false);
 
     const previewReporteHTML = async (workflowId: number) => {
-        setLoadingReporteHTML(true);
-        const contentHTML = await getReportHTMLPreview(workflowId);
-
-        const injectedScript = `
-            <script>
-            document.addEventListener('click', function(event) {
-                let target = event.target;
-                while (target && target.tagName !== 'A') {
-                target = target.parentElement;
-                }
-                if (target && target.tagName === 'A') {
-                const href = target.getAttribute('href');
-                if (href && href.startsWith('#')) {
-                    // Es un enlace interno: evitar navegación que afecte padre
-                    event.preventDefault();
-                    window.location.hash = href;
-                }
-                }
-            }, true);
-            </script>
-            `;
-        const modifiedHtml = contentHTML.replace('</body>', `${injectedScript}</body>`);
-        console.log("html content modified: ", modifiedHtml)
-        setReporteHTML(modifiedHtml);
-        setLoadingReporteHTML(false);
+        try {
+            setLoadingReporteHTML(true);
+            const contentHTML = await getReportHTMLPreview(workflowId);
+            setReporteHTML(contentHTML);
+        }
+        catch (error) {
+            console.log("Error loading preview report: ", error);
+            setErrorLoadingReporteHTML(true);
+        } finally {
+            setLoadingReporteHTML(false);
+        }
     };
 
     useEffect(() => {
@@ -48,41 +37,47 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
         }
     }, [])
 
-    useEffect(() => {
-        const iframe = refIframe.current;
-        if (!iframe) return;
-
-        const onNavigation = (e: Event) => {
-            e.preventDefault();
-        };
-
-        iframe.contentWindow?.addEventListener('beforeunload', onNavigation);
-
-        return () => {
-            iframe.contentWindow?.removeEventListener('beforeunload', onNavigation);
-        };
-    }, [reporteHTML]);
-
-
     return (
         <>
-            <Button
-                as={MenuItem}
+            <MenuItem
+                as={Button}
                 icon={<ScanEye />}
                 onClick={onOpen}
+                fontSize={"sm"}
+                fontWeight={"medium"}
+                _hover={{
+                    border: "2px solid #000000",
+                    borderRadius: "md",
+                    color: "black"
+                }}
             >
                 Visualizar reporte
-            </Button>
+            </MenuItem>
 
             <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Modal Title</ModalHeader>
+                    <ModalHeader>
+                        <Box display={"flex"} alignItems={"center"} gap={2}>
+                            <Image
+                                src={logoAv}
+                                alt="Avianca Logo"
+                                boxSize="34px"
+                                bg={"black"}
+                                color={"white"}
+                                borderRadius={"md"}
+                            />
+                            Avianca Playwright Report
+                        </Box>
+                    </ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody>
+                    <ModalBody minHeight={300}>
                         {
                             loadingReporteHTML ? (
-                                <p>Cargando reporte...</p>
+                                <Center height={"50vh"} display={"flex"} flexDirection={"column"}>
+                                    <AnimatedLoader width={20} height={20} />
+                                    <Box>Cargando reporte</Box>
+                                </Center>
                             ) : (
                                 <>
                                     {
@@ -91,19 +86,21 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                                             title="Preview Report"
                                             srcDoc={reporteHTML}
                                             sandbox="allow-scripts allow-same-origin allow-popups"
-                                            style={{ width: '100%', height: '80vh', border: 'none' }}
+                                            style={{ width: '100%', height: '60vh', border: 'none' }}
                                         />
                                     }
                                 </>
                             )
                         }
+                        {errorLoadingReporteHTML && (
+                            <Center height={"50vh"} display={"flex"} flexDirection={"column"} gap={4}>
+                                <Bell size={80}/>
+                                <Heading size={"md"}>
+                                    No hay reporte asociado a este workflow
+                                </Heading>
+                            </Center>
+                        )}
                     </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme='blue' mr={3} onClick={onClose}>
-                            Close
-                        </Button>
-                        <Button variant='ghost'>Secondary Action</Button>
-                    </ModalFooter>
                 </ModalContent>
             </Modal>
         </>
