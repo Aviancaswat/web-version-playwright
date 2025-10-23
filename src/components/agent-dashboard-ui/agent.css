@@ -34,8 +34,10 @@
   margin-right: 5px;
 } */
 
+
 .chat-ai ul li {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  margin-left: 30px;
   font-size: 16px;
 }
 

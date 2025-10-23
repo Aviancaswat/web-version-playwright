@@ -15,10 +15,10 @@ import type { DataWorkflows } from "../../components/TableWorkflowComponent/Tabl
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 
-type ResponseStreamModel = {
-    type: string;
-    delta?: string
-}
+// type ResponseStreamModel = {
+//     type: string;
+//     delta?: string
+// }
 
 type Messages = {
     role: "user" | "agent"
@@ -219,25 +219,25 @@ const ChatAgentPage = () => {
 
             setLoading(true);
 
-            const response = await RunAgentDashboard(
+            const { finalOutput } = await RunAgentDashboard(
                 `${JSON.stringify(dashboardDataAgentAvianca)}`,
                 questionUser
             );
 
-            let agentResponse = "";
+            // let agentResponse = "";
 
-            for await (const event of response) {
-                if (event.type === 'raw_model_stream_event') {
-                    const { type, delta } = event.data as ResponseStreamModel;
-                    if (type === "output_text_delta" && delta) {
-                        agentResponse += delta;
-                    }
-                }
-            }
+            // for await (const event of response) {
+            //     if (event.type === 'raw_model_stream_event') {
+            //         const { type, delta } = event.data as ResponseStreamModel;
+            //         if (type === "output_text_delta" && delta) {
+            //             agentResponse += delta;
+            //         }
+            //     }
+            // }
 
             setMessages(prevMessages => [
                 ...prevMessages,
-                { role: "agent", message: agentResponse }
+                { role: "agent", message: finalOutput ?? "" }
             ]);
 
             setLoading(false);

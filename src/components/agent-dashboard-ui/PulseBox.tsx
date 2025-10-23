@@ -1,16 +1,15 @@
 import { Box } from "@chakra-ui/react";
 import { keyframes as emotionKeyframes } from '@emotion/react';
 
-// Definir la animación de pulsación usando Emotion keyframes
 const pulse = emotionKeyframes`
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.3);  /* Aumenta el tamaño */
+    transform: scale(1.3); 
   }
   100% {
-    transform: scale(1);  /* Vuelve al tamaño original */
+    transform: scale(1);
   }
 `;
 
