@@ -203,35 +203,6 @@ const TableWorkflowsDash: React.FC = () => {
                 </AlertDialogOverlay>
               </AlertDialog>
             </Tooltip>
-            {/* <Tooltip
-              label="Descargar reporte"
-              bg={"white"}
-              color={"black"}
-              borderRadius={"md"}
-            >
-              <PDFDownloadLink
-                document={<InformDocument />}
-                fileName="informe-avianca-playwright.pdf"
-              >
-                {({ loading }) =>
-                  loading ? (
-                    "..."
-                  ) : (
-                    <Button
-                      size={"xs"}
-                      isDisabled={isLoading}
-                      bg={"black"}
-                      color={"white"}
-                      _hover={{
-                        bg: "gray",
-                      }}
-                    >
-                      <FileChartLine size={16} />
-                    </Button>
-                  )
-                }
-              </PDFDownloadLink>
-            </Tooltip> */}
           </ButtonGroup>
         </HStack>
       </Box>

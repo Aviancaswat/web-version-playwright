@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/core";
+import JSZip from "jszip";
 
 export interface GitHubContentFile {
   type: "file";
@@ -224,7 +225,6 @@ export const downLoadReportHTML = async (
         : `reporte-screenshots-${getTimestamp()}.zip`;
     a.click();
     URL.revokeObjectURL(url);
-    console.log("Reponse download: ", data);
   } catch (error) {
     console.error(
       `Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`
@@ -443,3 +443,51 @@ export const GetActionsMinutesBilling = async () => {
     throw new Error("Ha ocurrido un error al consulta los actions minutes | Error: " + error)
   }
 }
+
+export const getReportHTMLPreview = async (
+  workflowRunId?: number
+) => {
+  console.log("workflowRunId pasado a preview report: ", workflowRunId);
+  if (!workflowRunId) throw new Error("No hay workflow id asignado");
+
+  try {
+    const { artifacts, total_count } = await getArtefactsByRepo();
+    console.log("artifacts: ", artifacts);
+
+    if (total_count === 0) throw new Error("No hay reporte asociado al workflow");
+    let reports = artifacts.filter((e) => e.name === "playwright-report");
+    const reportFound = reports.find(
+      (e) => e.workflow_run && e.workflow_run.id === workflowRunId
+    );
+    if (!reportFound) throw new Error("No hay reporte asociado al workflow");
+    let artifactId = reportFound.id;
+    const { data } = await octokit.request(
+      "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
+      {
+        owner: owner,
+        repo: repo,
+        artifact_id: artifactId,
+        archive_format: "zip",
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28"
+        }
+      }
+    );
+
+    const zip = await JSZip.loadAsync(data as ArrayBuffer);
+    console.log("File zip: ", zip)
+    const htmlFile = Object.keys(zip.files).find((file) =>
+      file.endsWith("index.html")
+    );
+
+    if (!htmlFile) throw new Error("No se encontró index.html dentro del ZIP");
+    const htmlContent = await zip.file(htmlFile)!.async("string");
+    console.log("htmlContent: ", htmlContent)
+    return htmlContent;
+  } catch (error) {
+    console.error(
+      `Ha ocurrido un error al descargar el archivo del reporte | Error: ${error}`
+    );
+    throw error;
+  }
+};

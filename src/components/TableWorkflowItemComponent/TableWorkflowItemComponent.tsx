@@ -13,8 +13,7 @@ import {
   FileX2,
   FolderDown,
   GripHorizontal,
-  ImageDown,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
 import { useState, type ReactElement } from "react";
 import { v4 as uuid } from "uuid";
@@ -23,20 +22,19 @@ import {
   downLoadReportHTML,
   runWorkflowById,
   type ResultWorkflow,
-  type StatusWorkflow,
+  type StatusWorkflow
 } from "../../github/api";
 import AviancaToast from "../../utils/AviancaToast";
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
 import AnimatedLoader from "../loaders/AnimatedLoader";
+import PreviewReport from "./PreviewReport";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   data,
 }) => {
 
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
-  const [isLoadingScreenshots, setIsLoadingScreenshots] =
-    useState<boolean>(false);
   const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
   const [isLoadingDeleteArtifacts, setIsLoadingDeleteArtifacts] =
     useState<boolean>(false);
@@ -84,29 +82,6 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
       throw error;
     } finally {
       setIsLoadingReport(false);
-    }
-  };
-
-  const handleDownloadScreenshots = async (workflowId: number) => {
-    try {
-      setIsLoadingScreenshots(true);
-      await downLoadReportHTML(workflowId, "only-screenshots");
-      AviancaToast.success("Imágenes descargadas", {
-        description: "Se ha descargado correctamente las imágenes",
-        position: "bottom-center"
-      })
-    } catch (error) {
-      console.error(
-        `Error al descargar las imagenes para el workflow ${workflowId}:`,
-        error
-      );
-      AviancaToast.error("Upps! el reporte no existe", {
-        description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar las imágenes",
-        position: "bottom-center"
-      })
-      throw error;
-    } finally {
-      setIsLoadingScreenshots(false);
     }
   };
 
@@ -176,14 +151,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                 >
                   Descargar Reporte
                 </MenuItem>
-                <MenuItem
-                  icon={
-                    isLoadingScreenshots ? <AnimatedLoader /> : <ImageDown />
-                  }
-                  onClick={() => handleDownloadScreenshots(row.id)}
-                >
-                  Descargar Imagenes
-                </MenuItem>
+                <PreviewReport key={uuid()} workflowID={row.id} />
                 <MenuItem
                   icon={isLoadingRun ? <AnimatedLoader /> : <RefreshCw />}
                   onClick={() => handleRunWorkflow(row.id)}
