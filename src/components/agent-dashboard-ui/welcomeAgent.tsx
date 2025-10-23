@@ -1,6 +1,7 @@
 import { Box, Card, Heading, HStack, Image, Stack, Text } from "@chakra-ui/react";
 import { Cable, CircleX, LayoutDashboard, Users } from "lucide-react";
 import LogoAv from "../../assets/avianca-logo-desk.png";
+import ScaleAnimationBox from "../transitions/ScaleBox";
 
 const WelcomeAgentDashboard = () => {
     return (
@@ -11,10 +12,10 @@ const WelcomeAgentDashboard = () => {
             justifyContent={"center"}
             alignItems={"center"}
         >
-            <Box bg={"black"} color={"white"} borderRadius={"2xl"}>
-                <Image src={LogoAv} alt="Avianca Logo" height={20} width={20}/>
+            <Box bg={"black"} color={"white"} borderRadius={"2xl"} mb={3}>
+                <Image src={LogoAv} alt="Avianca Logo" height={16} width={16} />
             </Box>
-            <Heading size={"xl"}>Bienvenido a Avianca Playwright Agent</Heading>
+            <Heading size={"xl"} textAlign={"center"}>Bienvenido a <br />Avianca Playwright Agent</Heading>
             <Text>
                 Consulta y analiza los datos del dashboard
             </Text>
@@ -32,56 +33,64 @@ const WelcomeAgentDashboard = () => {
                 placeContent={"center"}
             >
                 <Stack width={"full"} direction={{ base: "column", lg: "row" }} gap={5}>
-                    <Card
-                        width={{ base: "100%", lg: "100%" }}
-                        borderRadius={"md"}
-                        display={"flex"}
-                        flexDirection={"row"}
-                        gap={3}
-                        alignItems={"center"}
-                    >
-                        <Box
-                            p={5}
-                            bg={"orange.200"}
-                            color={"orange.600"}
-                            borderLeftRadius={"md"}
+                    <ScaleAnimationBox width={{ base: "100%", lg: "50%" }}>
+                        <Card
+                            width={{ base: "100%", lg: "100%" }}
+                            borderRadius={"md"}
+                            display={"flex"}
+                            flexDirection={"row"}
+                            gap={3}
+                            alignItems={"center"}
                         >
-                            <LayoutDashboard />
-                        </Box>
-                        <Box pr={5}>
-                            <Heading size={"sm"}>Analiza los resultados del dashboard</Heading>
-                        </Box>
-                    </Card>
-                    <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
-                        <Box p={5} bg={"green.200"} color={"green.600"} borderLeftRadius={"md"}>
-                            <Users />
-                        </Box>
-                        <Box pr={5}>
-                            <Heading size={"sm"}>Dame el top users</Heading>
-                        </Box>
-                    </Card>
+                            <Box
+                                p={5}
+                                bg={"orange.200"}
+                                color={"orange.600"}
+                                borderLeftRadius={"md"}
+                            >
+                                <LayoutDashboard />
+                            </Box>
+                            <Box pr={5}>
+                                <Heading size={"sm"}>Analiza los resultados del dashboard</Heading>
+                            </Box>
+                        </Card>
+                    </ScaleAnimationBox>
+                    <ScaleAnimationBox width={{ base: "100%", lg: "50%" }}>
+                        <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
+                            <Box p={5} bg={"green.200"} color={"green.600"} borderLeftRadius={"md"}>
+                                <Users />
+                            </Box>
+                            <Box pr={5}>
+                                <Heading size={"sm"}>Dame el top users</Heading>
+                            </Box>
+                        </Card>
+                    </ScaleAnimationBox>
                 </Stack>
                 <Stack width={"full"} direction={{ base: "column", lg: "row" }} gap={5}>
-                    <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
-                        <Box p={5} bg={"purple.200"} color={"purple.600"} borderLeftRadius={"md"}>
-                            <CircleX />
-                        </Box>
-                        <Box pr={5}>
-                            <Heading size={"sm"}>
-                                Dame las 5 ejecuciones recientemente fallidas
-                            </Heading>
-                        </Box>
-                    </Card>
-                    <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
-                        <Box p={5} bg={"cyan.200"} color={"cyan.600"} borderLeftRadius={"md"}>
-                            <Cable />
-                        </Box>
-                        <Box pr={5}>
-                            <Heading size={"sm"}>
-                                Total de ejecuciones exitosas y fallidas
-                            </Heading>
-                        </Box>
-                    </Card>
+                    <ScaleAnimationBox width={{ base: "100%", lg: "50%" }}>
+                        <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
+                            <Box p={5} bg={"purple.200"} color={"purple.600"} borderLeftRadius={"md"}>
+                                <CircleX />
+                            </Box>
+                            <Box pr={5}>
+                                <Heading size={"sm"}>
+                                    Dame las 5 ejecuciones recientemente fallidas
+                                </Heading>
+                            </Box>
+                        </Card>
+                    </ScaleAnimationBox>
+                    <ScaleAnimationBox width={{ base: "100%", lg: "50%" }}>
+                        <Card width={{ base: "100%", lg: "100%" }} borderRadius={"md"} display={"flex"} flexDirection={"row"} gap={3} alignItems={"center"}>
+                            <Box p={5} bg={"cyan.200"} color={"cyan.600"} borderLeftRadius={"md"}>
+                                <Cable />
+                            </Box>
+                            <Box pr={5}>
+                                <Heading size={"sm"}>
+                                    Total de ejecuciones exitosas y fallidas
+                                </Heading>
+                            </Box>
+                        </Card>
+                    </ScaleAnimationBox>
                 </Stack>
             </HStack>
         </Box>

@@ -12,6 +12,7 @@ import PulsingBox from "../../components/agent-dashboard-ui/PulseBox";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
+import FadeAnimationText from "../../components/transitions/FadeText";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 
@@ -270,7 +271,7 @@ const ChatAgentPage = () => {
                     ) : (
                         <Box>
                             {messages.map((msg, index) => (
-                                <Box
+                                <FadeAnimationText
                                     key={index}
                                     marginBottom={4}
                                     display="flex"
@@ -281,7 +282,7 @@ const ChatAgentPage = () => {
                                     {
                                         msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
                                     }
-                                </Box>
+                                </FadeAnimationText>
                             ))}
                             {loading && (
                                 <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
