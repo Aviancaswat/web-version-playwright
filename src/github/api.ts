@@ -454,6 +454,14 @@ export const GetActionsMinutesBilling = async () => {
   }
 }
 
+const getMimeType = (file: string): string => {
+  if (file.endsWith(".png")) return "image/png";
+  if (file.endsWith(".jpg") || file.endsWith(".jpeg")) return "image/jpeg";
+  if (file.endsWith(".svg")) return "image/svg+xml";
+  if (file.endsWith(".gif")) return "image/gif";
+  return "application/octet-stream";
+}
+
 export const getReportHTMLPreview = async (
   workflowRunId?: number
 ) => {
@@ -466,13 +474,24 @@ export const getReportHTMLPreview = async (
 
     const zip = await JSZip.loadAsync(data as ArrayBuffer);
 
-    //obteniendo el index.html
     const htmlFile = Object.keys(zip.files).find((file) =>
       file.endsWith("index.html")
     );
 
     if (!htmlFile) throw new Error("No se encontró index.html dentro del ZIP");
     let htmlContent = await zip.file(htmlFile)!.async("string");
+
+    const assetsFolder = Object.keys(zip.files).filter((file) =>
+      file.startsWith("data")
+    );
+
+    const assets = await Promise.all(
+      assetsFolder.map(async (file) => {
+        const content = await zip.file(file)!.async("base64");
+        return { file, content };
+      })
+    );
+
 
     const injectedScript = `
             <script>
@@ -492,28 +511,36 @@ export const getReportHTMLPreview = async (
             </script>
     `;
 
-    let modifiedHtml = htmlContent.replace('</body>', `${injectedScript}</body>`);
+    const fixDynamicImagesScript = `
+      <script>
+        const fixImages = () => {
+          document.querySelectorAll("img[src^='data/']").forEach(img => {
+            const fileName = img.getAttribute("src");
+            const base64Map = ${JSON.stringify(
+        Object.fromEntries(assets.map(a => [a.file, a.content]))
+      )};
+            if (base64Map[fileName]) {
+              let mimeType = 'image/png';
+              if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) mimeType = 'image/jpeg';
+              if (fileName.endsWith('.svg')) mimeType = 'image/svg+xml';
+              img.src = \`data:\${mimeType};base64,\${base64Map[fileName]}\`;
+            }
+          });
+        };
+        document.addEventListener('click', () => setTimeout(fixImages, 500));
+        window.addEventListener('hashchange', fixImages);
+        window.addEventListener('load', fixImages);
+      </script>
+    `;
 
-    //obteniendo la carpeta de assets
-    const assetsFolder = Object.keys(zip.files).filter((file) =>
-      file.startsWith("data")
-    );
+    // assets.forEach(({ file, content }) => {
+    //   const mimeType = getMimeType(file);
+    //   const regex = new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g");
+    //   console.log("Reemplazando archivo en HTML: ", file);
+    //   modifiedHtml = modifiedHtml.replace(regex, `data:${mimeType};base64,${content}`);
+    // });
 
-    const assets = await Promise.all(
-      assetsFolder.map(async (file) => {
-        const content = await zip.file(file)!.async("base64");
-        return { file, content };
-      })
-    );
-
-    console.log("assets data report: ", assets);
-
-    //remplazar cada ruta de file con su contenido en base64
-    assets.forEach(({ file, content }) => {
-      const regex = new RegExp(file, "g");
-      console.log("Reemplazando archivo en HTML: ", file);
-      modifiedHtml = modifiedHtml.replace(regex, `data:application/octet-stream;base64,${content}`);
-    });
+    let modifiedHtml = htmlContent.replace('</body>', `${injectedScript}${fixDynamicImagesScript}</body>`);
 
     return modifiedHtml;
 
