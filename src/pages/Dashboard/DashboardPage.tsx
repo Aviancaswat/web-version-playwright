@@ -34,7 +34,7 @@ const DashboardPage = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Heading as="h1" size={"lg"} >{getGreeting()}</Heading>
+        <Heading as="h1" size={"lg"} ml={2}>{getGreeting()}</Heading>
         <Box display={"flex"} gap={2}>
           <Link to={"/create-test"}>
             <Button
