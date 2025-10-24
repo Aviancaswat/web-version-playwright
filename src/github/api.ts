@@ -169,14 +169,13 @@ export const checkWorkflowStatus = async (
   }
 };
 
-export const downLoadReportHTML = async (
-  workflowRunId?: number,
-  typeReport: "playwright" | "only-screenshots" = "playwright"
-) => {
-  console.log("workflowRunId pasado a download report: ", workflowRunId);
-  if (!workflowRunId) throw new Error("No hay workflow id asignado");
+const getReportByWorkflowId = async (workflowRunId?: number) => {
 
   try {
+
+    console.log("workflowRunId pasado a download report: ", workflowRunId);
+    if (!workflowRunId) throw new Error("No hay workflow id asignado");
+
     const { artifacts, total_count } = await getArtefactsByRepo();
 
     console.log("artifacts: ", artifacts);
@@ -184,14 +183,7 @@ export const downLoadReportHTML = async (
     if (total_count === 0)
       throw new Error("No hay reporte asociado al workflow");
 
-    let artifactId: number = 0;
-    let reports: any[] = [];
-
-    if (typeReport === "playwright") {
-      reports = artifacts.filter((e) => e.name === "playwright-report");
-    } else if (typeReport === "only-screenshots") {
-      reports = artifacts.filter((e) => e.name === "results-by-test");
-    }
+    let reports = artifacts.filter((e) => e.name === "playwright-report");
 
     const reportFound = reports.find(
       (e) => e.workflow_run && e.workflow_run.id === workflowRunId
@@ -199,9 +191,10 @@ export const downLoadReportHTML = async (
     console.log("reportFound: ", reportFound);
     if (!reportFound)
       throw new Error("No hay reporte asociado al workflow");
-    artifactId = reportFound.id;
+    let artifactId = reportFound.id;
 
     console.log("artifactId: ", artifactId);
+
     const { data } = await octokit.request(
       "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
       {
@@ -214,6 +207,23 @@ export const downLoadReportHTML = async (
         },
       }
     );
+
+    return data;
+
+  } catch (error) {
+    console.error(`Ha ocurrido un error al obtener el reporte ${error}`);
+    return null;
+  }
+}
+
+export const downLoadReportHTML = async (
+  workflowRunId?: number,
+  typeReport: "playwright" | "only-screenshots" = "playwright"
+) => {
+  try {
+
+    const data = await getReportByWorkflowId(workflowRunId);
+    if (!data) throw new Error("No se ha podido obtener el reporte");
 
     const blob = new Blob([data as ArrayBuffer], { type: "application/zip" });
     const url = URL.createObjectURL(blob);
@@ -448,32 +458,15 @@ export const getReportHTMLPreview = async (
   workflowRunId?: number
 ) => {
 
-  if (!workflowRunId) throw new Error("No hay workflow id asignado");
-
   try {
-    const { artifacts, total_count } = await getArtefactsByRepo();
 
-    if (total_count === 0) throw new Error("No hay reporte asociado al workflow");
-    let reports = artifacts.filter((e) => e.name === "playwright-report");
-    const reportFound = reports.find(
-      (e) => e.workflow_run && e.workflow_run.id === workflowRunId
-    );
-    if (!reportFound) throw new Error("No hay reporte asociado al workflow");
-    let artifactId = reportFound.id;
-    const { data } = await octokit.request(
-      "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
-      {
-        owner: owner,
-        repo: repo,
-        artifact_id: artifactId,
-        archive_format: "zip",
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28"
-        }
-      }
-    );
+    const data = await getReportByWorkflowId(workflowRunId);
+
+    if (!data) throw new Error("No se ha podido obtener el reporte");
 
     const zip = await JSZip.loadAsync(data as ArrayBuffer);
+
+    //obteniendo el index.html
     const htmlFile = Object.keys(zip.files).find((file) =>
       file.endsWith("index.html")
     );
@@ -491,7 +484,6 @@ export const getReportHTMLPreview = async (
                 if (target && target.tagName === 'A') {
                 const href = target.getAttribute('href');
                 if (href && href.startsWith('#')) {
-                    // Es un enlace interno: evitar navegación que afecte padre
                     event.preventDefault();
                     window.location.hash = href;
                 }
@@ -500,7 +492,29 @@ export const getReportHTMLPreview = async (
             </script>
     `;
 
-    const modifiedHtml = htmlContent.replace('</body>', `${injectedScript}</body>`);
+    let modifiedHtml = htmlContent.replace('</body>', `${injectedScript}</body>`);
+
+    //obteniendo la carpeta de assets
+    const assetsFolder = Object.keys(zip.files).filter((file) =>
+      file.startsWith("data")
+    );
+
+    const assets = await Promise.all(
+      assetsFolder.map(async (file) => {
+        const content = await zip.file(file)!.async("base64");
+        return { file, content };
+      })
+    );
+
+    console.log("assets data report: ", assets);
+
+    //remplazar cada ruta de file con su contenido en base64
+    assets.forEach(({ file, content }) => {
+      const regex = new RegExp(file, "g");
+      console.log("Reemplazando archivo en HTML: ", file);
+      modifiedHtml = modifiedHtml.replace(regex, `data:application/octet-stream;base64,${content}`);
+    });
+
     return modifiedHtml;
 
   } catch (error) {
