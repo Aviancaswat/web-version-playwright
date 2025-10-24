@@ -1,6 +1,6 @@
 import { Box, Button, Center, Heading, Image, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
 import { Bell, ScanEye } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import logoAv from "../../assets/avianca-logo-desk.png";
 import { getReportHTMLPreview } from "../../github/api";
 import AnimatedLoader from "../loaders/AnimatedLoader";
@@ -17,7 +17,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
     const [loadingReporteHTML, setLoadingReporteHTML] = useState<boolean>(false);
     const [errorLoadingReporteHTML, setErrorLoadingReporteHTML] = useState<boolean>(false);
 
-    const previewReporteHTML = async (workflowId: number) => {
+    const previewReporteHTML = useCallback(async (workflowId: number) => {
         try {
             setLoadingReporteHTML(true);
             const contentHTML = await getReportHTMLPreview(workflowId);
@@ -29,7 +29,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
         } finally {
             setLoadingReporteHTML(false);
         }
-    };
+    }, [workflowID]);
 
     useEffect(() => {
         if (workflowID) {
@@ -94,7 +94,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                         }
                         {errorLoadingReporteHTML && (
                             <Center height={"50vh"} display={"flex"} flexDirection={"column"} gap={4}>
-                                <Bell size={80}/>
+                                <Bell size={80} />
                                 <Heading size={"md"}>
                                     No hay reporte asociado a este workflow
                                 </Heading>
