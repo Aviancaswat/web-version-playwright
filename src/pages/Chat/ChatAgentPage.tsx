@@ -199,10 +199,8 @@ const ChatAgentPage = () => {
     };
 
     useEffect(() => {
-        if (chatRef.current) {
-            chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }
-    }, []);
+        chatRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     useEffect(() => {
         console.log("Obteniendo workflows...")
@@ -253,7 +251,6 @@ const ChatAgentPage = () => {
             flexDirection={"column"}
         >
             <Box
-                ref={chatRef}
                 width={"full"}
                 height={"100%"}
                 overflowY="auto"
@@ -290,6 +287,7 @@ const ChatAgentPage = () => {
                                     <ShinyTextAgent text="Pensando..." />
                                 </Box>
                             )}
+                            <Box ref={chatRef} />
                         </Box>
                     )
                 }
