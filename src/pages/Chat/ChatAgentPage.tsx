@@ -61,7 +61,15 @@ const MessageAgentUI = (msg: Messages) => {
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
                 >
-                    <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
+                    {
+                        (msg.message.trim().includes("<svg") ||
+                            msg.message.trim().includes("<img") ||
+                            msg.message.trim().includes("<video") ||
+                            msg.message.trim().includes("<table") ||
+                            msg.message.trim().includes("<html")) ?
+                            <div dangerouslySetInnerHTML={{ __html: msg.message }} /> :
+                            <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
+                    }
                 </Box>
             </Box>
             <motion.div
@@ -222,6 +230,8 @@ const ChatAgentPage = () => {
                 `${JSON.stringify(dashboardDataAgentAvianca)}`,
                 questionUser
             );
+
+            console.log("Final output agent dashboard: ", finalOutput);
 
             // let agentResponse = "";
 
