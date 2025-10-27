@@ -3,7 +3,7 @@ import logoAV from "../assets/avianca-logo-desk.png";
 
 export async function createPDF(text: string) {
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([600, 800]);
+    const page = pdfDoc.addPage([600, 1000]);
     const { height } = page.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
