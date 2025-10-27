@@ -54,7 +54,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                 Visualizar reporte
             </MenuItem>
 
-            <Modal isOpen={isOpen} onClose={onClose} size={"6xl"}>
+            <Modal isOpen={isOpen} onClose={onClose} size={"8xl"} scrollBehavior="inside">
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>
@@ -71,7 +71,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                         </Box>
                     </ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody minHeight={300}>
+                    <ModalBody minHeight={"5xl"}>
                         {
                             loadingReporteHTML ? (
                                 <Center height={"50vh"} display={"flex"} flexDirection={"column"}>

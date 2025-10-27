@@ -1,6 +1,6 @@
-import { Avatar, Box, Button, Center, Heading, Textarea, Tooltip, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Button, ButtonGroup, Center, Heading, HStack, Textarea, Tooltip, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { Copy } from "lucide-react";
+import { ArrowDownToLine, Copy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGFM from "remark-gfm";
@@ -16,11 +16,7 @@ import FadeAnimationText from "../../components/transitions/FadeText";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 import AviancaToast from "../../utils/AviancaToast";
-
-// type ResponseStreamModel = {
-//     type: string;
-//     delta?: string
-// }
+import { createPDF } from "../../utils/generatePDF";
 
 type Messages = {
     role: "user" | "agent"
@@ -44,10 +40,9 @@ const MessageUserUI = (msg: Messages) => {
     )
 }
 
-
 const MessageAgentUI = (msg: Messages) => {
 
-    const copyResponse = async (text: string) => {
+    const copyResponse = useCallback(async (text: string) => {
         try {
             await navigator.clipboard.writeText(text);
             AviancaToast.success("Respuesta copiada")
@@ -55,7 +50,18 @@ const MessageAgentUI = (msg: Messages) => {
             console.log("Error copying text: ", error);
             AviancaToast.error("Error copiando la respuesta al portapapeles")
         }
-    }
+    }, [])
+
+    const downloadResponse = useCallback(async (text: string) => {
+        try {
+            await createPDF(text);
+            AviancaToast.success("Respuesta descargada")
+        }
+        catch (error) {
+            console.log("Error downloading text: ", error);
+            AviancaToast.error("Error descargando la respuesta")
+        }
+    }, [])
 
     return (
         <VStack>
@@ -85,28 +91,55 @@ const MessageAgentUI = (msg: Messages) => {
                     }
                 </Box>
             </Box>
-            <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                style={{ cursor: 'pointer', marginLeft: 30, alignSelf: "start" }}
-                onClick={() => {
-                    navigator.clipboard.writeText(msg.message);
-                }}
-            >
-                <Tooltip label="Copiar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
-                    <Button
-                        bg={"transparent"}
-                        size={"xs"}
-                        onClick={() => copyResponse(msg.message)}
-                        _hover={{
-                            bg: "none",
-                            border: "none"
+            <HStack alignSelf={"start"} ml={30} spacing={0}>
+                <ButtonGroup>
+
+                    <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        style={{ cursor: 'pointer', alignSelf: "start" }}
+                        onClick={() => {
+                            navigator.clipboard.writeText(msg.message);
                         }}
                     >
-                        <Copy size={15} />
-                    </Button>
-                </Tooltip>
-            </motion.div>
+                        <Tooltip label="Copiar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
+                            <Button
+                                bg={"transparent"}
+                                size={"xs"}
+                                onClick={() => copyResponse(msg.message)}
+                                _hover={{
+                                    bg: "none",
+                                    border: "none"
+                                }}
+                            >
+                                <Copy size={15} />
+                            </Button>
+                        </Tooltip>
+                    </motion.div>
+                    <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        style={{ cursor: 'pointer', alignSelf: "start" }}
+                        onClick={() => {
+                            navigator.clipboard.writeText(msg.message);
+                        }}
+                    >
+                        <Tooltip label="Descargar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
+                            <Button
+                                bg={"transparent"}
+                                size={"xs"}
+                                onClick={() => downloadResponse(msg.message)}
+                                _hover={{
+                                    bg: "none",
+                                    border: "none"
+                                }}
+                            >
+                                <ArrowDownToLine size={15} />
+                            </Button>
+                        </Tooltip>
+                    </motion.div>
+                </ButtonGroup>
+            </HStack>
         </VStack>
     )
 }
@@ -239,23 +272,9 @@ const ChatAgentPage = () => {
 
             setLoading(true);
 
-            const { finalOutput } = await RunAgentDashboard(
-                `${JSON.stringify(dashboardDataAgentAvianca)}`,
-                questionUser
-            );
+            const { finalOutput } = await RunAgentDashboard(JSON.stringify(dashboardDataAgentAvianca), questionUser);
 
             console.log("Final output agent dashboard: ", finalOutput);
-
-            // let agentResponse = "";
-
-            // for await (const event of response) {
-            //     if (event.type === 'raw_model_stream_event') {
-            //         const { type, delta } = event.data as ResponseStreamModel;
-            //         if (type === "output_text_delta" && delta) {
-            //             agentResponse += delta;
-            //         }
-            //     }
-            // }
 
             setMessages(prevMessages => [
                 ...prevMessages,
@@ -263,6 +282,7 @@ const ChatAgentPage = () => {
             ]);
 
             setLoading(false);
+            setQuestionUser("")
         }
     }, [questionUser]);
 
@@ -315,18 +335,20 @@ const ChatAgentPage = () => {
                     )
                 }
             </Box>
-            <Box>
+            <Box height={"auto"}>
                 <Textarea
                     isDisabled={loadingWorkflows}
                     value={questionUser}
                     width={"full"}
-                    minHeight={100}
+                    height={"auto"}
                     placeholder="Preguntar algo..."
                     onKeyDown={getResponseModel}
                     onChange={(e) => setQuestionUser(e.target.value)}
                     bg={"white"}
                     color={"black"}
-                    borderRadius={"2xl"}
+                    borderRadius={"full"}
+                    textAlign={"left"}
+                    pt={7}
                 />
             </Box>
         </Box>
