@@ -15,6 +15,7 @@ import type { DataWorkflows } from "../../components/TableWorkflowComponent/Tabl
 import FadeAnimationText from "../../components/transitions/FadeText";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
+import AviancaToast from "../../utils/AviancaToast";
 
 // type ResponseStreamModel = {
 //     type: string;
@@ -43,7 +44,19 @@ const MessageUserUI = (msg: Messages) => {
     )
 }
 
+
 const MessageAgentUI = (msg: Messages) => {
+
+    const copyResponse = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            AviancaToast.success("Respuesta copiada")
+        } catch (error) {
+            console.log("Error copying text: ", error);
+            AviancaToast.error("Error copiando la respuesta al portapapeles")
+        }
+    }
+
     return (
         <VStack>
             <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
@@ -84,7 +97,7 @@ const MessageAgentUI = (msg: Messages) => {
                     <Button
                         bg={"transparent"}
                         size={"xs"}
-                        onClick={async () => await navigator.clipboard.writeText(msg.message)}
+                        onClick={() => copyResponse(msg.message)}
                         _hover={{
                             bg: "none",
                             border: "none"
