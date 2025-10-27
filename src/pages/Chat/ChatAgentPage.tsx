@@ -29,9 +29,11 @@ const MessageUserUI = (msg: Messages) => {
             <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
                 <Box
                     padding={2}
-                    borderRadius="md"
+                    borderRadius="full"
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
+                    paddingLeft={6}
+                    paddingRight={6}
                 >
                     <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
                 </Box>
