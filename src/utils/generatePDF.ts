@@ -7,7 +7,7 @@ export async function createPDF(text: string) {
     const { height } = page.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    page.drawText('Respuesta agente chat-APA', {
+    page.drawText('Chat-APA (Avianca Playwright Agent)', {
         x: 50,
         y: height - 50,
         size: 18,
