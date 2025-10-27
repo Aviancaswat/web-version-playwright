@@ -492,7 +492,6 @@ export const getReportHTMLPreview = async (
       })
     );
 
-
     const injectedScript = `
             <script>
             document.addEventListener('click', function(event) {
@@ -517,8 +516,8 @@ export const getReportHTMLPreview = async (
           document.querySelectorAll("img[src^='data/']").forEach(img => {
             const fileName = img.getAttribute("src");
             const base64Map = ${JSON.stringify(
-        Object.fromEntries(assets.map(a => [a.file, a.content]))
-      )};
+      Object.fromEntries(assets.map(a => [a.file, a.content]))
+    )};
             if (base64Map[fileName]) {
               let mimeType = 'image/png';
               if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) mimeType = 'image/jpeg';
@@ -542,7 +541,7 @@ export const getReportHTMLPreview = async (
 
     let modifiedHtml = htmlContent.replace('</body>', `${injectedScript}${fixDynamicImagesScript}</body>`);
 
-    return modifiedHtml;
+    return { modifiedHtml, assets };
 
   } catch (error) {
     console.error(
