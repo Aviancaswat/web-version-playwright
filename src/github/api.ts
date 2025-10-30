@@ -568,18 +568,3 @@ export const getLogsByJobId = async (jobId: number) => {
     throw error;
   }
 }
-
-const VITE_GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
-
-export const getAPI = async () => {
-  const res = await fetch("https://api.github.com/repos/Aviancaswat/avianca-test-core-nuxqa6/actions/runs/18946227534", {
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": `Bearer ${VITE_GITHUB_TOKEN}`,
-      "X-GitHub-Api-Version": "2022-11-28"
-    }
-  });
-
-  const json = await res.json();
-  console.log("JSON response:", json);
-}
