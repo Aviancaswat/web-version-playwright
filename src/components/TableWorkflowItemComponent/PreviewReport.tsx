@@ -1,5 +1,5 @@
-import { Box, Button, Center, Heading, Image, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
-import { Bell, FolderDown, ScanEye } from "lucide-react";
+import { Box, Button, ButtonGroup, Center, Heading, Image, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import { Bell, Bot, FolderDown, ScanEye } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import logoAv from "../../assets/avianca-logo-desk.png";
 import { downLoadReportHTML, getReportHTMLPreview } from "../../github/api";
@@ -16,7 +16,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [reporteHTML, setReporteHTML] = useState<string>("");
     const [loadingReporteHTML, setLoadingReporteHTML] = useState<boolean>(false);
-    const [errorLoadingReporteHTML, setErrorLoadingReporteHTML] = useState<boolean>(false);
+    const [errorLoadingReportHTML, setErrorLoadingReportHTML] = useState<boolean>(false);
     const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false)
 
     const previewReporteHTML = useCallback(async (workflowId: number) => {
@@ -28,7 +28,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
         }
         catch (error) {
             console.log("Error loading preview report: ", error);
-            setErrorLoadingReporteHTML(true);
+            setErrorLoadingReportHTML(true);
         } finally {
             setLoadingReporteHTML(false);
         }
@@ -108,7 +108,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                                     </>
                                 )
                             }
-                            {errorLoadingReporteHTML && (
+                            {errorLoadingReportHTML && (
                                 <Center height={"50vh"} display={"flex"} flexDirection={"column"} gap={4}>
                                     <Bell size={80} />
                                     <Heading size={"md"}>
@@ -119,17 +119,38 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                         </Box>
                     </ModalBody>
                     <ModalFooter>
-                        <Button
-                            leftIcon={isLoadingReport ? <AnimatedLoader /> : <FolderDown />}
-                            onClick={() => downloadReportPreview(workflowID)}
-                            bg={"black"}
-                            color={"white"}
-                            _hover={{
-                                bg: "black"
-                            }}
-                        >
-                            Descargar reporte
-                        </Button>
+                        <ButtonGroup spacing={2}>
+                            <Button
+                                leftIcon={isLoadingReport ? <AnimatedLoader /> : <FolderDown />}
+                                onClick={() => downloadReportPreview(workflowID)}
+                                bg={"black"}
+                                color={"white"}
+                                _hover={{
+                                    bg: "black"
+                                }}
+                                size={"sm"}
+                            >
+                                Descargar reporte
+                            </Button>
+                            <Button
+                                leftIcon={<Bot />}
+                                onClick={() => {
+                                    const url = new URL(document.URL).origin;
+                                    const urlChatAPA = url + "/chat-ai?workflowID=" + workflowID;
+                                    console.log("urlchatapa: ", urlChatAPA);
+                                    window.location.href = urlChatAPA;
+                                }}
+                                size={"sm"}
+                                variant={"outline"}
+                                _hover={{
+                                    bg: "white",
+                                    color: "black",
+                                    border: "1px solid #000"
+                                }}
+                            >
+                                Analizar con APA
+                            </Button>
+                        </ButtonGroup>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

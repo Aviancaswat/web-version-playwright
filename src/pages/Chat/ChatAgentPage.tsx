@@ -1,8 +1,11 @@
 import { Avatar, Box, Button, ButtonGroup, Center, Heading, HStack, Textarea, Tooltip, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { ArrowDownToLine, Copy } from "lucide-react";
+import 'highlight.js/styles/atom-one-dark.css';
+import { ArrowDownToLine, Copy, SquareArrowOutUpRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from "rehype-raw";
 import remarkGFM from "remark-gfm";
 import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
@@ -18,9 +21,12 @@ import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../.
 import AviancaToast from "../../utils/AviancaToast";
 import { createPDF } from "../../utils/generatePDF";
 
+
 type Messages = {
     role: "user" | "agent"
     message: string,
+    htmlContent?: string,
+    imageContent?: string
 }
 
 const MessageUserUI = (msg: Messages) => {
@@ -89,7 +95,10 @@ const MessageAgentUI = (msg: Messages) => {
                             msg.message.trim().includes("<table") ||
                             msg.message.trim().includes("<html")) ?
                             <div dangerouslySetInnerHTML={{ __html: msg.message }} /> :
-                            <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
+                            <ReactMarkdown
+                                children={msg.message}
+                                remarkPlugins={[remarkGFM]}
+                                rehypePlugins={[rehypeRaw, rehypeHighlight]} />
                     }
                 </Box>
             </Box>
@@ -148,13 +157,14 @@ const MessageAgentUI = (msg: Messages) => {
 
 const ChatAgentPage = () => {
 
-    const { setDataWorkflows, setDashboardDataAgentAvianca } = useTestStore();
     const chatRef = useRef<HTMLDivElement | null>(null);
-    const { dashboardDataAgentAvianca } = useTestStore();
+    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca } = useTestStore();
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
     const [messages, setMessages] = useState<Messages[]>([]);
+    const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -196,8 +206,8 @@ const ChatAgentPage = () => {
     }
 
     const getWorkflows = async () => {
-        setLoadingWorkflows(true);
         try {
+            setLoadingWorkflows(true);
             const runs = await getRunsByRepo();
             if (runs.length === 0) throw new Error("No hay workflows");
             console.log("Data workflows chat ai: ", runs)
@@ -246,7 +256,6 @@ const ChatAgentPage = () => {
 
             setDataWorkflows(newData);
             setDashboardDataAgentAvianca(dataJSON);
-
         } catch (error) {
             console.log(error);
         } finally {
@@ -263,7 +272,31 @@ const ChatAgentPage = () => {
         getWorkflows()
     }, [])
 
+    useEffect(() => {
+        const params = new URLSearchParams(new URL(document.URL).search);
+        if (params.size === 0) return;
+        const workflowParam = params.get("workflowID");
+
+        if (workflowParam && workflowParam !== workflowToAnalize) {
+            setWorkflowAnalize(workflowParam)
+            setQuestionUser(`Analiza el reporte asociado al workflow: ${workflowParam}`)
+            const enterEvent = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                which: 13,
+                bubbles: true
+            });
+            setTimeout(() => {
+                textAreaRef?.current?.dispatchEvent(enterEvent);
+                setQuestionUser("");
+            }, 1000)
+
+        }
+    }, [workflowToAnalize])
+
     const getResponseModel = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
 
@@ -274,17 +307,54 @@ const ChatAgentPage = () => {
 
             setLoading(true);
 
-            const { finalOutput } = await RunAgentDashboard(JSON.stringify(dashboardDataAgentAvianca), questionUser);
-
-            console.log("Final output agent dashboard: ", finalOutput);
+            const responseAgent = await RunAgentDashboard(JSON.stringify(dashboardDataAgentAvianca), questionUser);
+            console.log("Response agent dashboard: ", responseAgent);
 
             setMessages(prevMessages => [
                 ...prevMessages,
-                { role: "agent", message: finalOutput ?? "" }
+                { role: "agent", message: responseAgent.finalOutput ?? "" }
             ]);
 
             setLoading(false);
             setQuestionUser("")
+
+            const resultFunctionCall = responseAgent.output.find(e => e.type === "function_call_result")
+            if (!resultFunctionCall) return;
+
+            type OutputResponse = {
+                type: "text" | "image",
+                text?: string
+            }
+
+            const responseFunctionCallReport = resultFunctionCall?.output as OutputResponse;
+            console.log("responseFunctionCallReport: ", responseFunctionCallReport)
+            const textResultReport = responseFunctionCallReport?.text;
+            if (!textResultReport) return;
+
+            const result = JSON.parse(textResultReport);
+            console.log("result report Object: ", result)
+
+            if (result.success && result.reportReady) {
+                const reportData = (window as any).__playwrightReport;
+
+                if (reportData?.htmlContent) {
+                    console.log("ENTRO R")
+                    //es posible agregar un agente al tool para que analize el reporte 
+                    //con la data que retrona el método
+                    setMessages(prevMessages => [
+                        ...prevMessages,
+                        {
+                            role: "agent",
+                            message: result?.message ?? "",
+                            htmlContent: reportData?.htmlContent
+                        }
+                    ]);
+                    delete (window as any).__playwrightReport;
+                }
+                else {
+                    console.log("NO ENTRÓ: ", reportData)
+                }
+            }
         }
     }, [questionUser]);
 
@@ -313,18 +383,60 @@ const ChatAgentPage = () => {
                     ) : (
                         <Box>
                             {messages.map((msg, index) => (
-                                <FadeAnimationText
-                                    key={index}
-                                    marginBottom={4}
-                                    display="flex"
-                                    flexDirection={msg.role === "user" ? "row-reverse" : "row"}
-                                    alignItems="flex-start"
-                                    className="chat-ai"
-                                >
-                                    {
-                                        msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
-                                    }
-                                </FadeAnimationText>
+                                <>
+                                    <FadeAnimationText
+                                        key={index}
+                                        marginBottom={msg.htmlContent ? 10 : 4}
+                                        display="flex"
+                                        flexDirection={msg.role === "user" ? "row-reverse" : "row"}
+                                        alignItems="flex-start"
+                                        className="chat-ai"
+                                    >
+                                        {
+                                            msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
+                                        }
+                                    </FadeAnimationText>
+                                    <FadeAnimationText>
+                                        {
+                                            msg.htmlContent && (
+                                                <Box width={"80%"} margin={"auto"} pb={20}>
+                                                    <iframe
+                                                        srcDoc={msg.htmlContent}
+                                                        title={`Reporte Playwright ${index}`}
+                                                        sandbox="allow-scripts allow-same-origin"
+                                                        style={{
+                                                            width: "100%",
+                                                            margin: "auto",
+                                                            height: "250px",
+                                                            border: "none",
+                                                            pointerEvents: "none",
+                                                            background: "#F4F4F4",
+                                                            borderRadius: "15px",
+                                                        }}
+                                                    />
+                                                    <Box mt={5} float={"inline-end"}>
+                                                        <Button
+                                                            onClick={() => {
+                                                                const blob = new Blob([msg.htmlContent!], { type: 'text/html' });
+                                                                const url = URL.createObjectURL(blob);
+                                                                window.open(url, '_blank');
+                                                            }}
+                                                            rightIcon={<SquareArrowOutUpRight size={15} />}
+                                                            size={"sm"}
+                                                            bg="black"
+                                                            color="white"
+                                                            _hover={{
+                                                                bg: "blackAlpha.700",
+                                                            }}
+                                                        >
+                                                            Abrir en otra pestaña
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            )
+                                        }
+                                    </FadeAnimationText>
+                                </>
                             ))}
                             {loading && (
                                 <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
@@ -339,6 +451,7 @@ const ChatAgentPage = () => {
             </Box>
             <Box height={"auto"}>
                 <Textarea
+                    ref={textAreaRef}
                     isDisabled={loadingWorkflows}
                     value={questionUser}
                     width={"full"}
