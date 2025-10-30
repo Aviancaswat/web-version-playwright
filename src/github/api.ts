@@ -169,16 +169,13 @@ export const checkWorkflowStatus = async (
   }
 };
 
-const getReportByWorkflowId = async (workflowRunId?: number) => {
+export const getReportByWorkflowId = async (workflowRunId?: number) => {
 
   try {
 
-    console.log("workflowRunId pasado a download report: ", workflowRunId);
     if (!workflowRunId) throw new Error("No hay workflow id asignado");
 
     const { artifacts, total_count } = await getArtefactsByRepo();
-
-    console.log("artifacts: ", artifacts);
 
     if (total_count === 0)
       throw new Error("No hay reporte asociado al workflow");
@@ -188,12 +185,10 @@ const getReportByWorkflowId = async (workflowRunId?: number) => {
     const reportFound = reports.find(
       (e) => e.workflow_run && e.workflow_run.id === workflowRunId
     );
-    console.log("reportFound: ", reportFound);
     if (!reportFound)
       throw new Error("No hay reporte asociado al workflow");
     let artifactId = reportFound.id;
 
-    console.log("artifactId: ", artifactId);
 
     const { data } = await octokit.request(
       "GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}",
@@ -255,7 +250,6 @@ export const getAllWorkflowsByRepo = async () => {
         },
       }
     );
-    console.log("Data workflows: ", data);
     return data;
   } catch (error) {
     console.error(
@@ -379,7 +373,6 @@ export const getArtefactsByRepo = async () => {
 export const deleteAllArtefacts = async () => {
   try {
     const { artifacts } = await getArtefactsByRepo();
-    console.log("artifacts to delete: ", artifacts);
     if (artifacts.length === 0)
       throw new Error("No hay artefactos para eliminar");
 
@@ -395,7 +388,6 @@ export const deleteAllArtefacts = async () => {
           },
         }
       );
-      console.log(`Artefacto con ID ${artifact.id} eliminado.`);
     }
   } catch (error) {
     console.error(`Ha ocurrido un error al eliminar los artefactos ${error}`);
@@ -428,7 +420,6 @@ export const deleteArtefactById = async (workflowId: number) => {
           },
         }
       );
-      console.log(`Artefacto con ID ${artifact.id} eliminado.`);
     }
   } catch (error) {
     console.error(`Ha ocurrido un error al eliminar el artefacto ${error}`);
@@ -449,7 +440,7 @@ export const GetActionsMinutesBilling = async () => {
     return data;
   }
   catch (error) {
-    console.log("Error api actions: ", error)
+    console.error("Error api actions: ", error)
     throw new Error("Ha ocurrido un error al consulta los actions minutes | Error: " + error)
   }
 }
@@ -492,7 +483,6 @@ export const getReportHTMLPreview = async (
       })
     );
 
-
     const injectedScript = `
             <script>
             document.addEventListener('click', function(event) {
@@ -517,8 +507,8 @@ export const getReportHTMLPreview = async (
           document.querySelectorAll("img[src^='data/']").forEach(img => {
             const fileName = img.getAttribute("src");
             const base64Map = ${JSON.stringify(
-        Object.fromEntries(assets.map(a => [a.file, a.content]))
-      )};
+      Object.fromEntries(assets.map(a => [a.file, a.content]))
+    )};
             if (base64Map[fileName]) {
               let mimeType = 'image/png';
               if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) mimeType = 'image/jpeg';
@@ -533,16 +523,9 @@ export const getReportHTMLPreview = async (
       </script>
     `;
 
-    // assets.forEach(({ file, content }) => {
-    //   const mimeType = getMimeType(file);
-    //   const regex = new RegExp(file.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g");
-    //   console.log("Reemplazando archivo en HTML: ", file);
-    //   modifiedHtml = modifiedHtml.replace(regex, `data:${mimeType};base64,${content}`);
-    // });
-
     let modifiedHtml = htmlContent.replace('</body>', `${injectedScript}${fixDynamicImagesScript}</body>`);
 
-    return modifiedHtml;
+    return { modifiedHtml, assets };
 
   } catch (error) {
     console.error(
@@ -551,3 +534,52 @@ export const getReportHTMLPreview = async (
     throw error;
   }
 };
+
+export const getJobsByRunId = async (runId: number) => {
+
+  const { data } = await octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs', {
+    owner: owner,
+    repo: repo,
+    run_id: runId,
+    headers: {
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  })
+
+  return data;
+}
+
+export const getLogsByJobId = async (jobId: number) => {
+  try {
+
+    const { data } = await octokit.request("GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs", {
+      owner: owner,
+      repo: repo,
+      job_id: jobId,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+
+    return data;
+  }
+  catch (error) {
+    console.error("Ha ocurrido un error al obtener los logs getLogByJobId")
+    throw error;
+  }
+}
+
+const VITE_GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+
+export const getAPI = async () => {
+  const res = await fetch("https://api.github.com/repos/Aviancaswat/avianca-test-core-nuxqa6/actions/runs/18946227534", {
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${VITE_GITHUB_TOKEN}`,
+      "X-GitHub-Api-Version": "2022-11-28"
+    }
+  });
+
+  const json = await res.json();
+  console.log("JSON response:", json);
+}

@@ -23,7 +23,7 @@ export const ToastCustom: React.FC<ToastCustomProps> = ({ title, type }) => {
                 alt="Logo de la avianca"
                 ml={10}
                 bg={"black"}
-                boxSize="35px"
+                boxSize="30px"
                 borderRadius={"md"}
             />
         </Flex>
