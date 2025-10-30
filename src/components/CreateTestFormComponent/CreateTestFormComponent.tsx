@@ -164,17 +164,8 @@ const CreateTestFormComponent: React.FC = () => {
   };
 
   const getMethodOptionsByStep = (targetKey: number) => {
-    let accumulatedOptions: Option[] = [];
-
-    for (let index = 1; index <= targetKey; index++) {
-      const step = stepFields.find((step) => step.key === index);
-
-      if (step?.method) {
-        accumulatedOptions = [...accumulatedOptions, ...step.method];
-      }
-    }
-
-    return accumulatedOptions;
+    const step = stepFields.find((step) => step.key === targetKey);
+    return step?.method || [];
   };
 
   const handleInputChange = (

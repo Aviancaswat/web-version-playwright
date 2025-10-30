@@ -85,7 +85,6 @@
     "key": 1,
     "stepTitle": "Home",
     "method": [
-      { "value": "none", "label": "No aplica" },
       { "value": "homeSeleccionarOrigen", "label": "Seleccionar Origen" },
       { "value": "homeSeleccionarDestino", "label": "Seleccionar Destino" },
       {
@@ -163,7 +162,7 @@
         "isRequired": true
       },
       {
-        "name": "homeFechaLlegada",
+        "name": "homeFechaLLegada",
         "label": "Vuelta:",
         "type": "date",
         "isRequired": true,
@@ -294,6 +293,7 @@
   {
     "key": 4,
     "stepTitle": "Services",
+    "method": [{ "value": "none", "label": "No aplica" }],
     "input": [
       {
         "name": "servicesEquipajeManoBodega",
@@ -852,6 +852,7 @@
   {
     "key": 5,
     "stepTitle": "Seat",
+    "method": [{ "value": "none", "label": "No aplica" }],
     "hasOnlyText": true,
     "infoText": "Se seleccionará un asiento al azar.",
     "input": []
@@ -859,6 +860,7 @@
   {
     "key": 6,
     "stepTitle": "Payment",
+    "method": [{ "value": "none", "label": "No aplica" }],
     "hasOnlyText": true,
     "infoText": "Se ejecutará un pago al azar.",
     "input": []
