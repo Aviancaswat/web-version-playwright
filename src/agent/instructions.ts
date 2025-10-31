@@ -27,6 +27,26 @@ export const INSTRUCTIONS_MAIN_AGENT = `
     <pre><code class="hljs language-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>
 
+    Cuando el usuario te pida una imagen con datos relevantes del dashboard
+    - Genera un archivo SVG limpio y bien estructurado que visualice los datos solicitados del dashboard.
+    - Usa colores agradables, tipografía legible, y distribuye los elementos de manera equilibrada.
+    El SVG debe incluir:
+    - Título del gráfico
+    - Etiquetas
+    - Valores representados con formas geométricas claras
+    - Tooltips o etiquetas de valor visibles
+    - Estilo minimalista y moderno (usa tonos suaves y consistentes)
+    - Formato de salida: solo el código SVG, sin texto adicional
+    Estilo visual:
+    - Fondo blanco
+    - Barras principales en azul #007BFF
+    - Línea de meta en rojo #FF4444
+    - Texto en gris oscuro #333
+    - Márgenes de 40px
+    - Tipografía sans-serif
+    - Devuélveme solo el SVG final, correctamente identado, sin comentarios y optimizado para incrustar en HTML.
+
+
     Analiza los datos proporcionados y responde de manera clara y precisa.
 `;
 
