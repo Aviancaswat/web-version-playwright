@@ -1,12 +1,7 @@
-import { Avatar, Box, Button, ButtonGroup, Center, Heading, HStack, Textarea, Tooltip, VStack } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { Avatar, Box, Button, Center, Heading, Textarea } from "@chakra-ui/react";
 import 'highlight.js/styles/felipec.css';
-import { ArrowDownToLine, Copy, SquareArrowOutUpRight } from "lucide-react";
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeHighlight from 'rehype-highlight';
-import rehypeRaw from "rehype-raw";
-import remarkGFM from "remark-gfm";
 import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
 import LogoAv from "../../assets/avianca-logo-desk.png";
@@ -18,140 +13,15 @@ import type { DataWorkflows } from "../../components/TableWorkflowComponent/Tabl
 import FadeAnimationText from "../../components/transitions/FadeText";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
-import AviancaToast from "../../utils/AviancaToast";
-import { createPDF } from "../../utils/generatePDF";
+import MessageAgentUI from "./MessageAgent";
+import MessageUserUI from "./MessageUser";
 
 
-type Messages = {
+export type Messages = {
     role: "user" | "agent"
     message: string,
     htmlContent?: string,
     imageContent?: string
-}
-
-const MessageUserUI = (msg: Messages) => {
-    return (
-        <>
-            <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
-                <Box
-                    padding={2}
-                    borderRadius="full"
-                    backgroundColor={msg.role === "user" ? "black" : "gray.100"}
-                    color={msg.role === "user" ? "white" : "black"}
-                    paddingLeft={6}
-                    paddingRight={6}
-                >
-                    <ReactMarkdown children={msg.message} remarkPlugins={[remarkGFM]} />
-                </Box>
-            </Box>
-        </>
-    )
-}
-
-const MessageAgentUI = (msg: Messages) => {
-
-    const copyResponse = useCallback(async (text: string) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            AviancaToast.success("Respuesta copiada")
-        } catch (error) {
-            console.log("Error copying text: ", error);
-            AviancaToast.error("Error copiando la respuesta al portapapeles")
-        }
-    }, [])
-
-    const downloadResponse = useCallback(async (text: string) => {
-        try {
-            await createPDF(text);
-            AviancaToast.success("Respuesta descargada")
-        }
-        catch (error) {
-            console.log("Error downloading text: ", error);
-            AviancaToast.error("Error descargando la respuesta")
-        }
-    }, [])
-
-    return (
-        <VStack>
-            <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
-                <Box
-                    display="flex"
-                    flexDirection={msg.role === "user" ? "row-reverse" : "row"}
-                >
-                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
-                </Box>
-                <Box
-                    paddingLeft={5}
-                    paddingRight={5}
-                    paddingTop={2}
-                    borderRadius="md"
-                    backgroundColor={msg.role === "user" ? "black" : "gray.100"}
-                    color={msg.role === "user" ? "white" : "black"}
-                >
-                    {
-                        (msg.message.trim().includes("<svg") ||
-                            msg.message.trim().includes("<img") ||
-                            msg.message.trim().includes("<video") ||
-                            msg.message.trim().includes("<table") ||
-                            msg.message.trim().includes("<html")) ?
-                            <div dangerouslySetInnerHTML={{ __html: msg.message }} /> :
-                            <ReactMarkdown
-                                children={msg.message}
-                                remarkPlugins={[remarkGFM]}
-                                rehypePlugins={[rehypeRaw, rehypeHighlight]} />
-                    }
-                </Box>
-            </Box>
-            <HStack alignSelf={"start"} ml={50} spacing={0}>
-                <ButtonGroup>
-                    <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        style={{ cursor: 'pointer', alignSelf: "start" }}
-                        onClick={() => {
-                            navigator.clipboard.writeText(msg.message);
-                        }}
-                    >
-                        <Tooltip label="Copiar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
-                            <Button
-                                bg={"transparent"}
-                                size={"xs"}
-                                onClick={() => copyResponse(msg.message)}
-                                _hover={{
-                                    bg: "none",
-                                    border: "none"
-                                }}
-                            >
-                                <Copy size={15} />
-                            </Button>
-                        </Tooltip>
-                    </motion.div>
-                    <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        style={{ cursor: 'pointer', alignSelf: "start" }}
-                        onClick={() => {
-                            navigator.clipboard.writeText(msg.message);
-                        }}
-                    >
-                        <Tooltip label="Descargar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
-                            <Button
-                                bg={"transparent"}
-                                size={"xs"}
-                                onClick={() => downloadResponse(msg.message)}
-                                _hover={{
-                                    bg: "none",
-                                    border: "none"
-                                }}
-                            >
-                                <ArrowDownToLine size={15} />
-                            </Button>
-                        </Tooltip>
-                    </motion.div>
-                </ButtonGroup>
-            </HStack>
-        </VStack>
-    )
 }
 
 const ChatAgentPage = () => {
@@ -289,8 +159,10 @@ const ChatAgentPage = () => {
             setTimeout(() => {
                 textAreaRef?.current?.dispatchEvent(enterEvent);
                 setQuestionUser("");
+                const url = new URL(document.URL);
+                url.searchParams.delete('workflowID');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
             }, 1000)
-
         }
     }, [workflowToAnalize])
 
