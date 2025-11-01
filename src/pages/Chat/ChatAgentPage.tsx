@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, ButtonGroup, Center, Heading, HStack, Textarea, Tooltip, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import 'highlight.js/styles/atom-one-dark.css';
+import 'highlight.js/styles/felipec.css';
 import { ArrowDownToLine, Copy, SquareArrowOutUpRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -102,9 +102,8 @@ const MessageAgentUI = (msg: Messages) => {
                     }
                 </Box>
             </Box>
-            <HStack alignSelf={"start"} ml={30} spacing={0}>
+            <HStack alignSelf={"start"} ml={50} spacing={0}>
                 <ButtonGroup>
-
                     <motion.div
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
