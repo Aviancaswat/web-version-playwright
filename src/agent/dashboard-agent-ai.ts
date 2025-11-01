@@ -12,14 +12,12 @@ const client = new OpenAI({
 
 setDefaultOpenAIClient(client);
 
-const paramsGetReportGithub = z.object({
-    workflowId: z.number().describe('El ID numérico del workflow de GitHub. Ejemplo: 12345678')
-})
-
 const getReportByWorkflowIDGithubTool = tool({
-    name: 'get_report_by_workflow_id_github',
+    name: 'analyzer_report_github_tool',
     description: 'Obtiene la data del reporte desde la API de github',
-    parameters: paramsGetReportGithub,
+    parameters: z.object({
+        workflowId: z.number().describe('El ID numérico del workflow de GitHub. Ejemplo: 12345678')
+    }),
     execute: async (_context, _, function_call) => {
         console.log("Llamando a function call: ", function_call?.toolCall.name)
         console.log('🔧 Tool ejecutado con workflowId:', _context.workflowId);
@@ -60,14 +58,14 @@ const getReportByWorkflowIDGithubTool = tool({
             throw new Error(`Error al obtener reporte: ${(error as Error).message}`);
         }
     }
-});
+})
 
 const dashboardAviancaAgent = new Agent({
-    name: 'dashboard_avianca_playwright_agent',
+    name: 'avianca_playwright_agent',
     instructions: INSTRUCTIONS_MAIN_AGENT,
     model: MODEL,
     tools: [getReportByWorkflowIDGithubTool]
-});
+})
 
 export const RunAgentDashboard = async (dataDashboard: string, questionUser: string) => {
 
