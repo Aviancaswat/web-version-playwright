@@ -1,20 +1,13 @@
-import { Avatar, Box, Button, Center, Heading, Textarea } from "@chakra-ui/react";
+import { Box, Textarea } from "@chakra-ui/react";
 import 'highlight.js/styles/felipec.css';
-import { SquareArrowOutUpRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { v4 } from "uuid";
 import { RunAgentDashboard } from "../../agent/dashboard-agent-ai";
-import LogoAv from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
-import PulsingBox from "../../components/agent-dashboard-ui/PulseBox";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
-import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
-import FadeAnimationText from "../../components/transitions/FadeText";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
-import MessageAgentUI from "./MessageAgent";
-import MessageUserUI from "./MessageUser";
+import { MessageContainer } from "./MessageContainer";
 
 
 export type Messages = {
@@ -245,76 +238,15 @@ const ChatAgentPage = () => {
             >
                 {
                     messages.length === 0 ? (
-                        loadingWorkflows ? (
-                            <Center height={"100%"} display={"flex"} flexDirection={"column"}>
-                                <PulsingBox />
-                                <Heading mt={5} size={"md"}>Avianca Playwright Agent</Heading>
-                            </Center>
-                        ) : <WelcomeAgentDashboard />
+                        <WelcomeAgentDashboard
+                            isLoading={loadingWorkflows}
+                        />
                     ) : (
                         <Box>
-                            {messages.map((msg, index) => (
-                                <>
-                                    <FadeAnimationText
-                                        key={index}
-                                        marginBottom={msg.htmlContent ? 10 : 4}
-                                        display="flex"
-                                        flexDirection={msg.role === "user" ? "row-reverse" : "row"}
-                                        alignItems="flex-start"
-                                        className="chat-ai"
-                                    >
-                                        {
-                                            msg.role === "user" ? <MessageUserUI key={v4()} {...msg} /> : <MessageAgentUI key={v4()} {...msg} />
-                                        }
-                                    </FadeAnimationText>
-                                    <FadeAnimationText>
-                                        {
-                                            msg.htmlContent && (
-                                                <Box width={"80%"} margin={"auto"} pb={20}>
-                                                    <iframe
-                                                        srcDoc={msg.htmlContent}
-                                                        title={`Reporte Playwright ${index}`}
-                                                        sandbox="allow-scripts allow-same-origin"
-                                                        style={{
-                                                            width: "100%",
-                                                            margin: "auto",
-                                                            height: "250px",
-                                                            border: "none",
-                                                            pointerEvents: "none",
-                                                            background: "#F4F4F4",
-                                                            borderRadius: "15px",
-                                                        }}
-                                                    />
-                                                    <Box mt={5} float={"inline-end"}>
-                                                        <Button
-                                                            onClick={() => {
-                                                                const blob = new Blob([msg.htmlContent!], { type: 'text/html' });
-                                                                const url = URL.createObjectURL(blob);
-                                                                window.open(url, '_blank');
-                                                            }}
-                                                            rightIcon={<SquareArrowOutUpRight size={15} />}
-                                                            size={"sm"}
-                                                            bg="black"
-                                                            color="white"
-                                                            _hover={{
-                                                                bg: "blackAlpha.700",
-                                                            }}
-                                                        >
-                                                            Abrir en otra pestaña
-                                                        </Button>
-                                                    </Box>
-                                                </Box>
-                                            )
-                                        }
-                                    </FadeAnimationText>
-                                </>
-                            ))}
-                            {loading && (
-                                <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
-                                    <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
-                                    <ShinyTextAgent text="Pensando..." />
-                                </Box>
-                            )}
+                            <MessageContainer
+                                messages={messages}
+                                isLoading={loading}
+                            />
                             <Box ref={chatRef} />
                         </Box>
                     )
