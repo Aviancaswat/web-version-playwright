@@ -5,13 +5,6 @@ import { getJobsByRunId, getLogsByJobId, getReportHTMLPreview } from '../github/
 import { extractRelevantLogs } from '../utils/extractLogsReleevant';
 import { INSTRUCTIONS_MAIN_AGENT, MODEL } from './instructions';
 
-const client = new OpenAI({
-    apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
-    dangerouslyAllowBrowser: true,
-});
-
-setDefaultOpenAIClient(client);
-
 interface ReportData {
     workflowId: number;
     success: boolean;
@@ -24,7 +17,7 @@ interface ReportData {
 
 interface PlaywrightReport {
     workflowId: number;
-    htmlContent: string;
+    htmlContent: string | undefined;
 }
 
 declare global {
@@ -32,6 +25,13 @@ declare global {
         __playwrightReport?: PlaywrightReport;
     }
 }
+
+const client = new OpenAI({
+    apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
+    dangerouslyAllowBrowser: true,
+});
+
+setDefaultOpenAIClient(client);
 
 const getReportByWorkflowIDGithubTool = tool({
     name: 'analyzer_report_github_tool',
@@ -47,24 +47,16 @@ const getReportByWorkflowIDGithubTool = tool({
 
         try {
 
+            let isFoundReport = false;
             const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
 
             if (!contentHTML) {
                 const errorMsg = `No se encontró reporte HTML para el workflow ${workflowId}`;
                 console.warn(`${errorMsg}`);
-
-                return JSON.stringify({
-                    workflowId,
-                    success: false,
-                    reportReady: false,
-                    message: errorMsg,
-                    jobs: [],
-                    relevantLogs: null,
-                    jobsCount: 0
-                } as ReportData);
             }
 
-            if (typeof window !== undefined) {
+            if (typeof window !== undefined && contentHTML) {
+                isFoundReport = true;
                 window.__playwrightReport = {
                     workflowId: _context.workflowId,
                     htmlContent: contentHTML
@@ -95,14 +87,14 @@ const getReportByWorkflowIDGithubTool = tool({
             const responseData: ReportData = {
                 workflowId,
                 success: true,
-                reportReady: true,
-                message: `Reporte encontrado exitosamente con ${total_count} job(s)`,
+                reportReady: isFoundReport,
+                message: isFoundReport ? `Reporte encontrado exitosamente con ${total_count} job(s)` : `No se encontró reporte asociado al workflow ${workflowId}`,
                 jobs: jobs || [],
                 relevantLogs,
                 jobsCount: total_count
             };
 
-            console.log(`✅ [${function_call?.toolCall.name}] Completado exitosamente`);
+            console.log(`[${function_call?.toolCall.name}] Completado exitosamente`);
             return JSON.stringify(responseData, null, 2);
 
         } catch (error) {
@@ -126,7 +118,7 @@ export const RunAgentDashboard = async (dataDashboard: string, questionUser: str
     try {
 
         const systemPrompt = `
-            Responde la pregunta del usuario con los datos que te proporciono, responde las preguntas del usuario de manera clara y consisa.
+            Responde la pregunta del usuario con los datos dle dasboard que te proporciono.\n
             # DATOS DEL DASHBOARD
             ${JSON.stringify(dataDashboard)}    
             Si necesitas información de un workflow específico, usa la herramienta disponible.        

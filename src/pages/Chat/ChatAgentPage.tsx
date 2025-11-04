@@ -13,7 +13,8 @@ export type Messages = {
     role: "user" | "agent"
     message: string,
     htmlContent?: string,
-    imageContent?: string
+    imageContent?: string,
+    timestamp: string
 }
 
 const ChatAgentPage = () => {
@@ -165,7 +166,7 @@ const ChatAgentPage = () => {
 
             setMessages(prevMessages => [
                 ...prevMessages,
-                { role: "user", message: questionUser }
+                { role: "user", message: questionUser, timestamp: new Date().toISOString() }
             ]);
 
             setLoading(true);
@@ -175,7 +176,7 @@ const ChatAgentPage = () => {
 
             setMessages(prevMessages => [
                 ...prevMessages,
-                { role: "agent", message: responseAgent.finalOutput ?? "" }
+                { role: "agent", message: responseAgent.finalOutput ?? "", timestamp: new Date().toISOString() }
             ]);
 
             setLoading(false);
@@ -198,21 +199,20 @@ const ChatAgentPage = () => {
             console.log("result report Object: ", result)
 
             if (result.success && result.reportReady) {
-                const reportData = (window as any).__playwrightReport;
+                const reportData = window.__playwrightReport;
 
                 if (reportData?.htmlContent) {
-                    console.log("ENTRO R")
-                    //es posible agregar un agente al tool para que analize el reporte 
-                    //con la data que retrona el método
                     setMessages(prevMessages => [
                         ...prevMessages,
                         {
                             role: "agent",
                             message: result?.message ?? "",
-                            htmlContent: reportData?.htmlContent
+                            htmlContent: reportData?.htmlContent,
+                            timestamp: new Date().toISOString()
                         }
                     ]);
-                    delete (window as any).__playwrightReport;
+                    
+                    delete window.__playwrightReport;
                 }
                 else {
                     console.log("NO ENTRÓ: ", reportData)

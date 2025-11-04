@@ -1,6 +1,7 @@
-import { Avatar, Box, Button, ButtonGroup, HStack, Tooltip, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Button, ButtonGroup, HStack, Text, Tooltip, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { ArrowDownToLine, Copy } from "lucide-react";
+import moment from "moment";
 import { useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -50,7 +51,12 @@ const MessageAgentUI = (msg: Messages) => {
                     borderRadius="md"
                     backgroundColor={msg.role === "user" ? "black" : "gray.100"}
                     color={msg.role === "user" ? "white" : "black"}
+                    display={"flex"}
+                    flexDirection={"column"}
                 >
+                    <Box alignSelf={"end"} width={"100%"} bg={"red.100"}>
+                        <Text fontSize={"xs"} color={"gray.600"}>{moment(msg.timestamp).format("hh:mm a")}</Text>
+                    </Box>
                     {
                         (msg.message.trim().includes("<svg") ||
                             msg.message.trim().includes("<img") ||
@@ -65,7 +71,7 @@ const MessageAgentUI = (msg: Messages) => {
                     }
                 </Box>
             </Box>
-            <HStack alignSelf={"start"} ml={50} spacing={0}>
+            <HStack alignSelf={"start"} ml={50} spacing={0} width={"95%"}>
                 <ButtonGroup>
                     <motion.div
                         whileHover={{ scale: 1.1 }}
