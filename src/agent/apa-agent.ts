@@ -137,6 +137,7 @@ export const RunAgentDashboard = async (dataDashboard: string, questionUser: str
         );
 
         thread = response.history;
+        console.log("thread history: ", thread)
         return response;
     }
     catch (error) {

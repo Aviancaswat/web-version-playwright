@@ -54,7 +54,7 @@ const MessageAgentUI = (msg: Messages) => {
                     display={"flex"}
                     flexDirection={"column"}
                 >
-                    <Box alignSelf={"end"} width={"100%"} bg={"red.100"}>
+                    <Box alignSelf={"flex-end"} width={"100%"}>
                         <Text fontSize={"xs"} color={"gray.600"}>{moment(msg.timestamp).format("hh:mm a")}</Text>
                     </Box>
                     {

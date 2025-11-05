@@ -7,12 +7,16 @@ import type { Messages } from "./ChatAgentPage";
 const MessageUserUI = (msg: Messages) => {
     return (
         <>
-            <Box 
-                className="chat-message" 
-                display={"flex"} 
-                alignItems={"start"}
+            <Box
+                className="chat-message"
+                display={"flex"}
                 flexDirection={"column"}
-                >
+            >
+                <Box alignSelf={"flex-start"}>
+                    <Text fontSize={"xs"} color={"gray.600"}>
+                        {moment(msg.timestamp).format("hh:mm a")}
+                    </Text>
+                </Box>
                 <Box
                     padding={2}
                     borderRadius="full"
@@ -23,13 +27,9 @@ const MessageUserUI = (msg: Messages) => {
                 >
                     <ReactMarkdown children={msg.message} remarkPlugins={[remarkGfm]} />
                 </Box>
-                <Box alignSelf={"end"}>
-                    <Text fontSize={"xs"} color={"gray.600"}>{moment(msg.timestamp).format("hh:mm a")}</Text>
-                </Box>
             </Box>
         </>
     )
 }
-
 
 export default MessageUserUI;

@@ -1,6 +1,5 @@
 import { Avatar, Box, Button } from "@chakra-ui/react";
 import { SquareArrowOutUpRight } from "lucide-react";
-import { v4 as uuid } from "uuid";
 import LogoAv from "../../assets/avianca-logo-desk.png";
 import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
 import FadeAnimationText from "../../components/transitions/FadeText";
@@ -28,7 +27,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                             className="chat-ai"
                         >
                             {
-                                msg.role === "user" ? <MessageUserUI key={uuid()} {...msg} /> : <MessageAgentUI key={uuid()} {...msg} />
+                                msg.role === "user" ? <MessageUserUI {...msg} /> : <MessageAgentUI {...msg} />
                             }
                         </FadeAnimationText>
                         <FadeAnimationText>

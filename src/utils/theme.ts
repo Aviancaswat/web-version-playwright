@@ -1,6 +1,8 @@
-import { defineStyleConfig, extendTheme } from '@chakra-ui/react'
+import { defineStyleConfig, extendTheme } from '@chakra-ui/react';
 //@ts-ignore
-import '@fontsource-variable/inter'
+import '@fontsource/ubuntu';
+//@ts-ignore
+import '@fontsource-variable/inter';
 
 const Button = defineStyleConfig({
   baseStyle: {
@@ -23,7 +25,7 @@ const theme = extendTheme({
   },
   fonts: {
     heading: `'Inter Variable', sans-serif`,
-    body: `'Inter Variable', sans-serif`,
+    body: `'Ubuntu', sans-serif`,
   }
 })
 

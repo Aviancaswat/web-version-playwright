@@ -172,7 +172,6 @@ const ChatAgentPage = () => {
             setLoading(true);
 
             const responseAgent = await RunAgentDashboard(JSON.stringify(dashboardDataAgentAvianca), questionUser);
-            console.log("Response agent dashboard: ", responseAgent);
 
             setMessages(prevMessages => [
                 ...prevMessages,
@@ -191,12 +190,10 @@ const ChatAgentPage = () => {
             }
 
             const responseFunctionCallReport = resultFunctionCall?.output as OutputResponse;
-            console.log("responseFunctionCallReport: ", responseFunctionCallReport)
             const textResultReport = responseFunctionCallReport?.text;
             if (!textResultReport) return;
 
             const result = JSON.parse(textResultReport);
-            console.log("result report Object: ", result)
 
             if (result.success && result.reportReady) {
                 const reportData = window.__playwrightReport;
@@ -213,9 +210,6 @@ const ChatAgentPage = () => {
                     ]);
                     
                     delete window.__playwrightReport;
-                }
-                else {
-                    console.log("NO ENTRÓ: ", reportData)
                 }
             }
         }
