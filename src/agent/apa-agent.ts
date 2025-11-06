@@ -53,7 +53,8 @@ const getReportByWorkflowIDGithubTool = tool({
     description: `
     Usa esta herramienta cuando el usuario pide analizar, obtener o recuperar la información detallada de un 
     workflow específico de GitHub Actions, incluyendo jobs, logs y reporte HTML de Playwright. 
-    (ej: "analiza el reporte del workflow: 12345678").`,
+    (ej: "analiza el reporte del workflow: 12345678").
+    No usar esta herramienta para graficas, crear imagenes o generar visualizaciones`,
     parameters: z.object({
         workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
     }),
@@ -200,6 +201,7 @@ export const RunAgentDashboard = async (
         - Cuando el usuario pida GENERAR una imagen o visualización basado en los datos del dashboard.
         - Cuando el usuario pida CREAR una imagen o visualización basado en los datos del dashboard.
         - Cuando el usuario pida VISUALIZAR una imagen o visualización basado en los datos del dashboard.
+        - Cuando el usuario pida GRAFICAR una imagen o visualización basado en los datos del dashboard.
 
         - Sé conciso y preciso en tus respuestas
         `.trimStart();
