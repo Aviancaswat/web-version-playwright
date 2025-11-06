@@ -39,7 +39,7 @@ const dataExamples: ExampleType[] = [
     },
     {
         icon: Cable,
-        title: "Crea una imagen con los datos mas relevantes del dashboard",
+        title: "Crea una imagen con los datos de los usuarios",
         colors: ["green.200", "green.600"]
     }
 ]

@@ -187,11 +187,22 @@ export const RunAgentDashboard = async (
 
         # INSTRUCCIONES
         - Para consultas sobre el dashboard, usa DIRECTAMENTE estos datos
-        - Si el usuario pide ANALIZAR un reporte de un workflow en espcifico; usa la herramienta o tool "analyzer_report_github_tool".
-        - Si el usuario pide GENERAR o CREAR IMÁGENES o VISUALIZACIONES; usa la herramienta o tool "image_gen".
+        - Selecciona la herramienta a usar en base a la descripción del usuario
         - Solo llama herramientas si el usuario lo solicita EXPLÍCITAMENTE
+
+        # USO DE HERRAMIENTAS
+        ## CUANDO USAR LA HERRAMIENTA **analyzer_report_github_tool**:
+        - Cuando el usuario pida ANALIZAR un reporte de un workflow en especifico.
+        - Cuando el usuario pida OBTENER un reporte de un workflow en específico.
+        - Cuando el usuario pida RECUPERAR un reporte de un workflow en específico.
+
+        ## CUANDO USAR LA HERRAMIENTA **image_gen**:
+        - Cuando el usuario pida GENERAR una imagen o visualización basado en los datos del dashboard.
+        - Cuando el usuario pida CREAR una imagen o visualización basado en los datos del dashboard.
+        - Cuando el usuario pida VISUALIZAR una imagen o visualización basado en los datos del dashboard.
+
         - Sé conciso y preciso en tus respuestas
-        `.trim();
+        `.trimStart();
 
         // Crear contexto con los datos del dashboard
 
