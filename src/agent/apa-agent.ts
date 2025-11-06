@@ -1,4 +1,12 @@
-import { Agent, run, setDefaultOpenAIClient, tool, type AgentInputItem } from '@openai/agents';
+
+import {
+    Agent,
+    imageGenerationTool,
+    run,
+    setDefaultOpenAIClient,
+    tool,
+    type AgentInputItem
+} from '@openai/agents';
 import OpenAI from 'openai';
 import z from 'zod';
 import { getJobsByRunId, getLogsByJobId, getReportHTMLPreview } from '../github/api';
@@ -26,6 +34,10 @@ declare global {
     }
 }
 
+// ============================================
+// CONFIGURACIÓN DE OPENAI
+// ============================================
+
 const client = new OpenAI({
     apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
     dangerouslyAllowBrowser: true,
@@ -33,115 +45,287 @@ const client = new OpenAI({
 
 setDefaultOpenAIClient(client);
 
+// ============================================
+// DEFINICIÓN DE TOOLS
+// ============================================
+
 const getReportByWorkflowIDGithubTool = tool({
     name: 'analyzer_report_github_tool',
-    description: 'Obtiene la data del reporte desde la API de github',
+    description: `
+    Usa esta herramienta cuando el usuario pide analizar, obtener o recuperar la información detallada de un 
+    workflow específico de GitHub Actions, incluyendo jobs, logs y reporte HTML de Playwright. 
+    (ej: "analiza el reporte del workflow: 12345678").`,
     parameters: z.object({
-        workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub. Ejemplo: 12345678')
+        workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
     }),
-    execute: async (_context, _, function_call) => {
-        console.log("Llamando a function call: ", function_call?.toolCall.name)
-        console.log('🔧 Tool ejecutado con workflowId:', _context.workflowId);
+    execute: async (context, runContext) => {
+        console.log('🔧 [analyzer_report_github_tool] Iniciando con workflowId:', context.workflowId);
 
-        const { workflowId } = _context;
+        const { workflowId } = context;
 
         try {
-
+            // Obtener reporte HTML
             let isFoundReport = false;
             const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
 
             if (!contentHTML) {
-                const errorMsg = `No se encontró reporte HTML para el workflow ${workflowId}`;
-                console.warn(`${errorMsg}`);
+                console.warn(`⚠️ No se encontró reporte HTML para workflow ${workflowId}`);
             }
 
-            if (typeof window !== undefined && contentHTML) {
+            if (typeof window !== 'undefined' && contentHTML) {
                 isFoundReport = true;
                 window.__playwrightReport = {
-                    workflowId: _context.workflowId,
+                    workflowId: context.workflowId,
                     htmlContent: contentHTML
                 }
-                console.log(`Reporte guardado en window.__playwrightReport`);
+                console.log(`✅ Reporte guardado en window.__playwrightReport`);
             }
 
-            console.log(`Obteniendo los jobs del workflow ${workflowId}`)
-            const { total_count, jobs } = await getJobsByRunId(_context.workflowId);
-            console.log(`Se finalizó la obtención de los jobs: ${jobs.length} encontrados`);
-            let relevantLogs: string | null = null;
+            // Obtener jobs
+            console.log(`📊 Obteniendo jobs del workflow ${workflowId}`);
+            const { total_count, jobs } = await getJobsByRunId(context.workflowId);
+            console.log(`✅ Jobs encontrados: ${jobs.length}`);
 
+            // Obtener logs del primer job
+            let relevantLogs: string | null = null;
             if (total_count > 0 && jobs.length > 0) {
                 try {
-                    console.log("Extrayendo los logs...")
+                    console.log("📝 Extrayendo logs relevantes...");
                     const logs = await getLogsByJobId(jobs[0].id);
                     relevantLogs = extractRelevantLogs(logs as string);
-                    console.log("se finaliza extracción de logs relevantes");
+                    console.log("✅ Logs extraídos exitosamente");
                 }
                 catch (error) {
-                    console.error(`Error al obtener los logs para el Job ${jobs[0].id}`)
+                    console.error(`❌ Error al obtener logs del Job ${jobs[0].id}: `, error);
                 }
             }
             else {
-                console.log("No hya jobs diaponibles para extraer los logs");
+                console.log("ℹ️ No hay jobs disponibles");
             }
 
             const responseData: ReportData = {
                 workflowId,
                 success: true,
                 reportReady: isFoundReport,
-                message: isFoundReport ? `Reporte encontrado exitosamente con ${total_count} job(s)` : `No se encontró reporte asociado al workflow ${workflowId}`,
+                message: isFoundReport
+                    ? `Reporte encontrado con ${total_count} job(s)`
+                    : `No se encontró reporte para workflow ${workflowId}`,
                 jobs: jobs || [],
                 relevantLogs,
                 jobsCount: total_count
             };
 
-            console.log(`[${function_call?.toolCall.name}] Completado exitosamente`);
+            console.log(`✅[analyzer_report_github_tool] Completado exitosamente`);
+
+            // Retornar string formateado para mejor comprensión del LLM
             return JSON.stringify(responseData, null, 2);
 
         } catch (error) {
-            console.error('Error en tool:', error);
-            throw new Error(`Error al obtener reporte: ${(error as Error).message}`);
+            console.error('❌ Error en analyzer_report_github_tool:', error);
+            const errorMsg = `Error al obtener reporte del workflow ${workflowId}: ${(error as Error).message}`;
+            // NO lanzar error, retornar mensaje descriptivo para que el LLM lo maneje
+            return JSON.stringify({
+                workflowId,
+                success: false,
+                error: errorMsg
+            });
         }
     }
-})
+});
 
-let thread: AgentInputItem[] = []
+// ============================================
+// CONTEXTO DEL AGENTE
+// ============================================
 
-const dashboardAviancaAgent = new Agent({
+interface DashboardContext {
+    dashboardData: string;
+    conversationHistory: AgentInputItem[];
+}
+
+// ============================================
+// CONFIGURACIÓN DEL AGENTE
+// ============================================
+
+const dashboardAviancaAgent = new Agent<DashboardContext>({
     name: 'avianca_playwright_agent',
     instructions: INSTRUCTIONS_MAIN_AGENT,
     model: MODEL,
-    tools: [getReportByWorkflowIDGithubTool]
-})
+    tools: [
+        imageGenerationTool({
+            name: "image_gen",
+            model: "gpt-image-1",
+            quality: "high",
+            outputFormat: 'png'
+        }),
+        getReportByWorkflowIDGithubTool
+    ],
+    toolUseBehavior: "run_llm_again",
+    modelSettings: {
+        toolChoice: "auto"
+    }
+});
 
-export const RunAgentDashboard = async (dataDashboard: string, questionUser: string) => {
+// ============================================
+// FUNCIÓN PRINCIPAL PARA EJECUTAR EL AGENTE
+// ============================================
 
+// Construir mensajes para el agente
+
+export const RunAgentDashboard = async (
+    dataDashboard: string,
+    questionUser: string
+) => {
     try {
+        console.log(`\n${'='.repeat(60)} `);
+        console.log(`📨 Nueva consulta: "${questionUser}"`);
+        console.log(`${'='.repeat(60)} \n`);
 
-        const systemPrompt = `
-            Responde la pregunta del usuario con los datos dle dasboard que te proporciono.\n
-            # DATOS DEL DASHBOARD
-            ${JSON.stringify(dataDashboard)}    
-            Si necesitas información de un workflow específico, usa la herramienta disponible.        
-            Asegúrate de ser específico y detallar los puntos más importantes según los datos proporcionados.`
+         const systemMessage = `
+        # DATOS DEL DASHBOARD DISPONIBLES
 
-        if (thread.length === 0) {
-            thread.push({
+        ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
+
+        # INSTRUCCIONES
+        - Para consultas sobre el dashboard, usa DIRECTAMENTE estos datos
+        - Solo llama herramientas si el usuario lo solicita EXPLÍCITAMENTE
+            - Sé conciso y preciso en tus respuestas
+        `.trim();
+
+        // Crear contexto con los datos del dashboard
+
+        let messages: AgentInputItem[] = [
+            {
                 role: "system",
-                content: systemPrompt
-            })
-        }
+                content: systemMessage   
+            },
+            {
+                role: "user",
+                content: questionUser
+            }
+        ];
+
+        const context: DashboardContext = {
+            dashboardData: dataDashboard,
+            conversationHistory: messages
+        };
+
+        // Mensaje del sistema con datos del dashboard
 
         const response = await run(
             dashboardAviancaAgent,
-            thread.concat({ role: "user", content: questionUser })
+            messages,
+            {
+                context,
+                maxTurns: 10
+            },
         );
 
-        thread = response.history;
-        console.log("thread history: ", thread)
+        messages = response.history;
+
+        console.log(`\n✅ Respuesta generada exitosamente`);
+        console.log(`📊 Turnos utilizados: ${response.history.length / 2} `);
+
         return response;
     }
     catch (error) {
-        console.error("Ha ocurrido un error al llamar agent ai: ", error)
+        console.error("\n❌ Error al ejecutar el agente:", error);
+
+        // Manejo específico de errores comunes
+        if (error instanceof Error) {
+            if (error.message.includes('rate limit')) {
+                throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
+            }
+            if (error.message.includes('MaxTurnsExceededError')) {
+                throw new Error('El agente alcanzó el máximo de iteraciones. Por favor reformula tu pregunta.');
+            }
+        }
+
         throw error;
     }
-}
+};
+
+// ============================================
+// FUNCIÓN PARA EJECUTAR CON HISTORIAL
+// ============================================
+
+export const RunAgentWithHistory = async (
+    dataDashboard: string,
+    messages: AgentInputItem[]
+) => {
+    try {
+        console.log(`\n📚 Ejecutando con historial(${messages.length} mensajes)`);
+
+        const context: DashboardContext = {
+            dashboardData: dataDashboard,
+            conversationHistory: messages
+        };
+
+        // Asegurar que hay un mensaje de sistema al inicio
+        const messagesWithSystem: AgentInputItem[] =
+            (messages[0] as any)?.role === 'system'
+                ? messages
+                : [
+                    {
+                        role: "system",
+                        content: `Datos del dashboard: ${dataDashboard} `
+                    },
+                    ...messages
+                ];
+
+        const response = await run(
+            dashboardAviancaAgent,
+            messagesWithSystem,
+            {
+                context,
+                maxTurns: 10
+            }
+        );
+
+        return response;
+    }
+    catch (error) {
+        console.error("❌ Error al ejecutar con historial:", error);
+        throw error;
+    }
+};
+
+// ============================================
+// UTILIDADES PARA DEBUGGING
+// ============================================
+
+export const getAgentInfo = () => {
+    return {
+        name: dashboardAviancaAgent.name,
+        model: MODEL,
+        tools: dashboardAviancaAgent.tools.map(t => ({
+            // @ts-ignore - acceso a propiedades internas para debugging
+            name: t.name || 'unknown',
+            // @ts-ignore
+            description: t.description || ''
+        }))
+    };
+};
+
+export const testToolDirectly = async (toolName: string, params: any) => {
+    console.log(`\n🧪 Test directo de tool: ${toolName} `);
+    console.log(`Parámetros: `, params);
+
+    const tool = dashboardAviancaAgent.tools.find(
+        // @ts-ignore
+        t => t.name === toolName
+    );
+
+    if (!tool) {
+        throw new Error(`Tool ${toolName} no encontrada`);
+    }
+
+    try {
+        // @ts-ignore
+        const result = await tool.execute(params, {});
+        console.log(`✅ Resultado: `, result);
+        return result;
+    } catch (error) {
+        console.error(`❌ Error: `, error);
+        throw error;
+    }
+};

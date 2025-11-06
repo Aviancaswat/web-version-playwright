@@ -39,7 +39,7 @@ const dataExamples: ExampleType[] = [
     },
     {
         icon: Cable,
-        title: "Total de ejecuciones fallidas y exitosas",
+        title: "Crea una imagen con los datos de las ejecuciones exitosas,fallidas y canceladas del dashboard",
         colors: ["green.200", "green.600"]
     }
 ]

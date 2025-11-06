@@ -1,6 +1,7 @@
-import { Avatar, Box, Button } from "@chakra-ui/react";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { Avatar, Box, Button, Card, CardBody, Image } from "@chakra-ui/react";
+import { DownloadIcon, SquareArrowOutUpRight } from "lucide-react";
 import LogoAv from "../../assets/avianca-logo-desk.png";
+import PreviewImageGenerateAgent from "../../components/agent-dashboard-ui/previewImage";
 import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
 import FadeAnimationText from "../../components/transitions/FadeText";
 import type { Messages } from "./ChatAgentPage";
@@ -64,6 +65,38 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                                                 }}
                                             >
                                                 Abrir en otra pestaña
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                )
+                            }
+                        </FadeAnimationText>
+                        <FadeAnimationText display={"flex"} justifyContent={"center"}>
+                            {
+                                msg.imageContent && (
+                                    <Box display={"flex"} flexDirection={"column"}>
+                                        <Card maxW={"lg"}>
+                                            <CardBody>
+                                                <Image
+                                                    src={`data:image/png;base64,${msg.imageContent}`}
+                                                    alt='generate imagen agent'
+                                                    borderRadius='lg'
+                                                    maxH={400}
+                                                />
+                                            </CardBody>
+                                        </Card>
+                                        <Box display={"flex"} gap={1} justifyContent={"flex-end"} mt={1}>
+                                            <PreviewImageGenerateAgent imageContent={msg.imageContent} />
+                                            <Button
+                                                size={"sm"}
+                                                onClick={() => {
+                                                    const enlace = document.createElement("a");
+                                                    enlace.href = `data:image/png;base64,${msg.imageContent}`;
+                                                    enlace.download = "imagen-apa.png";
+                                                    enlace.click();
+                                                }}
+                                            >
+                                                <DownloadIcon size={18}/>
                                             </Button>
                                         </Box>
                                     </Box>

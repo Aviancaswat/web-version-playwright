@@ -160,60 +160,96 @@ const ChatAgentPage = () => {
     }, [workflowToAnalize])
 
     const getResponseModel = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
 
+            // Agregar mensaje del usuario
             setMessages(prevMessages => [
                 ...prevMessages,
                 { role: "user", message: questionUser, timestamp: new Date().toISOString() }
             ]);
 
             setLoading(true);
+            setQuestionUser("");
 
-            const responseAgent = await RunAgentDashboard(JSON.stringify(dashboardDataAgentAvianca), questionUser);
+            try {
+                const responseAgent = await RunAgentDashboard(
+                    JSON.stringify(dashboardDataAgentAvianca),
+                    questionUser
+                );
 
-            setMessages(prevMessages => [
-                ...prevMessages,
-                { role: "agent", message: responseAgent.finalOutput ?? "", timestamp: new Date().toISOString() }
-            ]);
+                // Procesar todas las respuestas juntas
+                const newMessages: Messages[] = [];
 
-            setLoading(false);
-            setQuestionUser("")
+                // 1. Primero verificar si hay reporte HTML
+                const resultFunctionCall: any = responseAgent.output.find(
+                    (e: any) => e.type === "function_call_result"
+                );
 
-            const resultFunctionCall = responseAgent.output.find(e => e.type === "function_call_result")
-            if (!resultFunctionCall) return;
+                if (resultFunctionCall) {
+                    const responseFunctionCallReport = resultFunctionCall?.output;
+                    const textResultReport = responseFunctionCallReport?.text;
 
-            type OutputResponse = {
-                type: "text" | "image",
-                text?: string
-            }
+                    if (textResultReport) {
+                        const result = JSON.parse(textResultReport);
+                        const reportData = window.__playwrightReport;
 
-            const responseFunctionCallReport = resultFunctionCall?.output as OutputResponse;
-            const textResultReport = responseFunctionCallReport?.text;
-            if (!textResultReport) return;
-
-            const result = JSON.parse(textResultReport);
-
-            if (result.success && result.reportReady) {
-                const reportData = window.__playwrightReport;
-
-                if (reportData?.htmlContent) {
-                    setMessages(prevMessages => [
-                        ...prevMessages,
-                        {
-                            role: "agent",
-                            message: result?.message ?? "",
-                            htmlContent: reportData?.htmlContent,
-                            timestamp: new Date().toISOString()
+                        if (result.success && result.reportReady && reportData?.htmlContent) {
+                            newMessages.push({
+                                role: "agent",
+                                message: result?.message ?? "",
+                                htmlContent: reportData?.htmlContent,
+                                timestamp: new Date().toISOString()
+                            });
+                            delete window.__playwrightReport;
                         }
-                    ]);
-                    
-                    delete window.__playwrightReport;
+                    }
                 }
+
+                // 2. Verificar si hay imágenes
+                const responseCallFunctionImage: any = responseAgent?.output.find(
+                    (e: any) => e.type === 'hosted_tool_call' && e.name === 'image_generation_call'
+                );
+
+                if (responseCallFunctionImage?.output) {
+                    newMessages.push({
+                        role: "agent",
+                        message: "",
+                        timestamp: new Date().toISOString(),
+                        imageContent: responseCallFunctionImage.output
+                    });
+                }
+
+                // 3. Agregar mensaje de texto final si existe y no hay otros mensajes
+                if (responseAgent.finalOutput && newMessages.length === 0) {
+                    newMessages.push({
+                        role: "agent",
+                        message: responseAgent.finalOutput,
+                        timestamp: new Date().toISOString()
+                    });
+                } else if (responseAgent.finalOutput && newMessages.length > 0) {
+                    // Si hay otros mensajes, agregar el texto al primero
+                    newMessages[0].message = responseAgent.finalOutput + "\n\n" + newMessages[0].message;
+                }
+
+                // Actualizar todos los mensajes de una vez
+                setMessages(prevMessages => [...prevMessages, ...newMessages]);
+
+            } catch (error) {
+                console.error("Error al obtener respuesta:", error);
+                setMessages(prevMessages => [
+                    ...prevMessages,
+                    {
+                        role: "agent",
+                        message: "Lo siento, ocurrió un error al procesar tu solicitud.",
+                        timestamp: new Date().toISOString()
+                    }
+                ]);
+            } finally {
+                setLoading(false);
             }
         }
-    }, [questionUser]);
+    }, [questionUser, dashboardDataAgentAvianca]);
 
     return (
         <Box
