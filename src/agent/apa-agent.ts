@@ -1,4 +1,3 @@
-
 import {
     Agent,
     imageGenerationTool,
@@ -177,7 +176,7 @@ export const RunAgentDashboard = async (
 ) => {
     try {
         console.log(`\n${'='.repeat(60)} `);
-        console.log(`📨 Nueva consulta: "${questionUser}"`);
+        console.log(`Nueva consulta: "${questionUser}"`);
         console.log(`${'='.repeat(60)} \n`);
 
          const systemMessage = `
@@ -222,13 +221,13 @@ export const RunAgentDashboard = async (
 
         messages = response.history;
 
-        console.log(`\n✅ Respuesta generada exitosamente`);
-        console.log(`📊 Turnos utilizados: ${response.history.length / 2} `);
+        console.log(`\n Respuesta generada exitosamente`);
+        console.log(`Turnos utilizados: ${response.history.length / 2} `);
 
         return response;
     }
     catch (error) {
-        console.error("\n❌ Error al ejecutar el agente:", error);
+        console.error("\nError al ejecutar el agente:", error);
 
         // Manejo específico de errores comunes
         if (error instanceof Error) {
@@ -253,7 +252,7 @@ export const RunAgentWithHistory = async (
     messages: AgentInputItem[]
 ) => {
     try {
-        console.log(`\n📚 Ejecutando con historial(${messages.length} mensajes)`);
+        console.log(`\nEjecutando con historial(${messages.length} mensajes)`);
 
         const context: DashboardContext = {
             dashboardData: dataDashboard,
@@ -289,25 +288,8 @@ export const RunAgentWithHistory = async (
     }
 };
 
-// ============================================
-// UTILIDADES PARA DEBUGGING
-// ============================================
-
-export const getAgentInfo = () => {
-    return {
-        name: dashboardAviancaAgent.name,
-        model: MODEL,
-        tools: dashboardAviancaAgent.tools.map(t => ({
-            // @ts-ignore - acceso a propiedades internas para debugging
-            name: t.name || 'unknown',
-            // @ts-ignore
-            description: t.description || ''
-        }))
-    };
-};
-
 export const testToolDirectly = async (toolName: string, params: any) => {
-    console.log(`\n🧪 Test directo de tool: ${toolName} `);
+    console.log(`\nTest directo de tool: ${toolName} `);
     console.log(`Parámetros: `, params);
 
     const tool = dashboardAviancaAgent.tools.find(
@@ -322,10 +304,10 @@ export const testToolDirectly = async (toolName: string, params: any) => {
     try {
         // @ts-ignore
         const result = await tool.execute(params, {});
-        console.log(`✅ Resultado: `, result);
+        console.log(`Resultado: `, result);
         return result;
     } catch (error) {
-        console.error(`❌ Error: `, error);
+        console.error(`Error: `, error);
         throw error;
     }
 };
