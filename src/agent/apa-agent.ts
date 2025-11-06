@@ -57,7 +57,7 @@ const getReportByWorkflowIDGithubTool = tool({
     parameters: z.object({
         workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
     }),
-    execute: async (context, runContext) => {
+    execute: async (context) => {
         console.log('🔧 [analyzer_report_github_tool] Iniciando con workflowId:', context.workflowId);
 
         const { workflowId } = context;
@@ -138,7 +138,6 @@ const getReportByWorkflowIDGithubTool = tool({
 
 interface DashboardContext {
     dashboardData: string;
-    conversationHistory: AgentInputItem[];
 }
 
 // ============================================
@@ -170,6 +169,8 @@ const dashboardAviancaAgent = new Agent<DashboardContext>({
 
 // Construir mensajes para el agente
 
+let messages: AgentInputItem[] = [];
+
 export const RunAgentDashboard = async (
     dataDashboard: string,
     questionUser: string
@@ -179,44 +180,44 @@ export const RunAgentDashboard = async (
         console.log(`Nueva consulta: "${questionUser}"`);
         console.log(`${'='.repeat(60)} \n`);
 
-         const systemMessage = `
+        const systemMessage = `
         # DATOS DEL DASHBOARD DISPONIBLES
 
         ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
 
         # INSTRUCCIONES
         - Para consultas sobre el dashboard, usa DIRECTAMENTE estos datos
+        - Si el usuario pide ANALIZAR un reporte de un workflow en espcifico; usa la herramienta o tool "analyzer_report_github_tool".
+        - Si el usuario pide GENERAR o CREAR IMÁGENES o VISUALIZACIONES; usa la herramienta o tool "image_gen".
         - Solo llama herramientas si el usuario lo solicita EXPLÍCITAMENTE
-            - Sé conciso y preciso en tus respuestas
+        - Sé conciso y preciso en tus respuestas
         `.trim();
 
         // Crear contexto con los datos del dashboard
 
-        let messages: AgentInputItem[] = [
-            {
-                role: "system",
-                content: systemMessage   
-            },
-            {
-                role: "user",
-                content: questionUser
+        if (messages.length === 0) {
+            const findRoleSystem = messages.find((e: any) => e.role === "system");
+            if (!findRoleSystem) {
+                messages.push({
+                    role: "system",
+                    content: systemMessage
+                })
             }
-        ];
+        }
 
         const context: DashboardContext = {
-            dashboardData: dataDashboard,
-            conversationHistory: messages
+            dashboardData: dataDashboard
         };
 
         // Mensaje del sistema con datos del dashboard
 
         const response = await run(
             dashboardAviancaAgent,
-            messages,
+            messages.concat({ role: "user", content: questionUser }),
             {
                 context,
                 maxTurns: 10
-            },
+            }
         );
 
         messages = response.history;
@@ -255,8 +256,7 @@ export const RunAgentWithHistory = async (
         console.log(`\nEjecutando con historial(${messages.length} mensajes)`);
 
         const context: DashboardContext = {
-            dashboardData: dataDashboard,
-            conversationHistory: messages
+            dashboardData: dataDashboard
         };
 
         // Asegurar que hay un mensaje de sistema al inicio
