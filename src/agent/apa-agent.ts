@@ -69,7 +69,7 @@ const getReportByWorkflowIDGithubTool = tool({
             const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
 
             if (!contentHTML) {
-                console.warn(`⚠️ No se encontró reporte HTML para workflow ${workflowId}`);
+                console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
             }
 
             if (typeof window !== 'undefined' && contentHTML) {
@@ -78,29 +78,29 @@ const getReportByWorkflowIDGithubTool = tool({
                     workflowId: context.workflowId,
                     htmlContent: contentHTML
                 }
-                console.log(`✅ Reporte guardado en window.__playwrightReport`);
+                console.log(`Reporte guardado en window.__playwrightReport`);
             }
 
             // Obtener jobs
-            console.log(`📊 Obteniendo jobs del workflow ${workflowId}`);
+            console.log(`Obteniendo jobs del workflow ${workflowId}`);
             const { total_count, jobs } = await getJobsByRunId(context.workflowId);
-            console.log(`✅ Jobs encontrados: ${jobs.length}`);
+            console.log(`Jobs encontrados: ${jobs.length}`);
 
             // Obtener logs del primer job
             let relevantLogs: string | null = null;
             if (total_count > 0 && jobs.length > 0) {
                 try {
-                    console.log("📝 Extrayendo logs relevantes...");
+                    console.log("Extrayendo logs relevantes...");
                     const logs = await getLogsByJobId(jobs[0].id);
                     relevantLogs = extractRelevantLogs(logs as string);
-                    console.log("✅ Logs extraídos exitosamente");
+                    console.log("Logs extraídos exitosamente");
                 }
                 catch (error) {
-                    console.error(`❌ Error al obtener logs del Job ${jobs[0].id}: `, error);
+                    console.error(`Error al obtener logs del Job ${jobs[0].id}: `, error);
                 }
             }
             else {
-                console.log("ℹ️ No hay jobs disponibles");
+                console.log("No hay jobs disponibles");
             }
 
             const responseData: ReportData = {
@@ -115,15 +115,13 @@ const getReportByWorkflowIDGithubTool = tool({
                 jobsCount: total_count
             };
 
-            console.log(`✅[analyzer_report_github_tool] Completado exitosamente`);
+            console.log(`[analyzer_report_github_tool] Completado exitosamente`);
 
-            // Retornar string formateado para mejor comprensión del LLM
             return JSON.stringify(responseData, null, 2);
 
         } catch (error) {
-            console.error('❌ Error en analyzer_report_github_tool:', error);
+            console.error('Error en analyzer_report_github_tool:', error);
             const errorMsg = `Error al obtener reporte del workflow ${workflowId}: ${(error as Error).message}`;
-            // NO lanzar error, retornar mensaje descriptivo para que el LLM lo maneje
             return JSON.stringify({
                 workflowId,
                 success: false,
@@ -168,8 +166,6 @@ const dashboardAviancaAgent = new Agent<DashboardContext>({
 // FUNCIÓN PRINCIPAL PARA EJECUTAR EL AGENTE
 // ============================================
 
-// Construir mensajes para el agente
-
 let messages: AgentInputItem[] = [];
 
 export const RunAgentDashboard = async (
@@ -206,8 +202,6 @@ export const RunAgentDashboard = async (
         - Sé conciso y preciso en tus respuestas
         `.trimStart();
 
-        // Crear contexto con los datos del dashboard
-
         if (messages.length === 0) {
             const findRoleSystem = messages.find((e: any) => e.role === "system");
             if (!findRoleSystem) {
@@ -221,8 +215,6 @@ export const RunAgentDashboard = async (
         const context: DashboardContext = {
             dashboardData: dataDashboard
         };
-
-        // Mensaje del sistema con datos del dashboard
 
         const response = await run(
             dashboardAviancaAgent,
@@ -243,7 +235,6 @@ export const RunAgentDashboard = async (
     catch (error) {
         console.error("\nError al ejecutar el agente:", error);
 
-        // Manejo específico de errores comunes
         if (error instanceof Error) {
             if (error.message.includes('rate limit')) {
                 throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
@@ -253,50 +244,6 @@ export const RunAgentDashboard = async (
             }
         }
 
-        throw error;
-    }
-};
-
-// ============================================
-// FUNCIÓN PARA EJECUTAR CON HISTORIAL
-// ============================================
-
-export const RunAgentWithHistory = async (
-    dataDashboard: string,
-    messages: AgentInputItem[]
-) => {
-    try {
-        console.log(`\nEjecutando con historial(${messages.length} mensajes)`);
-
-        const context: DashboardContext = {
-            dashboardData: dataDashboard
-        };
-
-        // Asegurar que hay un mensaje de sistema al inicio
-        const messagesWithSystem: AgentInputItem[] =
-            (messages[0] as any)?.role === 'system'
-                ? messages
-                : [
-                    {
-                        role: "system",
-                        content: `Datos del dashboard: ${dataDashboard} `
-                    },
-                    ...messages
-                ];
-
-        const response = await run(
-            dashboardAviancaAgent,
-            messagesWithSystem,
-            {
-                context,
-                maxTurns: 10
-            }
-        );
-
-        return response;
-    }
-    catch (error) {
-        console.error("❌ Error al ejecutar con historial:", error);
         throw error;
     }
 };
