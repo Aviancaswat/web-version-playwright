@@ -183,21 +183,12 @@ export const RunAgentDashboard = async (
         ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
 
         # INSTRUCCIONES
-        - Para consultas sobre el dashboard, usa DIRECTAMENTE estos datos
-        - Selecciona la herramienta a usar en base a la descripción del usuario
-        - Solo llama herramientas si el usuario lo solicita EXPLÍCITAMENTE
-
-        # USO DE HERRAMIENTAS
-        ## CUANDO USAR LA HERRAMIENTA **analyzer_report_github_tool**:
-        - Cuando el usuario pida ANALIZAR un reporte de un workflow en especifico.
-        - Cuando el usuario pida OBTENER un reporte de un workflow en específico.
-        - Cuando el usuario pida RECUPERAR un reporte de un workflow en específico.
-
-        ## CUANDO USAR LA HERRAMIENTA **image_gen**:
-        - Cuando el usuario pida GENERAR una imagen o visualización basado en los datos del dashboard.
-        - Cuando el usuario pida CREAR una imagen o visualización basado en los datos del dashboard.
-        - Cuando el usuario pida VISUALIZAR una imagen o visualización basado en los datos del dashboard.
-        - Cuando el usuario pida GRAFICAR una imagen o visualización basado en los datos del dashboard.
+        Eres un asistente esperto en pruebas de automtización con playwright que responde preguntas del usuario en base a los datos del dashboard.\n
+        tambien delegas la responsabilidad de que herramienta es mejor usar para una tarea en especifica:\n
+        
+        1. Si el usuario pide analizar/obtener/recuperar/explicar un resporte en especifico; delegas la tarea a la herramienta llamada "analyzer_report_github_tool".
+        2. Si el usuario pide crear/visualizar/generar/graficar una imagen; delegas la tarea a la herramienta llamada "image_gen".
+        reflexiona y piensa de manera detenida a que herramienta delegas o asignas la tarea dependiendo de la descripción del usuario. usa las recomendaciones que te dí anteriormente.
 
         - Sé conciso y preciso en tus respuestas
         `.trimStart();
@@ -212,16 +203,11 @@ export const RunAgentDashboard = async (
             }
         }
 
-        const context: DashboardContext = {
-            dashboardData: dataDashboard
-        };
-
         const response = await run(
             dashboardAviancaAgent,
             messages.concat({ role: "user", content: questionUser }),
             {
-                context,
-                maxTurns: 10
+                maxTurns: 5
             }
         );
 

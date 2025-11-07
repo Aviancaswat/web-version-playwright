@@ -1,0 +1,635 @@
+import {
+    Agent,
+    imageGenerationTool,
+    run,
+    setDefaultOpenAIClient,
+    tool,
+    type AgentInputItem
+} from '@openai/agents';
+import { RECOMMENDED_PROMPT_PREFIX } from '@openai/agents-core/extensions';
+import OpenAI from 'openai';
+import z from 'zod';
+import { getJobsByRunId, getLogsByJobId, getReportHTMLPreview } from '../github/api';
+import { extractRelevantLogs } from '../utils/extractLogsReleevant';
+import { MODEL } from './instructions';
+
+interface ReportData {
+    workflowId: number;
+    success: boolean;
+    reportReady: boolean;
+    message: string;
+    jobs: any[];
+    relevantLogs: string | null;
+    jobsCount: number;
+}
+
+interface PlaywrightReport {
+    workflowId: number;
+    htmlContent: string | undefined;
+}
+
+declare global {
+    interface Window {
+        __playwrightReport?: PlaywrightReport;
+    }
+}
+
+// ============================================
+// CONFIGURACIÓN DE OPENAI
+// ============================================
+
+const client = new OpenAI({
+    apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
+    dangerouslyAllowBrowser: true,
+});
+
+setDefaultOpenAIClient(client);
+
+// ============================================
+// DEFINICIÓN DE TOOLS
+// ============================================
+
+const getReportByWorkflowIDGithubTool = tool({
+    name: 'analyzer_report_github_tool',
+    description: `
+        Usa esta herramienta SOLO UNA VEZ cuando el usuario pida analizar un workflow específico.
+    Después de usar esta herramienta, NO la vuelvas a llamar.
+    NO usar esta herramienta para gráficas, crear imágenes o generar visualizaciones.
+    `,
+    parameters: z.object({
+        workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
+    }),
+    execute: async (context) => {
+        console.log('🔧 [analyzer_report_github_tool] Iniciando con workflowId:', context.workflowId);
+
+        const { workflowId } = context;
+
+        try {
+            // Obtener reporte HTML
+            let isFoundReport = false;
+            const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
+
+            if (!contentHTML) {
+                console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
+            }
+
+            if (typeof window !== 'undefined' && contentHTML) {
+                isFoundReport = true;
+                window.__playwrightReport = {
+                    workflowId: context.workflowId,
+                    htmlContent: contentHTML
+                }
+                console.log(`Reporte guardado en window.__playwrightReport`);
+            }
+
+            // Obtener jobs
+            console.log(`Obteniendo jobs del workflow ${workflowId}`);
+            const { total_count, jobs } = await getJobsByRunId(context.workflowId);
+            console.log(`Jobs encontrados: ${jobs.length}`);
+
+            // Obtener logs del primer job
+            let relevantLogs: string | null = null;
+            if (total_count > 0 && jobs.length > 0) {
+                try {
+                    console.log("Extrayendo logs relevantes...");
+                    const logs = await getLogsByJobId(jobs[0].id);
+                    relevantLogs = extractRelevantLogs(logs as string);
+                    console.log("Logs extraídos exitosamente");
+                }
+                catch (error) {
+                    console.error(`Error al obtener logs del Job ${jobs[0].id}: `, error);
+                }
+            }
+            else {
+                console.log("No hay jobs disponibles");
+            }
+
+            const responseData: ReportData = {
+                workflowId,
+                success: true,
+                reportReady: isFoundReport,
+                message: isFoundReport
+                    ? `Reporte encontrado con ${total_count} job(s)`
+                    : `No se encontró reporte para workflow ${workflowId}`,
+                jobs: jobs || [],
+                relevantLogs,
+                jobsCount: total_count
+            };
+
+            console.log(`[analyzer_report_github_tool] Completado exitosamente`);
+
+            return JSON.stringify(responseData, null, 2);
+
+        } catch (error) {
+            console.error('Error en analyzer_report_github_tool:', error);
+            const errorMsg = `Error al obtener reporte del workflow ${workflowId}: ${(error as Error).message}`;
+            return JSON.stringify({
+                workflowId,
+                success: false,
+                error: errorMsg
+            });
+        }
+    }
+});
+
+// ============================================
+// CONTEXTO DEL AGENTE
+// ============================================
+
+interface DashboardContext {
+    dashboardData: string;
+}
+
+// ============================================
+// CONFIGURACIÓN DEL AGENTE
+// ============================================
+
+const analizerReportPlaywrightAgent = new Agent({
+    name: 'analizer_report_playwright_agent',
+    instructions: `
+    ${RECOMMENDED_PROMPT_PREFIX}
+    Eres un agente que analiza los resultados del reporte de playwright, incluyendo los logs mas relevantes encontrados.
+    Responde de manera clara y concisa de lo que encuentres en el reporte con un lenguaje no técnico para el usuario no técnico.
+    `,
+    model: MODEL,
+    tools: [getReportByWorkflowIDGithubTool],
+})
+
+const generateImagenPlaywrightAgent = new Agent({
+    name: "generate_images_agent",
+    instructions: `
+        ${RECOMMENDED_PROMPT_PREFIX}
+        Eres un agente esperto en la generación, creación, visualización y graficación de imágenes.
+        Genera, crea, visualiza y grafica imagenes en base a la descripción solicitada por el usuario.
+    `,
+    tools: [imageGenerationTool()]
+})
+
+const apaAgent = Agent.create({
+    name: "avianca_playwright_agent",
+    instructions: `
+    Eres un asistente que delega la responsabilidad de que agente es mejor usar para una tarea en especifica:
+    1. Si el usuario pide analizar/obtener/recuperar/explicar un resporte en especifico; delegas la tarea a el agente "analizer_report_playwright_agent".
+    2. Si el usuario pide crear/visualizar/generar/graficar una imagen; delegas la tarea al agente "generate_images_agent".
+    Piensa bien a que agente delegas la tarea dependiendo de la descripción del usuario. como te recomendé anteriormente.
+    `,
+    handoffs: [analizerReportPlaywrightAgent, generateImagenPlaywrightAgent]
+})
+
+// const dashboardAviancaAgent = new Agent<DashboardContext>({
+//     name: 'avianca_playwright_agent',
+//     instructions: `
+//     # ROL DEL ASISTENTE
+//     Eres un asistente experto en automatización de pruebas con playwright y en datos del dashboard.
+
+//     # USO DE HERRAMIENTAS
+//     Usas las herramientas disponibles dependiendo el caso:
+//     1. Si el usuario te piden analizar, obtener o recuperar un reporte; usa la herramienta: analyzer_report_github_tool.
+//     2. Si el usuario te pida crear, generar, visualizar o graficar una imagen; usa la herramienta: image_gen.
+
+//     Respondes de manera clara y reflexiva.
+//     `,
+//     model: MODEL,
+//     tools: [
+//         imageGenerationTool({
+//             name: "image_gen",
+//             model: "gpt-image-1",
+//             quality: "high",
+//             outputFormat: 'png'
+//         }),
+//         getReportByWorkflowIDGithubTool
+//     ],
+//     toolUseBehavior: "stop_on_first_tool",
+//     modelSettings: {
+//         toolChoice: "auto",
+//         parallelToolCalls: false
+//     },
+//     resetToolChoice: false
+// });
+
+// ============================================
+// FUNCIÓN PRINCIPAL PARA EJECUTAR EL AGENTE
+// ============================================
+
+let messages: AgentInputItem[] = [];
+
+export const RunAgentDashboard = async (
+    dataDashboard: string,
+    questionUser: string
+) => {
+    
+    try {
+        console.log(`\n${'='.repeat(60)} `);
+        console.log(`Nueva consulta: "${questionUser}"`);
+        console.log(`${'='.repeat(60)} \n`);
+
+        const systemMessage = `
+        # DATOS DEL DASHBOARD DISPONIBLES
+        ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
+        `.trimStart();
+
+        if (messages.length === 0) {
+            const findRoleSystem = messages.find((e: any) => e.role === "system");
+            if (!findRoleSystem) {
+                messages.push({
+                    role: "system",
+                    content: systemMessage
+                })
+            }
+        }
+
+        const context: DashboardContext = {
+            dashboardData: dataDashboard
+        };
+
+        const response = await run(
+            apaAgent,
+            messages.concat({ role: "user", content: questionUser }),
+            {
+                context,
+                maxTurns: 3
+            }
+        );
+
+        messages = response.history;
+
+        console.log(`\n Respuesta generada exitosamente`);
+        console.log(`Turnos utilizados: ${response.history.length / 2} `);
+
+        return response;
+    }
+    catch (error) {
+        console.error("\nError al ejecutar el agente:", error);
+
+        if (error instanceof Error) {
+            if (error.message.includes('rate limit')) {
+                throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
+            }
+            if (error.message.includes('MaxTurnsExceededError')) {
+                throw new Error('El agente alcanzó el máximo de iteraciones. Por favor reformula tu pregunta.');
+            }
+        }
+
+        throw error;
+    }
+};
+
+export const testToolDirectly = async (toolName: string, params: any) => {
+    console.log(`\nTest directo de tool: ${toolName} `);
+    console.log(`Parámetros: `, params);
+
+    const tool = apaAgent.tools.find(
+        // @ts-ignore
+        t => t.name === toolName
+    );
+
+    if (!tool) {
+        throw new Error(`Tool ${toolName} no encontrada`);
+    }
+
+    try {
+        // @ts-ignore
+        const result = await tool.execute(params, {});
+        console.log(`Resultado: `, result);
+        return result;
+    } catch (error) {
+        console.error(`Error: `, error);
+        throw error;
+    }
+};
+
+
+
+//============================== CONFIGURACION DE HADOFFS ================================ 
+import {
+    Agent,
+    handoff,
+    imageGenerationTool,
+    run,
+    RunContext,
+    setDefaultOpenAIClient,
+    tool,
+    type AgentInputItem
+} from '@openai/agents';
+import OpenAI from 'openai';
+import z from 'zod';
+import { getJobsByRunId, getLogsByJobId, getReportHTMLPreview } from '../github/api';
+import { extractRelevantLogs } from '../utils/extractLogsReleevant';
+
+interface ReportData {
+    workflowId: number;
+    success: boolean;
+    reportReady: boolean;
+    message: string;
+    jobs: any[];
+    relevantLogs: string | null;
+    jobsCount: number;
+}
+
+interface PlaywrightReport {
+    workflowId: number;
+    htmlContent: string | undefined;
+}
+
+declare global {
+    interface Window {
+        __playwrightReport?: PlaywrightReport;
+    }
+}
+
+// ============================================
+// CONFIGURACIÓN DE OPENAI
+// ============================================
+
+const client = new OpenAI({
+    apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
+    dangerouslyAllowBrowser: true,
+    maxRetries: 0
+});
+
+setDefaultOpenAIClient(client);
+
+// ============================================
+// DEFINICIÓN DE TOOLS
+// ============================================
+
+const getReportByWorkflowIDGithubTool = tool({
+    name: 'analyzer_report_github_tool',
+    description: `
+        Usa esta herramienta SOLO UNA VEZ cuando el usuario pida analizar un workflow específico.
+    Después de usar esta herramienta, NO la vuelvas a llamar.
+    NO usar esta herramienta para gráficas, crear imágenes o generar visualizaciones.
+    `,
+    parameters: z.object({
+        workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
+    }),
+    execute: async (context) => {
+        console.log('🔧 [analyzer_report_github_tool] Iniciando con workflowId:', context.workflowId);
+
+        const { workflowId } = context;
+
+        try {
+            // Obtener reporte HTML
+            let isFoundReport = false;
+            const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
+
+            if (!contentHTML) {
+                console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
+            }
+
+            if (typeof window !== 'undefined' && contentHTML) {
+                isFoundReport = true;
+                window.__playwrightReport = {
+                    workflowId: context.workflowId,
+                    htmlContent: contentHTML
+                }
+                console.log(`Reporte guardado en window.__playwrightReport`);
+            }
+
+            // Obtener jobs
+            console.log(`Obteniendo jobs del workflow ${workflowId}`);
+            const { total_count, jobs } = await getJobsByRunId(context.workflowId);
+            console.log(`Jobs encontrados: ${jobs.length}`);
+
+            // Obtener logs del primer job
+            let relevantLogs: string | null = null;
+            if (total_count > 0 && jobs.length > 0) {
+                try {
+                    console.log("Extrayendo logs relevantes...");
+                    const logs = await getLogsByJobId(jobs[0].id);
+                    relevantLogs = extractRelevantLogs(logs as string);
+                    console.log("Logs extraídos exitosamente");
+                }
+                catch (error) {
+                    console.error(`Error al obtener logs del Job ${jobs[0].id}: `, error);
+                }
+            }
+            else {
+                console.log("No hay jobs disponibles");
+            }
+
+            const responseData: ReportData = {
+                workflowId,
+                success: true,
+                reportReady: isFoundReport,
+                message: isFoundReport
+                    ? `Reporte encontrado con ${total_count} job(s)`
+                    : `No se encontró reporte para workflow ${workflowId}`,
+                jobs: jobs || [],
+                relevantLogs,
+                jobsCount: total_count
+            };
+
+            console.log(`[analyzer_report_github_tool] Completado exitosamente`);
+
+            return JSON.stringify(responseData, null, 2);
+
+        } catch (error) {
+            console.error('Error en analyzer_report_github_tool:', error);
+            const errorMsg = `Error al obtener reporte del workflow ${workflowId}: ${(error as Error).message}`;
+            return JSON.stringify({
+                workflowId,
+                success: false,
+                error: errorMsg
+            });
+        }
+    }
+});
+
+// ============================================
+// CONTEXTO DEL AGENTE
+// ============================================
+
+interface DashboardContext {
+    dashboardData: string;
+}
+
+// ============================================
+// CONFIGURACIÓN DEL AGENTE
+// ============================================
+
+const analizerReportPlaywrightAgent = new Agent({
+    name: 'analizer_report_playwright_agent',
+    instructions: `
+    Eres un agente que analiza los resultados del reporte de playwright, incluyendo los logs mas relevantes encontrados.
+    Si es necesario usa la herramienta disponible para esto.
+    Responde de manera clara y concisa de lo que encuentres en el reporte con un lenguaje no técnico para el usuario no técnico.
+    `,
+    model: 'gpt-4.1-nano-2025-04-14',
+    tools: [getReportByWorkflowIDGithubTool],
+})
+
+const generateImagenPlaywrightAgent = new Agent({
+    name: "generate_images_agent",
+    instructions: `
+        Eres un agente esperto en la generación, creación, visualización y graficación de imágenes.
+        Genera, crea, visualiza y grafica imagenes en base a la descripción solicitada por el usuario.
+        Para esto usa la herramienta disponible.
+    `,
+    model: 'gpt-4.1-nano-2025-04-14',
+    tools: [
+        imageGenerationTool({
+            quality: "high",
+            outputFormat: "png"
+        })
+    ]
+})
+
+const dashboardAgent = new Agent({
+    name: "dashboard_agent",
+    instructions: `
+    Eres un agente que reponde preguntas del usuario en base a los datos del dashboard que te paso por contexto.
+    Respondes de manera clara y concisa de manera que el usuario te pueda entender facilmente.
+    `,
+    model: 'gpt-4.1-nano-2025-04-14'
+})
+
+// Función callback para registrar handoffs
+function onHandoff(ctx: RunContext, input?: any) {
+    console.log(`🔄 Handoff detectado hacia otro agent. | Context: ${ctx}`);
+    if (input) console.log("Datos tranferidos: ", input);
+}
+
+const dashboardHandoffSchema = z.object({
+    dashboardData: z.string().describe("Datos JSON del dashboard que el agente debe usar como contexto.")
+});
+
+// Crear handoffs con callbacks de tracking
+const dashboardHandoff = handoff(dashboardAgent, {
+    toolNameOverride: "transfer_to_dashboard_agent",
+    toolDescriptionOverride: "Delegar la tarea al agente del dashboard para responder preguntas sobre datos actuales.",
+    inputType: dashboardHandoffSchema,
+    onHandoff,
+    inputFilter: (handoffInputData: any) => {
+        const { dashboardData } = handoffInputData;
+        return dashboardData;
+    }
+});
+
+const analizerHandoff = handoff(analizerReportPlaywrightAgent, {
+    toolNameOverride: "transfer_to_playwright_report_agent",
+    toolDescriptionOverride: "Delegar la tarea al agente analizador de reportes de Playwright.",
+    inputType: z.object({
+        workflowId: z.number().nullable().describe("ID del workflow de GitHub Actions a analizar.")
+    }),
+    onHandoff,
+    inputFilter: (handoffInputData: any) => {
+        const { workflowId } = handoffInputData;
+        return workflowId;
+    }
+});
+
+const generateImagenHandoff = handoff(generateImagenPlaywrightAgent, {
+    toolNameOverride: "transfer_to_image_generation_agent",
+    toolDescriptionOverride: "Delegar la tarea al agente generador de imágenes y visualizaciones.",
+    inputType: z.object({
+        prompt: z.string().describe("Descripción textual de la imagen que se desea generar o visualizar.")
+    }),
+    onHandoff,
+    inputFilter: (handoffInputData) => handoffInputData
+});
+
+const apaAgent = Agent.create({
+    name: "avianca_playwright_agent",
+    instructions: `
+    Eres un asistente que responde preguntas del usuario en base a los datos del dashboard.
+    tambien delegas la responsabilidad de que agente es mejor usar para una tarea en especifica:
+    1. Si el usuario te preguntas datos sobre el dashboard; usa el agente "dashboard_agent".
+    2. Si el usuario pide analizar/obtener/recuperar/explicar un resporte en especifico; delegas la tarea a el agente "analizer_report_playwright_agent".
+    3. Si el usuario pide crear/visualizar/generar/graficar una imagen; delegas la tarea al agente "generate_images_agent".
+    Piensa bien a que agente delegas la tarea dependiendo de la descripción del usuario. como te recomendé anteriormente.
+    Solo puedes delegar una vez. Si ya delegaste, no vuelvas a hacerlo.
+    `,
+    handoffs: [dashboardHandoff, analizerHandoff, generateImagenHandoff]
+})
+
+// ============================================
+// FUNCIÓN PRINCIPAL PARA EJECUTAR EL AGENTE
+// ============================================
+
+let messages: AgentInputItem[] = [];
+
+export const RunAgentDashboard = async (
+    dataDashboard: string,
+    questionUser: string
+) => {
+
+    try {
+        console.log(`\n${'='.repeat(60)} `);
+        console.log(`Nueva consulta: "${questionUser}"`);
+        console.log(`${'='.repeat(60)} \n`);
+
+        const systemMessage = `
+        # DATOS DEL DASHBOARD DISPONIBLES
+        ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
+        `.trimStart();
+
+        if (messages.length === 0) {
+            const findRoleSystem = messages.find((e: any) => e.role === "system");
+            if (!findRoleSystem) {
+                messages.push({
+                    role: "system",
+                    content: systemMessage
+                })
+            }
+        }
+
+        const context: DashboardContext = {
+            dashboardData: dataDashboard
+        };
+
+        const response = await run(
+            apaAgent,
+            messages.concat({ role: "user", content: questionUser }),
+            {
+                context,
+                maxTurns: 3
+            }
+        );
+
+        messages = response.history;
+
+        console.log(`\n Respuesta generada exitosamente`);
+        console.log(`Turnos utilizados: ${response.history.length / 2} `);
+
+        return response;
+    }
+    catch (error) {
+        console.error("\nError al ejecutar el agente:", error);
+
+        if (error instanceof Error) {
+            if (error.message.includes('rate limit')) {
+                throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
+            }
+            if (error.message.includes('MaxTurnsExceededError')) {
+                throw new Error('El agente alcanzó el máximo de iteraciones. Por favor reformula tu pregunta.');
+            }
+        }
+
+        throw error;
+    }
+};
+
+export const testToolDirectly = async (toolName: string, params: any) => {
+    console.log(`\nTest directo de tool: ${toolName} `);
+    console.log(`Parámetros: `, params);
+
+    const tool = apaAgent.tools.find(
+        // @ts-ignore
+        t => t.name === toolName
+    );
+
+    if (!tool) {
+        throw new Error(`Tool ${toolName} no encontrada`);
+    }
+
+    try {
+        // @ts-ignore
+        const result = await tool.execute(params, {});
+        console.log(`Resultado: `, result);
+        return result;
+    } catch (error) {
+        console.error(`Error: `, error);
+        throw error;
+    }
+};
