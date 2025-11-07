@@ -207,7 +207,7 @@ export const RunAgentDashboard = async (
             dashboardAviancaAgent,
             messages.concat({ role: "user", content: questionUser }),
             {
-                maxTurns: 5
+                maxTurns: 10
             }
         );
 
