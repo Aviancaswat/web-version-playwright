@@ -17,8 +17,8 @@ import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
 
-const SIDEBAR_WIDTH = 280;    
-const SIDEBAR_COLLAPSED = 72;  
+const SIDEBAR_WIDTH = 280;
+const SIDEBAR_COLLAPSED = 72;
 
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -52,13 +52,12 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
           initial={{ width: SIDEBAR_WIDTH }}
           animate={{ width: isOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED }}
           transition={{ type: "spring", stiffness: 260, damping: 30 }}
-          overflow="visible"      
+          overflow="visible"
           height="100%"
           bg="blackAlpha.900"
           position="relative"
-          zIndex={2}             
+          zIndex={2}
         >
-       
           <Box height="100%" overflow="hidden">
             <SideBarDashboard
               childrens={routesConfig}
@@ -82,13 +81,11 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
               _hover={{ bg: "blackAlpha.700" }}
               bg="blackAlpha.800"
               color="white"
-              zIndex={3}      
+              zIndex={3}
             />
           </Tooltip>
         </MotionBox>
-
-        {/* Contenido principal */}
-        <Box as="main" flex="1" p={3} height="100%" overflow="auto" bg="gray.50">
+        <Box as="main" flex="1" height="100%" overflow="auto" bg="gray.50">
           {children}
         </Box>
       </HStack>

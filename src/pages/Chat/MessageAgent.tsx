@@ -40,7 +40,7 @@ const MessageAgentUI = (msg: Messages) => {
             <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
                 <Box
                     display="flex"
-                    flexDirection={msg.role === "user" ? "row-reverse" : "row"}
+                    flexDirection={"row"}
                 >
                     <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
                 </Box>
@@ -49,8 +49,8 @@ const MessageAgentUI = (msg: Messages) => {
                     paddingRight={5}
                     paddingTop={2}
                     borderRadius="md"
-                    backgroundColor={msg.role === "user" ? "black" : "gray.100"}
-                    color={msg.role === "user" ? "white" : "black"}
+                    backgroundColor={"transparent"}
+                    color={"black"}
                     display={"flex"}
                     flexDirection={"column"}
                 >

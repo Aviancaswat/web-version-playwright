@@ -1,7 +1,8 @@
-import { Box, Textarea } from "@chakra-ui/react";
+import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
 import 'highlight.js/styles/felipec.css';
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RunAgentDashboard } from "../../agent/apa-agent";
+import logo from '../../assets/avianca-logo-desk.png';
 import '../../components/agent-dashboard-ui/agent.css';
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
@@ -19,9 +20,9 @@ export type Messages = {
 
 const ChatAgentPage = () => {
 
+    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca } = useTestStore();
     const chatRef = useRef<HTMLDivElement | null>(null);
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca } = useTestStore();
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
@@ -163,7 +164,6 @@ const ChatAgentPage = () => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
 
-            // Agregar mensaje del usuario
             setMessages(prevMessages => [
                 ...prevMessages,
                 { role: "user", message: questionUser, timestamp: new Date().toISOString() }
@@ -178,10 +178,8 @@ const ChatAgentPage = () => {
                     questionUser
                 );
 
-                // Procesar todas las respuestas juntas
                 const newMessages: Messages[] = [];
 
-                // 1. Primero verificar si hay reporte HTML
                 const resultFunctionCall: any = responseAgent.output.find(
                     (e: any) => e.type === "function_call_result"
                 );
@@ -206,7 +204,6 @@ const ChatAgentPage = () => {
                     }
                 }
 
-                // 2. Verificar si hay imágenes
                 const responseCallFunctionImage: any = responseAgent?.output.find(
                     (e: any) => e.type === 'hosted_tool_call' && e.name === 'image_generation_call'
                 );
@@ -220,7 +217,6 @@ const ChatAgentPage = () => {
                     });
                 }
 
-                // 3. Agregar mensaje de texto final si existe y no hay otros mensajes
                 if (responseAgent.finalOutput && newMessages.length === 0) {
                     newMessages.push({
                         role: "agent",
@@ -228,11 +224,9 @@ const ChatAgentPage = () => {
                         timestamp: new Date().toISOString()
                     });
                 } else if (responseAgent.finalOutput && newMessages.length > 0) {
-                    // Si hay otros mensajes, agregar el texto al primero
                     newMessages[0].message = responseAgent.finalOutput + "\n\n" + newMessages[0].message;
                 }
 
-                // Actualizar todos los mensajes de una vez
                 setMessages(prevMessages => [...prevMessages, ...newMessages]);
 
             } catch (error) {
@@ -262,7 +256,7 @@ const ChatAgentPage = () => {
                 width={"full"}
                 height={"100%"}
                 overflowY="auto"
-                padding="2"
+                padding="0px 4px 4px 4px"
                 flex="1"
             >
                 {
@@ -271,32 +265,58 @@ const ChatAgentPage = () => {
                             isLoading={loadingWorkflows}
                         />
                     ) : (
-                        <Box>
-                            <MessageContainer
-                                messages={messages}
-                                isLoading={loading}
-                            />
-                            <Box ref={chatRef} />
+                        <Box width={"100%"}>
+                            <HStack
+                                p={7}
+                                height={10}
+                                bg="black"
+                                color="white"
+                                justify="space-between"
+                                position="sticky"
+                                top={0}
+                                width="100%"
+                                zIndex={10}
+                            >
+                                <Heading size="sm">Chat APA</Heading>
+                                <Box bg="black" borderRadius="full">
+                                    <Image src={logo} width={10} height={10} />
+                                </Box>
+                            </HStack>
+
+                            <Box mt="20px">
+                                <MessageContainer
+                                    messages={messages}
+                                    isLoading={loading}
+                                />
+                                <Box ref={chatRef} />
+                            </Box>
                         </Box>
                     )
                 }
             </Box>
-            <Box height={"auto"}>
+            <Box height={"auto"} mt={6}>
                 <Textarea
                     ref={textAreaRef}
                     isDisabled={loadingWorkflows}
                     value={questionUser}
-                    width={"full"}
+                    width={"95%"}
+                    margin={"auto"}
                     height={"auto"}
                     placeholder="Preguntar algo..."
                     onKeyDown={getResponseModel}
                     onChange={(e) => setQuestionUser(e.target.value)}
                     bg={"white"}
                     color={"black"}
-                    borderRadius={"full"}
+                    borderRadius={"xl"}
                     textAlign={"left"}
-                    pt={7}
+                    display={"flex"}
+                    alignItems={"center"}
                 />
+            </Box>
+            <Box width={"100%"} pt={1} pb={1}>
+                <Text textAlign={"center"} color={"gray.400"}>
+                    Chat APA puede cometer errores, verifique la información
+                </Text>
             </Box>
         </Box>
     );
