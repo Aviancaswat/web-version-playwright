@@ -1,6 +1,7 @@
 import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
 import 'highlight.js/styles/felipec.css';
 import { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuid } from "uuid";
 import { RunAgentDashboard } from "../../agent/apa-agent";
 import logo from '../../assets/avianca-logo-desk.png';
 import '../../components/agent-dashboard-ui/agent.css';
@@ -20,7 +21,7 @@ export type Messages = {
 
 const ChatAgentPage = () => {
 
-    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca } = useTestStore();
+    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca, setConversationsAPA } = useTestStore();
     const chatRef = useRef<HTMLDivElement | null>(null);
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -242,6 +243,14 @@ const ChatAgentPage = () => {
             } finally {
                 setLoading(false);
             }
+
+            setConversationsAPA(prev => [
+                ...prev,
+                {
+                    converdationId: uuid(),
+                    messages: messages
+                }
+            ])
         }
     }, [questionUser, dashboardDataAgentAvianca]);
 

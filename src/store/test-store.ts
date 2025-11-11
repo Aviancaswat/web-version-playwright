@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import type { FilterType } from "../components/TableWorkflowComponent/FilterComponent";
 import type { DataWorkflows } from "../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import type { ResultWorkflow, StatusWorkflow } from "../github/api";
+import type { Messages } from "../pages/Chat/ChatAgentPage";
 
 export type FilterGeneric = {
   type: FilterType
@@ -34,12 +35,18 @@ export interface JSONDashboardAgentAvianca {
   }
 }
 
+export interface ConversationsAPA {
+  converdationId: string;
+  messages: Messages[]
+}
+
 type State = {
   statusWorkflow: StatusWorkflow;
   resultWorkflow: ResultWorkflow;
   dataWorkflows: DataWorkflows[];
   selectedFilters: FilterGeneric[],
-  dashboardDataAgentAvianca: JSONDashboardAgentAvianca
+  dashboardDataAgentAvianca: JSONDashboardAgentAvianca,
+  conversationsAPA: ConversationsAPA[]
 };
 
 type Actions = {
@@ -48,6 +55,7 @@ type Actions = {
   setDataWorkflows: (newData: DataWorkflows[]) => void;
   setSelectedFilters: (newFilter: FilterGeneric[]) => void;
   setDashboardDataAgentAvianca: (newData: JSONDashboardAgentAvianca) => void;
+  setConversationsAPA: (update: (data: ConversationsAPA[]) => ConversationsAPA[]) => void;
 };
 
 type Store = State & Actions;
@@ -59,6 +67,7 @@ const store = create<Store>()(
       resultWorkflow: "neutral",
       dataWorkflows: [],
       selectedFilters: [],
+      conversationsAPA: [],
       dashboardDataAgentAvianca: {
         workflowsData: [],
         recent_failures: [],
@@ -80,7 +89,11 @@ const store = create<Store>()(
         set(() => ({ resultWorkflow: newResult })),
       setDataWorkflows: (newData) => set(() => ({ dataWorkflows: newData })),
       setSelectedFilters: (newFilter) => set(() => ({ selectedFilters: newFilter })),
-      setDashboardDataAgentAvianca: (newdata) => set(() => ({ dashboardDataAgentAvianca: newdata }))
+      setDashboardDataAgentAvianca: (newdata) => set(() => ({ dashboardDataAgentAvianca: newdata })),
+      setConversationsAPA: (updater: (prev: ConversationsAPA[]) => ConversationsAPA[]) =>
+        set((state) => ({
+          conversationsAPA: updater(state.conversationsAPA),
+        }))
     }),
     {
       name: "test-store"
@@ -92,25 +105,29 @@ export const useTestStore = () => {
   const {
     statusWorkflow,
     resultWorkflow,
+    dataWorkflows,
+    selectedFilters,
+    dashboardDataAgentAvianca,
+    conversationsAPA,
     setStatusWorkflow,
     setResultWorkflow,
-    dataWorkflows,
     setDataWorkflows,
-    selectedFilters,
     setSelectedFilters,
-    dashboardDataAgentAvianca,
-    setDashboardDataAgentAvianca
+    setDashboardDataAgentAvianca,
+    setConversationsAPA
   } = store();
   return {
     statusWorkflow,
     resultWorkflow,
+    dataWorkflows,
+    selectedFilters,
+    dashboardDataAgentAvianca,
+    conversationsAPA,
     setStatusWorkflow,
     setResultWorkflow,
-    dataWorkflows,
     setDataWorkflows,
-    selectedFilters,
     setSelectedFilters,
-    dashboardDataAgentAvianca,
-    setDashboardDataAgentAvianca
+    setDashboardDataAgentAvianca,
+    setConversationsAPA
   };
 };
