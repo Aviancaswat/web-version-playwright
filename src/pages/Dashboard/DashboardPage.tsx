@@ -26,7 +26,7 @@ const CardBillingActionsStorage = lazy(() => import("../../components/Billing/Ca
 
 const DashboardPage = () => {
   return (
-    <Box height={"95vh"} overflow={"auto"} position={"relative"}>
+    <Box height={"95vh"} overflow={"auto"} position={"relative"} p={2}>
       <Box
         mb={5}
         display={"flex"}
