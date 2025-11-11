@@ -161,7 +161,7 @@ const ChatAgentPage = () => {
     }, [workflowToAnalize])
 
     const getResponseModel = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey && questionUser.trim() !== "") {
             e.preventDefault();
 
             setMessages(prevMessages => [
