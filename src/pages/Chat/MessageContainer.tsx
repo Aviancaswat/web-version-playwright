@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Card, CardBody, Image } from "@chakra-ui/react";
+import { Avatar, Box, Button, Card, CardBody, Heading, Image } from "@chakra-ui/react";
 import { DownloadIcon, SquareArrowOutUpRight } from "lucide-react";
 import LogoAv from "../../assets/avianca-logo-desk.png";
 import PreviewImageGenerateAgent from "../../components/agent-dashboard-ui/previewImage";
@@ -96,7 +96,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                                                     enlace.click();
                                                 }}
                                             >
-                                                <DownloadIcon size={18}/>
+                                                <DownloadIcon size={18} />
                                             </Button>
                                         </Box>
                                     </Box>
@@ -110,7 +110,9 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                 isLoading && (
                     <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
                         <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
-                        <ShinyTextAgent text="Pensando..." />
+                        <Heading color={"black"} size={"sm"} fontWeight={"light"}>
+                            <ShinyTextAgent text="Pensando..." />
+                        </Heading>
                     </Box>
                 )
             }

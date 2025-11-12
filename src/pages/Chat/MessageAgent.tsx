@@ -55,7 +55,9 @@ const MessageAgentUI = (msg: Messages) => {
                     flexDirection={"column"}
                 >
                     <Box alignSelf={"flex-end"} width={"100%"}>
-                        <Text fontSize={"xs"} color={"gray.600"}>{moment(msg.timestamp).format("hh:mm a")}</Text>
+                        <Text fontSize={"xs"} color={"gray.600"}>
+                            {moment(msg.timestamp).format("hh:mm a")}
+                        </Text>
                     </Box>
                     {
                         (msg.message.trim().includes("<svg") ||
