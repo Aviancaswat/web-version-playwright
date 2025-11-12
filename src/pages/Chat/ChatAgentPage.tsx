@@ -1,5 +1,6 @@
 import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
 import 'highlight.js/styles/felipec.css';
+import { Bot } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { RunAgentDashboard } from "../../agent/apa-agent";
@@ -29,6 +30,7 @@ const ChatAgentPage = () => {
     const [questionUser, setQuestionUser] = useState<string>("");
     const [messages, setMessages] = useState<Messages[]>([]);
     const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
+    const [conversationId, setConversationId] = useState<string | undefined>(undefined)
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -134,6 +136,9 @@ const ChatAgentPage = () => {
     useEffect(() => {
         console.log("Obteniendo workflows...")
         getWorkflows()
+        const conversationUUID = uuid();
+        setConversationId(conversationUUID);
+        console.log("Se creo la conversación con id: ", conversationUUID);
     }, [])
 
     useEffect(() => {
@@ -162,6 +167,7 @@ const ChatAgentPage = () => {
     }, [workflowToAnalize])
 
     const getResponseModel = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+
         if (e.key === "Enter" && !e.shiftKey && questionUser.trim() !== "") {
             e.preventDefault();
 
@@ -247,7 +253,7 @@ const ChatAgentPage = () => {
             setConversationsAPA(prev => [
                 ...prev,
                 {
-                    converdationId: uuid(),
+                    converdationId: conversationId!,
                     messages: messages
                 }
             ])
@@ -286,7 +292,12 @@ const ChatAgentPage = () => {
                                 width="100%"
                                 zIndex={10}
                             >
-                                <Heading size="sm">Chat APA</Heading>
+                                <HStack alignItems={"center"}>
+                                    <Bot />
+                                    <Heading size="sm">
+                                        Chat APA
+                                    </Heading>
+                                </HStack>
                                 <Box bg="black" borderRadius="full">
                                     <Image src={logo} width={10} height={10} />
                                 </Box>
@@ -323,7 +334,7 @@ const ChatAgentPage = () => {
                 />
             </Box>
             <Box width={"100%"} pt={1} pb={1}>
-                <Text textAlign={"center"} color={"gray.400"}>
+                <Text textAlign={"center"} color={"gray.400"} fontSize={"sm"}>
                     Chat APA puede cometer errores, verifique la información
                 </Text>
             </Box>
