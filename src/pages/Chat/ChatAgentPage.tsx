@@ -4,7 +4,7 @@ import { Bot } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { RunAgentDashboard } from "../../agent/apa-agent";
-import logo from '../../assets/avianca-logo-desk.png';
+import logo from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
 import { SidebarHistory } from "../../components/agent-dashboard-ui/SidebarHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
@@ -363,6 +363,32 @@ const ChatAgentPage = () => {
                 padding="0px 4px 4px 4px"
                 flex="1"
             >
+                <HStack
+                    p={7}
+                    height={10}
+                    bg="black"
+                    color="white"
+                    justify="space-between"
+                    position="sticky"
+                    top={0}
+                    width="100%"
+                    zIndex={10}
+                >
+                    <HStack alignItems={"center"}>
+                        <Bot />
+                        <Heading size="sm">
+                            Chat APA
+                        </Heading>
+                    </HStack>
+                    <HStack>
+                        <Box className="actions-agent" width={"100%"} bg={"transparent"}>
+                            <SidebarHistory />
+                        </Box>
+                        <Box bg="black" borderRadius="full" minW={10}>
+                            <Image src={logo} width={10} height={10} />
+                        </Box>
+                    </HStack>
+                </HStack>
                 {
                     messages.length === 0 ? (
                         <WelcomeAgentDashboard
@@ -370,33 +396,6 @@ const ChatAgentPage = () => {
                         />
                     ) : (
                         <Box width={"100%"}>
-                            <HStack
-                                p={7}
-                                height={10}
-                                bg="black"
-                                color="white"
-                                justify="space-between"
-                                position="sticky"
-                                top={0}
-                                width="100%"
-                                zIndex={10}
-                            >
-                                <HStack alignItems={"center"}>
-                                    <Bot />
-                                    <Heading size="sm">
-                                        Chat APA
-                                    </Heading>
-                                </HStack>
-                                <HStack>
-                                    <Box className="actions-agent" width={"100%"} bg={"transparent"}>
-                                        <SidebarHistory />
-                                    </Box>
-                                    <Box bg="black" borderRadius="full" minW={10}>
-                                        <Image src={logo} width={10} height={10} />
-                                    </Box>
-                                </HStack>
-                            </HStack>
-
                             <Box mt="20px">
                                 <MessageContainer
                                     messages={messages}
@@ -425,6 +424,11 @@ const ChatAgentPage = () => {
                     textAlign={"left"}
                     display={"flex"}
                     alignItems={"center"}
+                    _focus={{
+                        outline: "none",
+                        border: "1px solid #000",
+                        boxShadow: "none"
+                    }}
                 />
             </Box>
             <Box width={"100%"} pt={1} pb={1}>

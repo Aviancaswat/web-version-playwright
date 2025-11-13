@@ -122,18 +122,19 @@ const WelcomeAgentDashboard: React.FC<Props> = ({ isLoading }) => {
                         height={"100%"}
                         display={"flex"}
                         flexDirection={"column"}
-                        justifyContent={"center"}
+                        justifyContent={"start"}
                         alignItems={"center"}
+                        mt={5}
                     >
-                        <Box bg={"black"} color={"white"} borderRadius={"2xl"} mb={3}>
+                        <Box bg={"black"} color={"white"} borderRadius={"2xl"} mb={2}>
                             <Image src={LogoAv} alt="Avianca Logo" height={16} width={16} />
                         </Box>
-                        <Heading size={"xl"} textAlign={"center"}>Bienvenido a <br />Avianca Playwright Agent</Heading>
+                        <Heading size={"xl"} textAlign={"center"}>Bienvenido a APA</Heading>
                         <Text>
                             Consulta y analiza los datos del dashboard
                         </Text>
                         <Box>
-                            <Heading size={"md"} mt={5}>
+                            <Heading size={"md"} mb={3}>
                                 Algunas preguntas que puedes hacerme:
                             </Heading>
                         </Box>
@@ -141,7 +142,7 @@ const WelcomeAgentDashboard: React.FC<Props> = ({ isLoading }) => {
                             gap={3}
                             flexWrap={"wrap"}
                             width={{ base: "full", lg: "100%" }}
-                            mt={10}
+                            mt={5}
                             display={"grid"}
                             placeContent={"center"}
                         >
