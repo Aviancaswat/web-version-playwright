@@ -36,7 +36,8 @@ export interface JSONDashboardAgentAvianca {
 }
 
 export interface ConversationsAPA {
-  converdationId: string;
+  converdationId: string
+  title?: string
   messages: Messages[]
 }
 

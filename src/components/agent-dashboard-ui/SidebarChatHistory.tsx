@@ -6,6 +6,7 @@ import {
     AccordionPanel,
     Box,
     Button,
+    Center,
     Divider,
     Drawer,
     DrawerBody,
@@ -17,12 +18,15 @@ import {
     MenuButton,
     MenuItem,
     MenuList,
+    Text,
     Tooltip,
-    useDisclosure
+    useDisclosure,
+    VStack
 } from '@chakra-ui/react';
-import { Bot, Ellipsis, PanelRightOpen, Pencil, Search, SquarePen, Trash2 } from 'lucide-react';
+import { Bot, Ellipsis, MessageCircleOff, PanelRightOpen, Search, SquarePen, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTestStore } from '../../store/test-store';
+import { ModalChangeNameChat } from './ModalChangeNameChat';
 
 export const SidebarChatHistory = () => {
     const { conversationsAPA } = useTestStore();
@@ -31,8 +35,8 @@ export const SidebarChatHistory = () => {
     const [hoverChatId, setHoverChatId] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        console.log("cambio el valor de hoverChatId: ", hoverChatId);
-    }, [hoverChatId])
+        console.log("cambió conversationsAPA: ", conversationsAPA);
+    }, [conversationsAPA])
 
     return (
         <>
@@ -117,6 +121,18 @@ export const SidebarChatHistory = () => {
                                     <AccordionPanel p={0} mt={2}>
                                         <Menu>
                                             {
+                                                conversationsAPA.length === 0 && (
+                                                    <Center height={"100%"}>
+                                                        <VStack>
+                                                            <MessageCircleOff size={40} />
+                                                            <Text fontSize={"sm"} textAlign={"center"}>
+                                                                Aún no tienes conversaciones. Inicia un nuevo chat para comenzar.
+                                                            </Text>
+                                                        </VStack>
+                                                    </Center>
+                                                )
+                                            }
+                                            {
                                                 conversationsAPA
                                                     .filter(e => e.messages.length > 0)
                                                     .map(e => (
@@ -137,11 +153,11 @@ export const SidebarChatHistory = () => {
                                                             display={"flex"}
                                                             justifyContent={"space-between"}
                                                         >
-                                                            {e.messages[0].message.substring(0, 32) + "..."}
+                                                            {e.title?.substring(0, 35)} {e.title?.length! >= 35 ? "..." : ""}
                                                             {
                                                                 hoverChatId === e.converdationId && (
-                                                                    <Box>
-                                                                        <Menu>
+                                                                    <Box >
+                                                                        <Menu closeOnSelect={false}>
                                                                             <MenuButton
                                                                                 as={Button}
                                                                                 size={"sm"}
@@ -161,19 +177,10 @@ export const SidebarChatHistory = () => {
                                                                             >
                                                                                 <Ellipsis size={15} />
                                                                             </MenuButton>
-                                                                            <MenuList>
-                                                                                <MenuItem
-                                                                                    icon={<Pencil size={15} />}
-                                                                                    _hover={{
-                                                                                        borderColor: "transparent",
-                                                                                        bg: "gray.100"
-                                                                                    }}
-                                                                                    _focus={{
-                                                                                        outline: "none"
-                                                                                    }}
-                                                                                >
-                                                                                    Cambiar el nombre
-                                                                                </MenuItem>
+                                                                            <MenuList p={"0px 1px 2px 1px"}>
+                                                                                <ModalChangeNameChat
+                                                                                    conversationId={e.converdationId}
+                                                                                />
                                                                                 <MenuItem
                                                                                     icon={<Trash2 size={15} />}
                                                                                     _hover={{
@@ -183,7 +190,6 @@ export const SidebarChatHistory = () => {
                                                                                     _focus={{
                                                                                         outline: "none"
                                                                                     }}
-
                                                                                     color={"red.400"}
                                                                                 >
                                                                                     Eliminar

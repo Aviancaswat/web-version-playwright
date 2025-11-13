@@ -201,7 +201,7 @@ const ChatAgentPage = () => {
                         if (!existing) {
                             return [
                                 ...prev,
-                                { converdationId: conversationId!, messages: updatedMessages },
+                                { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
                             ];
                         }
 
@@ -289,7 +289,7 @@ const ChatAgentPage = () => {
                             if (!existing) {
                                 return [
                                     ...prev,
-                                    { converdationId: conversationId!, messages: updatedMessages },
+                                    { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
                                 ];
                             }
 
@@ -325,7 +325,7 @@ const ChatAgentPage = () => {
                             if (!existing) {
                                 return [
                                     ...prev,
-                                    { converdationId: conversationId!, messages: updatedMessages },
+                                    { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
                                 ];
                             }
 
