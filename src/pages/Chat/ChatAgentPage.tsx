@@ -6,6 +6,7 @@ import { v4 as uuid } from "uuid";
 import { RunAgentDashboard } from "../../agent/apa-agent";
 import logo from '../../assets/avianca-logo-desk.png';
 import '../../components/agent-dashboard-ui/agent.css';
+import { SidebarHistory } from "../../components/agent-dashboard-ui/SidebarHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import { getRunsByRepo } from "../../github/api";
@@ -37,7 +38,6 @@ const ChatAgentPage = () => {
     const [messages, setMessages] = useState<Messages[]>([]);
     const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
     const [conversationId, setConversationId] = useState<string | undefined>(undefined)
-    const [colorMessageUser, setColorMessageUser] = useState<string[] | undefined>(undefined);
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -193,7 +193,6 @@ const ChatAgentPage = () => {
                 setMessages((prevMessages) => {
                     const updatedMessages = [...prevMessages, userMessage];
 
-                    // Actualizamos conversaciones de forma inmutable
                     setConversationsAPA((prev) => {
                         const existing = prev.find(
                             (c) => c.converdationId === conversationId
@@ -388,9 +387,14 @@ const ChatAgentPage = () => {
                                         Chat APA
                                     </Heading>
                                 </HStack>
-                                <Box bg="black" borderRadius="full">
-                                    <Image src={logo} width={10} height={10} />
-                                </Box>
+                                <HStack>
+                                    <Box className="actions-agent" width={"100%"} bg={"transparent"}>
+                                        <SidebarHistory />
+                                    </Box>
+                                    <Box bg="black" borderRadius="full" minW={10}>
+                                        <Image src={logo} width={10} height={10} />
+                                    </Box>
+                                </HStack>
                             </HStack>
 
                             <Box mt="20px">

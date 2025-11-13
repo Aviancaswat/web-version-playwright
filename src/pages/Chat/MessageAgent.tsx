@@ -9,7 +9,6 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import LogoAv from "../../assets/avianca-logo-desk.png";
 import AviancaToast from "../../utils/AviancaToast";
-import { createPDF } from "../../utils/generatePDF";
 import type { Messages } from "./ChatAgentPage";
 
 const MessageAgentUI = (msg: Messages) => {
@@ -24,16 +23,16 @@ const MessageAgentUI = (msg: Messages) => {
         }
     }, [])
 
-    const downloadResponse = useCallback(async (text: string) => {
-        try {
-            await createPDF(text);
-            AviancaToast.success("Respuesta descargada")
-        }
-        catch (error) {
-            console.log("Error downloading text: ", error);
-            AviancaToast.error("Error descargando la respuesta")
-        }
-    }, [])
+    // const downloadResponse = useCallback(async (text: string) => {
+    //     try {
+    //         await createPDF(text);
+    //         AviancaToast.success("Respuesta descargada")
+    //     }
+    //     catch (error) {
+    //         console.log("Error downloading text: ", error);
+    //         AviancaToast.error("Error descargando la respuesta")
+    //     }
+    // }, [])
 
     return (
         <VStack>
