@@ -27,7 +27,7 @@ import { Bot, Ellipsis, MessageCircleOff, PanelRightOpen, Search, SquarePen, Tra
 import { useEffect, useRef, useState } from 'react';
 import { useTestStore } from '../../store/test-store';
 import AviancaToast from '../../utils/AviancaToast';
-import { ModalChangeNameChat } from './ModalChangeNameChat';
+import { ModalUpdateChatName } from './ModalUpdateChatName';
 
 export const SidebarChatHistory = () => {
     const { conversationsAPA, setConversationsAPA } = useTestStore();
@@ -172,7 +172,7 @@ export const SidebarChatHistory = () => {
                                                             {
                                                                 hoverChatId === e.converdationId && (
                                                                     <Box >
-                                                                        <Menu closeOnSelect={false}>
+                                                                        <Menu>
                                                                             <MenuButton
                                                                                 as={Button}
                                                                                 size={"sm"}
@@ -193,7 +193,7 @@ export const SidebarChatHistory = () => {
                                                                                 <Ellipsis size={15} />
                                                                             </MenuButton>
                                                                             <MenuList p={"0px 1px 2px 1px"}>
-                                                                                <ModalChangeNameChat
+                                                                                <ModalUpdateChatName
                                                                                     conversationId={e.converdationId}
                                                                                 />
                                                                                 <MenuItem
