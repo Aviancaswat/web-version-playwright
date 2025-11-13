@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 import { RunAgentDashboard } from "../../agent/apa-agent";
 import logo from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
-import { SidebarHistory } from "../../components/agent-dashboard-ui/SidebarHistory";
+import { SidebarChatHistory } from "../../components/agent-dashboard-ui/SidebarChatHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import { getRunsByRepo } from "../../github/api";
@@ -382,7 +382,7 @@ const ChatAgentPage = () => {
                     </HStack>
                     <HStack>
                         <Box className="actions-agent" width={"100%"} bg={"transparent"}>
-                            <SidebarHistory />
+                            <SidebarChatHistory />
                         </Box>
                         <Box bg="black" borderRadius="full" minW={10}>
                             <Image src={logo} width={10} height={10} />
