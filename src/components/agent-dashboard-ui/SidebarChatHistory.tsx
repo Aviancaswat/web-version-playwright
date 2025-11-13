@@ -26,10 +26,11 @@ import {
 import { Bot, Ellipsis, MessageCircleOff, PanelRightOpen, Search, SquarePen, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTestStore } from '../../store/test-store';
+import AviancaToast from '../../utils/AviancaToast';
 import { ModalChangeNameChat } from './ModalChangeNameChat';
 
 export const SidebarChatHistory = () => {
-    const { conversationsAPA } = useTestStore();
+    const { conversationsAPA, setConversationsAPA } = useTestStore();
     const { isOpen, onOpen, onClose } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null);
     const [hoverChatId, setHoverChatId] = useState<string | undefined>(undefined);
@@ -37,6 +38,20 @@ export const SidebarChatHistory = () => {
     useEffect(() => {
         console.log("cambió conversationsAPA: ", conversationsAPA);
     }, [conversationsAPA])
+
+    const handleDeleteChat = (conversationId: string) => {
+
+        if (!conversationId) return;
+
+        setConversationsAPA(prev => {
+            const filters = prev.filter(e => e.converdationId !== conversationId);
+            return filters;
+        })
+
+        AviancaToast.success("Chat eliminado", {
+            description: "El chat se ha eliminado correctamente"
+        })
+    }
 
     return (
         <>
@@ -191,6 +206,7 @@ export const SidebarChatHistory = () => {
                                                                                         outline: "none"
                                                                                     }}
                                                                                     color={"red.400"}
+                                                                                    onClick={() => handleDeleteChat(e.converdationId)}
                                                                                 >
                                                                                     Eliminar
                                                                                 </MenuItem>
