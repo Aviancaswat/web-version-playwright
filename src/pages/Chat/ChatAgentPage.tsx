@@ -22,7 +22,13 @@ export type Messages = {
 
 const ChatAgentPage = () => {
 
-    const { setDataWorkflows, setDashboardDataAgentAvianca, dashboardDataAgentAvianca, conversationsAPA, setConversationsAPA } = useTestStore();
+    const {
+        setDataWorkflows,
+        setDashboardDataAgentAvianca,
+        dashboardDataAgentAvianca,
+        conversationsAPA,
+        setConversationsAPA
+    } = useTestStore();
     const chatRef = useRef<HTMLDivElement | null>(null);
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -31,6 +37,7 @@ const ChatAgentPage = () => {
     const [messages, setMessages] = useState<Messages[]>([]);
     const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
     const [conversationId, setConversationId] = useState<string | undefined>(undefined)
+    const [colorMessageUser, setColorMessageUser] = useState<string[] | undefined>(undefined);
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -135,7 +142,8 @@ const ChatAgentPage = () => {
 
     useEffect(() => {
         console.log("Obteniendo workflows...")
-        getWorkflows()
+        getWorkflows();
+        //Obteniendo conversaciones ID
         const conversationUUID = uuid();
         setConversationId(conversationUUID);
         console.log("Se creo la conversación con id: ", conversationUUID);
@@ -166,6 +174,10 @@ const ChatAgentPage = () => {
             }, 1000)
         }
     }, [workflowToAnalize])
+
+    useEffect(() => {
+        console.log("Se actualiza las conversaciones: ", conversationsAPA)
+    }, [conversationsAPA])
 
     const getResponseModel = useCallback(
         async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

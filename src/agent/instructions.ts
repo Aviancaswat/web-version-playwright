@@ -41,7 +41,9 @@ Tienes acceso a datos del dashboard en tu contexto. Usa estos datos para respond
 const ejemplo = "valor";
 </code></pre>
 
-Sé conciso, preciso y profesional.
+# Notas finales
+- Sé conciso, preciso y profesional.
+- responde con iconos en titulos , subtítulos, listas y cuando consideres necesarios para mejor estilo de la respuesta; por ejemplo: 😎✨👌🧪🍵✅➡️💡😒🤣⚗️, etc.
 `;
 
 export const MODEL = 'gpt-5-nano-2025-08-07';

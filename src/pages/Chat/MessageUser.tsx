@@ -6,7 +6,13 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import type { Messages } from "./ChatAgentPage";
 
-const MessageUserUI = (msg: Messages) => {
+type MessageUserProps = {
+    msg: Messages,
+    msgColor: string[]
+}
+
+const MessageUserUI: React.FC<MessageUserProps> = ({ msg, msgColor }) => {
+
     return (
         <>
             <Box
@@ -22,8 +28,8 @@ const MessageUserUI = (msg: Messages) => {
                 <Box
                     padding={2}
                     borderRadius="full"
-                    backgroundColor={"black"}
-                    color={"white"}
+                    backgroundColor={msgColor[0] ?? "cyan.200"}
+                    color={msgColor[1] ?? "cyan.600"}
                     paddingLeft={6}
                     paddingRight={6}
                 >

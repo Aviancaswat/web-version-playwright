@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, ButtonGroup, HStack, Text, Tooltip, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { ArrowDownToLine, Copy } from "lucide-react";
+import { Copy } from "lucide-react";
 import moment from "moment";
 import { useCallback } from "react";
 import ReactMarkdown from "react-markdown";
@@ -97,7 +97,7 @@ const MessageAgentUI = (msg: Messages) => {
                             </Button>
                         </Tooltip>
                     </motion.div>
-                    <motion.div
+                    {/* <motion.div
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         style={{ cursor: 'pointer', alignSelf: "start" }}
@@ -118,7 +118,7 @@ const MessageAgentUI = (msg: Messages) => {
                                 <ArrowDownToLine size={15} />
                             </Button>
                         </Tooltip>
-                    </motion.div>
+                    </motion.div> */}
                 </ButtonGroup>
             </HStack>
         </VStack>

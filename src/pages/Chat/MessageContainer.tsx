@@ -13,7 +13,12 @@ interface MessageContainerProps {
     isLoading: boolean
 }
 
+//Obteniendo colores del mensaje
+const colors = [["orange.100", "orange.600"], ["cyan.100", "blue.600"]]
+const colorRandom = colors[Math.floor(Math.random() * colors.length)];
+
 export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, isLoading }) => {
+
     return (
         <>
             {
@@ -28,7 +33,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                             className="chat-ai"
                         >
                             {
-                                msg.role === "user" ? <MessageUserUI {...msg} /> : <MessageAgentUI {...msg} />
+                                msg.role === "user" ? <MessageUserUI msg={msg} msgColor={colorRandom} /> : <MessageAgentUI {...msg} />
                             }
                         </FadeAnimationText>
                         <FadeAnimationText>
