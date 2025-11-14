@@ -79,10 +79,10 @@ export const ModalSearchChats = () => {
                             autoFocus
                         />
                         <Box mt={5}>
-                            <Heading fontSize={"sm"}>Tus chats</Heading>
+                            <Heading fontSize={"sm"}>Tus chats ({dataFilter.length})</Heading>
                         </Box>
                     </ModalHeader>
-                    <ModalBody maxHeight={300} overflowY={"auto"}>
+                    <ModalBody maxHeight={200} overflowY={"auto"}>
                         {
                             dataFilter.length > 0 ? (
                                 dataFilter.map((item, idx) => (

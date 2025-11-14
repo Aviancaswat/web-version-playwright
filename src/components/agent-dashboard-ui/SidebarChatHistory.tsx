@@ -156,15 +156,15 @@ export const SidebarChatHistory = () => {
                                                             onMouseEnter={() => setHoverChatId(e.converdationId)}
                                                             onMouseLeave={() => setHoverChatId(undefined)}
                                                             display={"flex"}
-                                                            justifyContent={"space-between"}
+                                                            justifyContent={"start"}
                                                         >
                                                             <HStack>
                                                                 <MessageCircleMore size={15} />
-                                                                <Text>{e.title?.substring(0, 33)} {e.title?.length! >= 35 ? "..." : ""}</Text>
+                                                                <Text>{e.title?.substring(0, 30)} {e.title?.length! >= 35 ? "..." : ""}</Text>
                                                             </HStack>
                                                             {
                                                                 hoverChatId === e.converdationId && (
-                                                                    <Box >
+                                                                    <Box>
                                                                         <Menu>
                                                                             <MenuButton
                                                                                 as={Button}
