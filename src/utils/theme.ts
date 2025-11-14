@@ -6,17 +6,18 @@ import '@fontsource-variable/inter';
 
 const Button = defineStyleConfig({
   baseStyle: {
-    _hover: { bg: "green.500", border: "none", color: "white" },
-    _focus: { border: "none", outline: "none" }
+    _hover: { bg: "green.500", color: "white" },
+    _focus: { outline: "none" },
+    _focusVisible: { boxShadow: "none" }
   }
-})
+});
 
 const MenuItem = defineStyleConfig({
   baseStyle: {
-    _hover: { bg: "green.500", border: "none", color: "white" },
-    _focus: { border: "none", outline: "none" }
+    _hover: { bg: "green.500", color: "white" },
+    _focus: { outline: "none" }
   }
-})
+});
 
 const theme = extendTheme({
   components: {
@@ -27,6 +28,6 @@ const theme = extendTheme({
     heading: `'Inter Variable', sans-serif`,
     body: `'Ubuntu', sans-serif`,
   }
-})
+});
 
-export default theme
+export default theme;

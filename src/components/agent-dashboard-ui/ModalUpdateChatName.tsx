@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, Input, List, ListIcon, ListItem, MenuItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@chakra-ui/react";
+import { Button, Heading, HStack, Input, List, ListIcon, ListItem, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, Text, useDisclosure } from "@chakra-ui/react";
 import { Check, Pen, Pencil } from "lucide-react";
 import React, { useState } from "react";
 import { useTestStore } from "../../store/test-store";
@@ -54,9 +54,18 @@ export const ModalUpdateChatName = ({ conversationId }: { conversationId: string
                     <ModalHeader>
                         <HStack>
                             <Pen />
-                            <Heading fontWeight={700} fontSize={"xl"}> Cambia el nombre de chat</Heading>
+                            <Heading fontWeight={700} fontSize={"xl"}> Nuevo nombre de chat</Heading>
                         </HStack>
                     </ModalHeader>
+                    <ModalCloseButton
+                        _hover={{
+                            borderColor: "transparent",
+                            bg: "gray.100"
+                        }}
+                        _focus={{
+                            outline: "none"
+                        }}
+                    />
                     <ModalBody>
                         <Input
                             value={newChatName}
@@ -65,16 +74,22 @@ export const ModalUpdateChatName = ({ conversationId }: { conversationId: string
                                 boxShadow: "none",
                                 borderColor: "gray.300"
                             }}
-                            placeholder="analiza fallo del reporte, generación de imagenes, etc..."
+                            placeholder="preguntas sobre el reporte 12345..."
                             onKeyDown={handleChangeNameChat}
                             autoFocus
                         />
-                        <List mt={5}>
+                        <Text fontSize={"sm"} color={"gray.500"}>
+                            Presiona Enter para actualizar el nombre
+                        </Text>
+                        <List mt={5} bg={"gray.100"} p={2} borderRadius={"md"}>
+                            <Heading fontSize={"sm"} fontWeight={800} mb={1}>
+                                Sugerencias:
+                            </Heading>
                             {
                                 [
                                     "Cambia el nombre para identificarlo más fácilmente",
                                     "Ponle un nombre que te ayude a recordarlo después.",
-                                    "Renombra este chat para mantener tu historial organizado"
+                                    "Cambialo para mantener tu historial organizado"
                                 ].map(e => (
                                     <ListItem fontSize={"sm"}>
                                         <ListIcon as={Check} color={"black"} />
