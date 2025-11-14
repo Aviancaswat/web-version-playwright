@@ -5,9 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useTestStore, type ConversationsAPA } from "../../store/test-store";
 import AnimatedLoader from "../loaders/AnimatedLoader";
 
-export const ModalSearchChats = () => {
+export const ModalSearchChats = ({onCloseSidebar}: {onCloseSidebar: Function}) => {
 
-    const { conversationsAPA: data } = useTestStore()
+    const { conversationsAPA: data, setCurrentConversationId, setCurrentMessages } = useTestStore()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [dataFilter, setDataFilter] = useState<ConversationsAPA[]>(data)
     const [valueSearchChat, setSearchChat] = useState<string>('');
@@ -27,6 +27,16 @@ export const ModalSearchChats = () => {
         }, 300),
         [data]
     );
+
+    const setChatSelectedUser = (conversationId: string) => {
+        if (conversationId.trim().length === 0) return;
+        const conversationFind = data.find(e => e.converdationId === conversationId);
+        if (!conversationFind) return;
+        setCurrentConversationId(conversationFind.converdationId);
+        setCurrentMessages(conversationFind.messages);
+        onClose();
+        onCloseSidebar();
+    }
 
     const handleKeyUpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -98,6 +108,7 @@ export const ModalSearchChats = () => {
                                             outline: "none"
                                         }}
                                         icon={<MessageCircleMore size={15} />}
+                                        onClick={() => setChatSelectedUser(item.converdationId)}
                                     >
                                         {item.title}
                                     </MenuItem>

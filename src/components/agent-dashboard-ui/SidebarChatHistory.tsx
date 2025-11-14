@@ -156,7 +156,7 @@ export const SidebarChatHistory = () => {
                             >
                                 Nuevo chat
                             </MenuItem>
-                            <ModalSearchChats />
+                            <ModalSearchChats onCloseSidebar={onClose} />
                         </Menu>
                         <Divider mt={5} />
                         <Box mt={5}>
@@ -199,75 +199,73 @@ export const SidebarChatHistory = () => {
                                                     .map(e => (
                                                         <MenuItem
                                                             key={e.converdationId}
-                                                            _hover={{
-                                                                borderColor: "transparent",
-                                                                bg: "gray.100"
-                                                            }}
-                                                            _focus={{
-                                                                outline: "none"
-                                                            }}
+                                                            _hover={{ borderColor: "transparent", bg: "gray.100" }}
+                                                            _focus={{ outline: "none" }}
                                                             fontSize={12}
                                                             noOfLines={1}
                                                             isTruncated
                                                             onMouseEnter={() => setHoverChatId(e.converdationId)}
                                                             onMouseLeave={() => setHoverChatId(undefined)}
-                                                            display={"flex"}
-                                                            justifyContent={"start"}
-                                                            onClick={() => setChatSelectedUser(e.converdationId)}
+                                                            display="flex"
+                                                            justifyContent="space-between"
+                                                            alignItems="center"
+                                                            minW="unset"
+                                                            pr={2}
                                                         >
-                                                            <HStack>
-                                                                <MessageCircleMore size={15} />
-                                                                <Text>{e.title?.substring(0, 30)} {e.title?.length! >= 35 ? "..." : ""}</Text>
+                                                            <HStack
+                                                                as={Button}
+                                                                variant="unstyled"
+                                                                onClick={() => setChatSelectedUser(e.converdationId)}
+                                                                size="sm"
+                                                                _hover={{ bg: "gray.100", borderColor: "transparent" }}
+                                                                _focus={{ outline: "none" }}
+                                                                fontSize={12}
+                                                                p={0}
+                                                                m={0}
+                                                                alignItems="center"
+                                                            >
+                                                                <MessageCircleMore style={{ width: 15, height: 15 }} />
+
+                                                                <Text isTruncated maxW="200px">
+                                                                    {e.title?.substring(0, 35)}
+                                                                    {e.title?.length! >= 35 ? "..." : ""}
+                                                                </Text>
                                                             </HStack>
-                                                            {
-                                                                hoverChatId === e.converdationId && (
-                                                                    <Box>
-                                                                        <Menu>
-                                                                            <MenuButton
-                                                                                as={Button}
-                                                                                size={"sm"}
-                                                                                bg={"transparent"}
-                                                                                _hover={{
-                                                                                    bg: "transparent",
-                                                                                    borderColor: "transparent"
-                                                                                }}
-                                                                                _focus={{
-                                                                                    bg: "transparent",
-                                                                                    outline: "none"
-                                                                                }}
-                                                                                _active={{
-                                                                                    bg: "transparent"
-                                                                                }}
-                                                                                height={4}
-                                                                            >
-                                                                                <Ellipsis size={15} />
-                                                                            </MenuButton>
-                                                                            <MenuList p={"0px 1px 2px 1px"}>
-                                                                                <ModalUpdateChatName
-                                                                                    conversationId={e.converdationId}
-                                                                                />
-                                                                                <MenuItem
-                                                                                    icon={<Trash2 size={15} />}
-                                                                                    _hover={{
-                                                                                        borderColor: "transparent",
-                                                                                        bg: "red.100"
-                                                                                    }}
-                                                                                    _focus={{
-                                                                                        outline: "none"
-                                                                                    }}
-                                                                                    color={"red.400"}
-                                                                                    onClick={() => handleDeleteChat(e.converdationId)}
-                                                                                >
-                                                                                    Eliminar
-                                                                                </MenuItem>
-                                                                            </MenuList>
-                                                                        </Menu>
-                                                                    </Box>
-                                                                )
-                                                            }
+
+                                                            {hoverChatId === e.converdationId && (
+                                                                <Menu>
+                                                                    <MenuButton
+                                                                        as={Button}
+                                                                        size="sm"
+                                                                        bg="transparent"
+                                                                        _hover={{ bg: "transparent", borderColor: "transparent" }}
+                                                                        _focus={{ outline: "none" }}
+                                                                        _active={{ bg: "transparent" }}
+                                                                        height={4}
+                                                                        minW="unset"
+                                                                    >
+                                                                        <Ellipsis style={{ width: 15, height: 15 }} />
+                                                                    </MenuButton>
+
+                                                                    <MenuList p="0px 1px 2px 1px">
+                                                                        <ModalUpdateChatName conversationId={e.converdationId} />
+
+                                                                        <MenuItem
+                                                                            icon={<Trash2 style={{ width: 15, height: 15 }} />}
+                                                                            _hover={{ bg: "red.100", borderColor: "transparent" }}
+                                                                            _focus={{ outline: "none" }}
+                                                                            color="red.400"
+                                                                            onClick={() => handleDeleteChat(e.converdationId)}
+                                                                        >
+                                                                            Eliminar
+                                                                        </MenuItem>
+                                                                    </MenuList>
+                                                                </Menu>
+                                                            )}
                                                         </MenuItem>
                                                     ))
                                             }
+
                                         </Menu>
                                     </AccordionPanel>
                                 </AccordionItem>
