@@ -74,11 +74,11 @@ export const ModalSearchChats = () => {
                             placeholder="Busca por el nombre del chat"
                             autoFocus
                         />
-                    </ModalHeader>
-                    <ModalBody>
-                        <Box>
-                            <Heading fontSize={"sm"} mb={2}>Tus chats</Heading>
+                        <Box mt={5}>
+                            <Heading fontSize={"sm"}>Tus chats</Heading>
                         </Box>
+                    </ModalHeader>
+                    <ModalBody maxHeight={300} overflowY={"auto"}>
                         {
                             dataFilter.length > 0 ? (
                                 dataFilter.map((item, idx) => (
