@@ -69,9 +69,7 @@ export const SidebarChatHistory = () => {
             setConversationsAPA(prev => {
                 const exists = prev.find(c => c.converdationId === currentConversationId);
 
-                const title =
-                    currentMessages[0]?.message?.slice(0, 35) ||
-                    "Nuevo chat";
+                const title = "Nuevo chat";
 
                 if (!exists) {
                     return [
@@ -102,6 +100,15 @@ export const SidebarChatHistory = () => {
 
         onClose();
     };
+
+    const setChatSelectedUser = (conversationId: string) => {
+        if (conversationId.trim().length === 0) return;
+        const conversationFind = conversationsAPA.find(e => e.converdationId === conversationId);
+        if (!conversationFind) return;
+        setCurrentConversationId(conversationFind.converdationId);
+        setCurrentMessages(conversationFind.messages);
+        onClose();
+    }
 
     return (
         <>
@@ -206,6 +213,7 @@ export const SidebarChatHistory = () => {
                                                             onMouseLeave={() => setHoverChatId(undefined)}
                                                             display={"flex"}
                                                             justifyContent={"start"}
+                                                            onClick={() => setChatSelectedUser(e.converdationId)}
                                                         >
                                                             <HStack>
                                                                 <MessageCircleMore size={15} />
