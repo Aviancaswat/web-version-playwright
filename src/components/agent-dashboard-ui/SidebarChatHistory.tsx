@@ -14,6 +14,7 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerOverlay,
+    HStack,
     Menu,
     MenuButton,
     MenuItem,
@@ -23,10 +24,11 @@ import {
     useDisclosure,
     VStack
 } from '@chakra-ui/react';
-import { Bot, Ellipsis, MessageCircleOff, PanelRightOpen, Search, SquarePen, Trash2 } from 'lucide-react';
+import { Bot, Ellipsis, MessageCircleMore, MessageCircleOff, PanelRightOpen, SquarePen, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTestStore } from '../../store/test-store';
 import AviancaToast from '../../utils/AviancaToast';
+import { ModalSearchChats } from './ModalSearchChats';
 import { ModalUpdateChatName } from './ModalUpdateChatName';
 
 export const SidebarChatHistory = () => {
@@ -98,19 +100,7 @@ export const SidebarChatHistory = () => {
                             >
                                 Nuevo chat
                             </MenuItem>
-                            <MenuItem
-                                icon={<Search size={15} />}
-                                fontSize={14}
-                                _hover={{
-                                    bg: "gray.100",
-                                    borderColor: "transparent"
-                                }}
-                                _focus={{
-                                    outline: "none"
-                                }}
-                            >
-                                Buscar chat
-                            </MenuItem>
+                            <ModalSearchChats />
                         </Menu>
                         <Divider mt={5} />
                         <Box mt={5}>
@@ -168,7 +158,10 @@ export const SidebarChatHistory = () => {
                                                             display={"flex"}
                                                             justifyContent={"space-between"}
                                                         >
-                                                            {e.title?.substring(0, 35)} {e.title?.length! >= 35 ? "..." : ""}
+                                                            <HStack>
+                                                                <MessageCircleMore size={15} />
+                                                                <Text>{e.title?.substring(0, 33)} {e.title?.length! >= 35 ? "..." : ""}</Text>
+                                                            </HStack>
                                                             {
                                                                 hoverChatId === e.converdationId && (
                                                                     <Box >
