@@ -1,4 +1,4 @@
-import { Box, Center, Heading, Input, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Center, Heading, HStack, Input, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, Text, useDisclosure } from "@chakra-ui/react";
 import { debounce } from "lodash";
 import { MessageCircleMore, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -54,6 +54,10 @@ export const ModalSearchChats = () => {
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalContent>
                     <ModalHeader>
+                        <HStack>
+                            <Search />
+                            <Heading fontSize={"xl"}>Buscar chat</Heading>
+                        </HStack>
                         <ModalCloseButton
                             _hover={{
                                 borderColor: "transparent",
