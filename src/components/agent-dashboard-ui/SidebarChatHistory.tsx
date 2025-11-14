@@ -65,31 +65,33 @@ export const SidebarChatHistory = () => {
 
     const createNewChat = () => {
 
-        if (currentMessages.length > 0 && currentConversationId) {
-            setConversationsAPA(prev => {
-                const exists = prev.find(c => c.converdationId === currentConversationId);
+        // if (currentMessages.length > 0 && currentConversationId) {
+        //     setConversationsAPA(prev => {
+        //         const exists = prev.find(c => c.converdationId === currentConversationId);
 
-                const title = "Nuevo chat";
+        //         const title = currentMessages[0].message?.substring(0, 35) ?? "Nuevo chat";
 
-                if (!exists) {
-                    return [
-                        ...prev,
-                        {
-                            converdationId: currentConversationId,
-                            messages: currentMessages,
-                            title
-                        }
-                    ];
-                }
+        //         if (!exists) {
+        //             console.log("Paso 1")
+        //             return [
+        //                 ...prev,
+        //                 {
+        //                     converdationId: currentConversationId,
+        //                     messages: currentMessages,
+        //                     title
+        //                 }
+        //             ];
+        //         }
 
-                return prev.map(c =>
-                    c.converdationId === currentConversationId
-                        ? { ...c, messages: currentMessages, title }
-                        : c
-                );
-            });
+        //         console.log("Paso 2")
+        //         return prev.map(c =>
+        //             c.converdationId === currentConversationId
+        //                 ? { ...c, messages: currentMessages, title }
+        //                 : c
+        //         );
+        //     });
 
-        }
+        // }
 
         const newId = uuid();
 
