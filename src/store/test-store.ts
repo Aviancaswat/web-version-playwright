@@ -47,7 +47,9 @@ type State = {
   dataWorkflows: DataWorkflows[];
   selectedFilters: FilterGeneric[],
   dashboardDataAgentAvianca: JSONDashboardAgentAvianca,
-  conversationsAPA: ConversationsAPA[]
+  conversationsAPA: ConversationsAPA[],
+  currentConversationId: string | undefined,
+  currentMessages: Messages[]
 };
 
 type Actions = {
@@ -57,6 +59,11 @@ type Actions = {
   setSelectedFilters: (newFilter: FilterGeneric[]) => void;
   setDashboardDataAgentAvianca: (newData: JSONDashboardAgentAvianca) => void;
   setConversationsAPA: (update: (data: ConversationsAPA[]) => ConversationsAPA[]) => void;
+  setCurrentConversationId: (id: string) => void;
+  setCurrentMessages: (
+    messages: Messages[] | ((prev: Messages[]) => Messages[])
+  ) => void;
+  resetCurrentConversation: () => void;
 };
 
 type Store = State & Actions;
@@ -69,6 +76,8 @@ const store = create<Store>()(
       dataWorkflows: [],
       selectedFilters: [],
       conversationsAPA: [],
+      currentConversationId: undefined,
+      currentMessages: [],
       dashboardDataAgentAvianca: {
         workflowsData: [],
         recent_failures: [],
@@ -94,7 +103,19 @@ const store = create<Store>()(
       setConversationsAPA: (updater: (prev: ConversationsAPA[]) => ConversationsAPA[]) =>
         set((state) => ({
           conversationsAPA: updater(state.conversationsAPA),
-        }))
+        })),
+      setCurrentConversationId: (id: string) => set({ currentConversationId: id }),
+      setCurrentMessages: (updater) =>
+        set((state) => ({
+          currentMessages:
+            typeof updater === "function"
+              ? updater(state.currentMessages)
+              : updater,
+        })),
+      resetCurrentConversation: () => set({
+        currentConversationId: undefined,
+        currentMessages: []
+      })
     }),
     {
       name: "test-store"
@@ -110,13 +131,18 @@ export const useTestStore = () => {
     selectedFilters,
     dashboardDataAgentAvianca,
     conversationsAPA,
+    currentConversationId,
+    currentMessages,
     setStatusWorkflow,
     setResultWorkflow,
     setDataWorkflows,
     setSelectedFilters,
     setDashboardDataAgentAvianca,
-    setConversationsAPA
+    setConversationsAPA,
+    setCurrentConversationId,
+    setCurrentMessages
   } = store();
+
   return {
     statusWorkflow,
     resultWorkflow,
@@ -124,11 +150,15 @@ export const useTestStore = () => {
     selectedFilters,
     dashboardDataAgentAvianca,
     conversationsAPA,
+    currentConversationId,
+    currentMessages,
     setStatusWorkflow,
     setResultWorkflow,
     setDataWorkflows,
     setSelectedFilters,
     setDashboardDataAgentAvianca,
-    setConversationsAPA
+    setConversationsAPA,
+    setCurrentConversationId,
+    setCurrentMessages
   };
 };

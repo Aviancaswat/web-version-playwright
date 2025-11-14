@@ -26,13 +26,21 @@ import {
 } from '@chakra-ui/react';
 import { Bot, Ellipsis, MessageCircleMore, MessageCircleOff, PanelRightOpen, SquarePen, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { v4 as uuid } from "uuid";
 import { useTestStore } from '../../store/test-store';
 import AviancaToast from '../../utils/AviancaToast';
 import { ModalSearchChats } from './ModalSearchChats';
 import { ModalUpdateChatName } from './ModalUpdateChatName';
 
 export const SidebarChatHistory = () => {
-    const { conversationsAPA, setConversationsAPA } = useTestStore();
+    const {
+        conversationsAPA,
+        setConversationsAPA,
+        currentConversationId,
+        currentMessages,
+        setCurrentConversationId,
+        setCurrentMessages
+    } = useTestStore();
     const { isOpen, onOpen, onClose } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null);
     const [hoverChatId, setHoverChatId] = useState<string | undefined>(undefined);
@@ -54,6 +62,46 @@ export const SidebarChatHistory = () => {
             description: "El chat se ha eliminado correctamente"
         })
     }
+
+    const createNewChat = () => {
+
+        if (currentMessages.length > 0 && currentConversationId) {
+            setConversationsAPA(prev => {
+                const exists = prev.find(c => c.converdationId === currentConversationId);
+
+                const title =
+                    currentMessages[0]?.message?.slice(0, 35) ||
+                    "Nuevo chat";
+
+                if (!exists) {
+                    return [
+                        ...prev,
+                        {
+                            converdationId: currentConversationId,
+                            messages: currentMessages,
+                            title
+                        }
+                    ];
+                }
+
+                return prev.map(c =>
+                    c.converdationId === currentConversationId
+                        ? { ...c, messages: currentMessages, title }
+                        : c
+                );
+            });
+
+        }
+
+        const newId = uuid();
+
+        setCurrentConversationId(newId);
+        setCurrentMessages([]);
+
+        console.log("Nuevo chat creado:", newId);
+
+        onClose();
+    };
 
     return (
         <>
@@ -97,6 +145,7 @@ export const SidebarChatHistory = () => {
                                     outline: "none"
                                 }}
                                 mb={1}
+                                onClick={createNewChat}
                             >
                                 Nuevo chat
                             </MenuItem>

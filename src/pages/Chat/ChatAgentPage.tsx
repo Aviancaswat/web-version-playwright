@@ -24,20 +24,23 @@ export type Messages = {
 const ChatAgentPage = () => {
 
     const {
+        currentConversationId: conversationId,
+        currentMessages: messages,
+        setCurrentConversationId: setConversationId,
+        setCurrentMessages: setMessages,
         setDataWorkflows,
         setDashboardDataAgentAvianca,
         dashboardDataAgentAvianca,
         conversationsAPA,
         setConversationsAPA
     } = useTestStore();
+
     const chatRef = useRef<HTMLDivElement | null>(null);
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
-    const [messages, setMessages] = useState<Messages[]>([]);
     const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
-    const [conversationId, setConversationId] = useState<string | undefined>(undefined)
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -194,28 +197,36 @@ const ChatAgentPage = () => {
                     const updatedMessages = [...prevMessages, userMessage];
 
                     setConversationsAPA((prev) => {
-                        const existing = prev.find(
-                            (c) => c.converdationId === conversationId
-                        );
+                        const exists = prev.find(c => c.converdationId === conversationId);
 
-                        if (!existing) {
+                        const firstUserMessage = updatedMessages.find(m => m.role === "user");
+                        const title = firstUserMessage?.message?.slice(0, 35) || "Nuevo chat";
+
+                        if (!exists) {
                             return [
                                 ...prev,
-                                { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
+                                {
+                                    converdationId: conversationId!,
+                                    messages: updatedMessages,
+                                    title
+                                }
                             ];
                         }
 
-                        const updatedConversations = prev.map((c) =>
+                        return prev.map(c =>
                             c.converdationId === conversationId
-                                ? { ...c, messages: [...c.messages, userMessage] }
+                                ? {
+                                    ...c,
+                                    messages: [...c.messages, userMessage],
+                                    title
+                                }
                                 : c
                         );
-
-                        return updatedConversations;
                     });
 
                     return updatedMessages;
                 });
+
 
                 setLoading(true);
                 setQuestionUser("");
