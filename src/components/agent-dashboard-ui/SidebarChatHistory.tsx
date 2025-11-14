@@ -36,8 +36,6 @@ export const SidebarChatHistory = () => {
     const {
         conversationsAPA,
         setConversationsAPA,
-        currentConversationId,
-        currentMessages,
         setCurrentConversationId,
         setCurrentMessages
     } = useTestStore();
