@@ -23,6 +23,6 @@ export const useChatApa = () => {
         fetchChats,
         createUser: ChatService.createChat,
         updateUser: ChatService.updateChat,
-        deleteUser: ChatService.deleteChat,
+        deleteUser: ChatService.deleteChat
     };
 };
