@@ -38,7 +38,9 @@ export interface JSONDashboardAgentAvianca {
 export interface ConversationsAPA {
   converdationId: string
   title?: string
-  messages: Messages[]
+  messages: Messages[],
+  createAt?: number,
+  updateAt?: number
 }
 
 type State = {
