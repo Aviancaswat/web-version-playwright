@@ -27,6 +27,7 @@ import {
 import { Bot, Ellipsis, MessageCircleMore, MessageCircleOff, PanelRightOpen, SquarePen, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from "uuid";
+import { ConversationService } from '../../firebase/firestore/services/conversation.service';
 import { useTestStore } from '../../store/test-store';
 import AviancaToast from '../../utils/AviancaToast';
 import { ModalSearchChats } from './ModalSearchChats';
@@ -35,7 +36,6 @@ import { ModalUpdateChatName } from './ModalUpdateChatName';
 export const SidebarChatHistory = () => {
     const {
         conversationsAPA,
-        setConversationsAPA,
         setCurrentConversationId,
         setCurrentMessages
     } = useTestStore();
@@ -47,58 +47,43 @@ export const SidebarChatHistory = () => {
         console.log("cambió conversationsAPA: ", conversationsAPA);
     }, [conversationsAPA])
 
-    const handleDeleteChat = (conversationId: string) => {
-
+    const handleDeleteChat = async (conversationId: string) => {
         if (!conversationId) return;
 
-        setConversationsAPA(prev => {
-            const filters = prev.filter(e => e.converdationId !== conversationId);
-            return filters;
-        })
+        try {
 
-        AviancaToast.success("Chat eliminado", {
-            description: "El chat se ha eliminado correctamente"
-        })
-    }
+            await ConversationService.deleteConversation(conversationId);
+            AviancaToast.success("Chat eliminado", {
+                description: "El chat se ha eliminado correctamente",
+            });
 
-    const createNewChat = () => {
+        } catch (error) {
+            console.error("Error eliminando chat:", error);
+            AviancaToast.error("Error al eliminar el chat");
+        }
+    };
 
-        // if (currentMessages.length > 0 && currentConversationId) {
-        //     setConversationsAPA(prev => {
-        //         const exists = prev.find(c => c.converdationId === currentConversationId);
-
-        //         const title = currentMessages[0].message?.substring(0, 35) ?? "Nuevo chat";
-
-        //         if (!exists) {
-        //             console.log("Paso 1")
-        //             return [
-        //                 ...prev,
-        //                 {
-        //                     converdationId: currentConversationId,
-        //                     messages: currentMessages,
-        //                     title
-        //                 }
-        //             ];
-        //         }
-
-        //         console.log("Paso 2")
-        //         return prev.map(c =>
-        //             c.converdationId === currentConversationId
-        //                 ? { ...c, messages: currentMessages, title }
-        //                 : c
-        //         );
-        //     });
-
-        // }
-
+    const createNewChat = async () => {
         const newId = uuid();
 
-        setCurrentConversationId(newId);
-        setCurrentMessages([]);
+        try {
 
-        console.log("Nuevo chat creado:", newId);
+            await ConversationService.createConversation({
+                converdationId: newId,
+                title: "Nuevo chat",
+                messages: []
+            });
 
-        onClose();
+            setCurrentConversationId(newId);
+            setCurrentMessages([]);
+
+            console.log("Nuevo chat creado:", newId);
+            onClose();
+
+        } catch (error) {
+            console.error("Error creando chat:", error);
+            AviancaToast.error("Error al crear el chat");
+        }
     };
 
     const setChatSelectedUser = (conversationId: string) => {

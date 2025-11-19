@@ -1,4 +1,5 @@
 import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
+import { doc, onSnapshot } from "firebase/firestore";
 import 'highlight.js/styles/felipec.css';
 import { Bot } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -9,8 +10,10 @@ import '../../components/agent-dashboard-ui/agent.css';
 import { SidebarChatHistory } from "../../components/agent-dashboard-ui/SidebarChatHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
+import { coversationCollection } from "../../firebase/firestore/collections/conversation.collection";
+import { ConversationService } from "../../firebase/firestore/services/conversation.service";
 import { getRunsByRepo } from "../../github/api";
-import { useTestStore, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
+import { useTestStore, type ConversationsAPA, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 import { MessageContainer } from "./MessageContainer";
 
 export type Messages = {
@@ -182,8 +185,44 @@ const ChatAgentPage = () => {
         console.log("Se actualiza las conversaciones: ", conversationsAPA)
     }, [conversationsAPA])
 
+    useEffect(() => {
+
+        if (!conversationId) return;
+
+        const ref = doc(coversationCollection, conversationId);
+
+        const unsub = onSnapshot(ref, (snap) => {
+            const data = snap.data();
+
+            if (!data) return;
+
+            const conversation: ConversationsAPA = {
+                converdationId: conversationId,
+                title: data.title ?? "Nuevo chat",
+                messages: data.messages ?? [],
+            };
+
+            setMessages(conversation.messages);
+
+            setConversationsAPA((prev) => {
+                const exists = prev.some(c => c.converdationId === conversationId);
+
+                if (!exists) {
+                    return [...prev, conversation];
+                }
+
+                return prev.map(c =>
+                    c.converdationId === conversationId ? conversation : c
+                );
+            });
+        });
+
+        return () => unsub();
+    }, [conversationId]);
+
     const getResponseModel = useCallback(
         async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+
             if (e.key === "Enter" && !e.shiftKey && questionUser.trim() !== "") {
                 e.preventDefault();
 
@@ -193,49 +232,18 @@ const ChatAgentPage = () => {
                     timestamp: new Date().toISOString(),
                 };
 
-                setMessages((prevMessages) => {
-                    const updatedMessages = [...prevMessages, userMessage];
-
-                    setConversationsAPA((prev) => {
-                        const exists = prev.find(c => c.converdationId === conversationId);
-
-                        const firstUserMessage = updatedMessages.find(m => m.role === "user");
-                        const title = firstUserMessage?.message?.slice(0, 35) || "Nuevo chat";
-
-                        if (!exists) {
-                            return [
-                                ...prev,
-                                {
-                                    converdationId: conversationId!,
-                                    messages: updatedMessages,
-                                    title
-                                }
-                            ];
-                        }
-
-                        return prev.map(c =>
-                            c.converdationId === conversationId
-                                ? {
-                                    ...c,
-                                    messages: [...c.messages, userMessage],
-                                    title
-                                }
-                                : c
-                        );
-                    });
-
-                    return updatedMessages;
+                await ConversationService.addMessage(conversationId!, userMessage);
+                await ConversationService.updateConversation(conversationId!, {
+                    title: userMessage.message,
                 });
-
 
                 setLoading(true);
                 setQuestionUser("");
 
                 try {
-
                     const responseAgent = await RunAgentDashboard(
                         JSON.stringify(dashboardDataAgentAvianca),
-                        questionUser
+                        userMessage.message
                     );
 
                     const newMessages: Messages[] = [];
@@ -289,34 +297,11 @@ const ChatAgentPage = () => {
                             responseAgent.finalOutput + "\n\n" + newMessages[0].message;
                     }
 
-                    setMessages((prevMessages) => {
-                        const updatedMessages = [...prevMessages, ...newMessages];
+                    for (const msg of newMessages) {
+                        await ConversationService.addMessage(conversationId!, msg);
+                    }
 
-                        setConversationsAPA((prev) => {
-                            const existing = prev.find(
-                                (c) => c.converdationId === conversationId
-                            );
-
-                            if (!existing) {
-                                return [
-                                    ...prev,
-                                    { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
-                                ];
-                            }
-
-                            const updatedConversations = prev.map((c) =>
-                                c.converdationId === conversationId
-                                    ? { ...c, messages: [...c.messages, ...newMessages] }
-                                    : c
-                            );
-
-                            return updatedConversations;
-                        });
-
-                        return updatedMessages;
-                    });
                 } catch (error) {
-
                     console.error("Error al obtener respuesta:", error);
 
                     const errorMsg: Messages = {
@@ -325,40 +310,15 @@ const ChatAgentPage = () => {
                         timestamp: new Date().toISOString(),
                     };
 
-                    setMessages((prevMessages) => {
-                        const updatedMessages = [...prevMessages, errorMsg];
+                    await ConversationService.addMessage(conversationId!, errorMsg);
 
-                        setConversationsAPA((prev) => {
-                            const existing = prev.find(
-                                (c) => c.converdationId === conversationId
-                            );
-
-                            if (!existing) {
-                                return [
-                                    ...prev,
-                                    { converdationId: conversationId!, messages: updatedMessages, title: questionUser },
-                                ];
-                            }
-
-                            const updatedConversations = prev.map((c) =>
-                                c.converdationId === conversationId
-                                    ? { ...c, messages: [...c.messages, errorMsg] }
-                                    : c
-                            );
-
-                            return updatedConversations;
-                        });
-
-                        return updatedMessages;
-                    });
                 } finally {
                     setLoading(false);
                 }
             }
         },
-        [questionUser, dashboardDataAgentAvianca, conversationId, setConversationsAPA]
+        [questionUser, dashboardDataAgentAvianca, conversationId]
     );
-
 
     return (
         <Box

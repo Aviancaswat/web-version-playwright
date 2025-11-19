@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ChatService } from "../services/chat.service";
-import type { ChatMessage } from "../types/Chat.type";
+import { ChatService } from "../services/conversation.service";
+import type { ChatMessage } from "../types/conversation.type";
 
 export const useChatApa = () => {
     const [users, setChats] = useState<ChatMessage[]>([]);
