@@ -15,22 +15,10 @@ import { INSTRUCTIONS_MAIN_AGENT, MODEL } from './instructions';
 interface ReportData {
     workflowId: number;
     success: boolean;
-    reportReady: boolean;
-    message: string;
+    message?: string;
     jobs: any[];
     relevantLogs: string | null;
     jobsCount: number;
-}
-
-interface PlaywrightReport {
-    workflowId: number;
-    htmlContent: string | undefined;
-}
-
-declare global {
-    interface Window {
-        __playwrightReport?: PlaywrightReport;
-    }
 }
 
 // ============================================
@@ -65,20 +53,10 @@ const getReportByWorkflowIDGithubTool = tool({
 
         try {
             // Obtener reporte HTML
-            let isFoundReport = false;
             const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
 
             if (!contentHTML) {
                 console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
-            }
-
-            if (typeof window !== 'undefined' && contentHTML) {
-                isFoundReport = true;
-                window.__playwrightReport = {
-                    workflowId: context.workflowId,
-                    htmlContent: contentHTML
-                }
-                console.log(`Reporte guardado en window.__playwrightReport`);
             }
 
             // Obtener jobs
@@ -106,10 +84,6 @@ const getReportByWorkflowIDGithubTool = tool({
             const responseData: ReportData = {
                 workflowId,
                 success: true,
-                reportReady: isFoundReport,
-                message: isFoundReport
-                    ? `Reporte encontrado con ${total_count} job(s)`
-                    : `No se encontró reporte para workflow ${workflowId}`,
                 jobs: jobs || [],
                 relevantLogs,
                 jobsCount: total_count

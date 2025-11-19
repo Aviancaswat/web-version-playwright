@@ -273,16 +273,13 @@ const ChatAgentPage = () => {
 
                         if (textResultReport) {
                             const result = JSON.parse(textResultReport);
-                            const reportData = window.__playwrightReport;
 
-                            if (result.success && result.reportReady && reportData?.htmlContent) {
+                            if (result.success) {
                                 newMessages.push({
                                     role: "agent",
                                     message: result?.message ?? "",
-                                    htmlContent: reportData?.htmlContent,
                                     timestamp: new Date().toISOString(),
                                 });
-                                delete window.__playwrightReport;
                             }
                         }
                     }

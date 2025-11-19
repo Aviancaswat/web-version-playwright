@@ -23,17 +23,6 @@ const MessageAgentUI = (msg: Messages) => {
         }
     }, [])
 
-    // const downloadResponse = useCallback(async (text: string) => {
-    //     try {
-    //         await createPDF(text);
-    //         AviancaToast.success("Respuesta descargada")
-    //     }
-    //     catch (error) {
-    //         console.log("Error downloading text: ", error);
-    //         AviancaToast.error("Error descargando la respuesta")
-    //     }
-    // }, [])
-
     return (
         <VStack>
             <Box className="chat-message" display={"flex"} gap={2} alignItems={"start"}>
@@ -96,28 +85,6 @@ const MessageAgentUI = (msg: Messages) => {
                             </Button>
                         </Tooltip>
                     </motion.div>
-                    {/* <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        style={{ cursor: 'pointer', alignSelf: "start" }}
-                        onClick={() => {
-                            navigator.clipboard.writeText(msg.message);
-                        }}
-                    >
-                        <Tooltip label="Descargar respuesta" bg={"black"} color={"white"} borderRadius={"md"}>
-                            <Button
-                                bg={"transparent"}
-                                size={"xs"}
-                                onClick={() => downloadResponse(msg.message)}
-                                _hover={{
-                                    bg: "none",
-                                    border: "none"
-                                }}
-                            >
-                                <ArrowDownToLine size={15} />
-                            </Button>
-                        </Tooltip>
-                    </motion.div> */}
                 </ButtonGroup>
             </HStack>
         </VStack>
