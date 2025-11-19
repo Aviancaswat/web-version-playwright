@@ -1,34 +1,38 @@
 import { Button, Heading, HStack, Input, List, ListIcon, ListItem, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, Text, useDisclosure } from "@chakra-ui/react";
 import { Check, Pen, Pencil } from "lucide-react";
 import React, { useState } from "react";
-import { useTestStore } from "../../store/test-store";
+import { ConversationService } from "../../firebase/firestore/services/conversation.service";
 import AviancaToast from "../../utils/AviancaToast";
 
 export const ModalUpdateChatName = ({ conversationId }: { conversationId: string }) => {
-    const { conversationsAPA, setConversationsAPA } = useTestStore();
+
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [newChatName, setNewChatName] = useState<string | undefined>(undefined);
 
-    const handleChangeNameChat = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleChangeNameChat = async (e: React.KeyboardEvent<HTMLInputElement>) => {
 
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key !== "Enter" || e.shiftKey) return;
 
-            if (!newChatName || newChatName.trim() === "") return;
+        if (!newChatName || newChatName.trim() === "") return;
 
-            const indexConversationFound = conversationsAPA.findIndex(e => e.converdationId === conversationId);
-            if (indexConversationFound === -1) return;
+        if (!conversationId) return;
 
-            setConversationsAPA(prev => {
-                const index = prev.findIndex(e => e.converdationId === conversationId);
-                prev[index].title = newChatName;
-                return prev;
-            })
+        try {
+
+            await ConversationService.updateConversation(conversationId, {
+                title: newChatName.trim()
+            });
+
             onClose();
             AviancaToast.success("Chat cambiado", {
                 description: "El nombre del chat se ha cambiado con éxito"
-            })
+            });
+
+        } catch (error) {
+            console.error("Error cambiando nombre del chat:", error);
+            AviancaToast.error("No se pudo cambiar el nombre del chat");
         }
-    }
+    };
 
     return (
         <>

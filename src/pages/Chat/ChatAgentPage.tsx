@@ -10,7 +10,7 @@ import '../../components/agent-dashboard-ui/agent.css';
 import { SidebarChatHistory } from "../../components/agent-dashboard-ui/SidebarChatHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
-import { coversationCollection } from "../../firebase/firestore/collections/conversation.collection";
+import { conversationCollection } from "../../firebase/firestore/collections/conversation.collection";
 import { ConversationService } from "../../firebase/firestore/services/conversation.service";
 import { getRunsByRepo } from "../../github/api";
 import { useTestStore, type ConversationsAPA, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
@@ -189,7 +189,7 @@ const ChatAgentPage = () => {
 
         if (!conversationId) return;
 
-        const ref = doc(coversationCollection, conversationId);
+        const ref = doc(conversationCollection, conversationId);
 
         const unsub = onSnapshot(ref, (snap) => {
             const data = snap.data();
@@ -219,6 +219,21 @@ const ChatAgentPage = () => {
 
         return () => unsub();
     }, [conversationId]);
+
+    useEffect(() => {
+
+        const listenConversations = () => {
+
+            return onSnapshot(conversationCollection, (snapshot) => {
+                const convs = snapshot.docs.map((doc) => ({
+                    converdationId: doc.id,
+                    ...(doc.data() as any)
+                }));
+                setConversationsAPA(() => [...convs]);
+            });
+        }
+        listenConversations();
+    }, [])
 
     const getResponseModel = useCallback(
         async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChatService } from "../services/conversation.service";
+import { ConversationService } from "../services/conversation.service";
 import type { ChatMessage } from "../types/conversation.type";
 
 export const useChatApa = () => {
@@ -8,7 +8,7 @@ export const useChatApa = () => {
 
     const fetchChats = async () => {
         setLoading(true);
-        const data = await ChatService.getAllChats();
+        const data = await ConversationService.getAllCoversations();
         setChats(data);
         setLoading(false);
     };
@@ -21,8 +21,8 @@ export const useChatApa = () => {
         users,
         loading,
         fetchChats,
-        createUser: ChatService.createChat,
-        updateUser: ChatService.updateChat,
-        deleteUser: ChatService.deleteChat
+        createUser: ConversationService.createConversation,
+        updateUser: ConversationService.updateConversation,
+        deleteUser: ConversationService.deleteConversation
     };
 };

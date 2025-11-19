@@ -37,7 +37,7 @@ export const SidebarChatHistory = () => {
     const {
         conversationsAPA,
         setCurrentConversationId,
-        setCurrentMessages
+        setCurrentMessages,
     } = useTestStore();
     const { isOpen, onOpen, onClose } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null);
