@@ -52,19 +52,17 @@ const getReportByWorkflowIDGithubTool = tool({
         const { workflowId } = context;
 
         try {
-            // Obtener reporte HTML
+
             const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
 
             if (!contentHTML) {
                 console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
             }
 
-            // Obtener jobs
             console.log(`Obteniendo jobs del workflow ${workflowId}`);
             const { total_count, jobs } = await getJobsByRunId(context.workflowId);
             console.log(`Jobs encontrados: ${jobs.length}`);
 
-            // Obtener logs del primer job
             let relevantLogs: string | null = null;
             if (total_count > 0 && jobs.length > 0) {
                 try {
