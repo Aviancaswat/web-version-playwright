@@ -65,25 +65,10 @@ export const SidebarChatHistory = () => {
 
     const createNewChat = async () => {
         const newId = uuid();
-
-        try {
-
-            await ConversationService.createConversation({
-                converdationId: newId,
-                title: "Nuevo chat",
-                messages: []
-            });
-
-            setCurrentConversationId(newId);
-            setCurrentMessages([]);
-
-            console.log("Nuevo chat creado:", newId);
-            onClose();
-
-        } catch (error) {
-            console.error("Error creando chat:", error);
-            AviancaToast.error("Error al crear el chat");
-        }
+        setCurrentConversationId(newId);
+        setCurrentMessages([]);
+        console.log("Nuevo chat creado:", newId);
+        onClose();
     };
 
     const setChatSelectedUser = (conversationId: string) => {
