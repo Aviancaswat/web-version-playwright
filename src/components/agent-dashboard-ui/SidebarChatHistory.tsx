@@ -82,7 +82,14 @@ export const SidebarChatHistory = () => {
 
     return (
         <>
-            <Tooltip label="Historial de chats" bg={"white"} color={"black"} borderRadius={"md"} placement='left'>
+            <Tooltip
+                label="Historial de chats"
+                bg={"white"}
+                color={"black"}
+                borderRadius={"md"}
+                placement='left'
+                hasArrow
+            >
                 <Button
                     ref={btnRef}
                     size={"sm"}
@@ -101,7 +108,6 @@ export const SidebarChatHistory = () => {
                 isOpen={isOpen}
                 placement='right'
                 onClose={onClose}
-                finalFocusRef={btnRef}
             >
                 <DrawerOverlay />
                 <DrawerContent>

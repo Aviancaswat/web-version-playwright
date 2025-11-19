@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { FilterType } from "../components/TableWorkflowComponent/FilterComponent";
 import type { DataWorkflows } from "../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import type { ResultWorkflow, StatusWorkflow } from "../github/api";
@@ -71,58 +70,53 @@ type Actions = {
 type Store = State & Actions;
 
 const store = create<Store>()(
-  persist(
-    (set) => ({
-      statusWorkflow: "queued",
-      resultWorkflow: "neutral",
-      dataWorkflows: [],
-      selectedFilters: [],
-      conversationsAPA: [],
+  (set) => ({
+    statusWorkflow: "queued",
+    resultWorkflow: "neutral",
+    dataWorkflows: [],
+    selectedFilters: [],
+    conversationsAPA: [],
+    currentConversationId: undefined,
+    currentMessages: [],
+    dashboardDataAgentAvianca: {
+      workflowsData: [],
+      recent_failures: [],
+      top_users: [],
+      users: [],
+      summary: {
+        cancel_rate: 0,
+        failure_rate: 0,
+        pass_rate: 0,
+        total_cancelled: 0,
+        total_failed: 0,
+        total_passed: 0,
+        total_workflows: 0
+      }
+    },
+    setStatusWorkflow: (newState) =>
+      set(() => ({ statusWorkflow: newState })),
+    setResultWorkflow: (newResult) =>
+      set(() => ({ resultWorkflow: newResult })),
+    setDataWorkflows: (newData) => set(() => ({ dataWorkflows: newData })),
+    setSelectedFilters: (newFilter) => set(() => ({ selectedFilters: newFilter })),
+    setDashboardDataAgentAvianca: (newdata) => set(() => ({ dashboardDataAgentAvianca: newdata })),
+    setConversationsAPA: (updater: (prev: ConversationsAPA[]) => ConversationsAPA[]) =>
+      set((state) => ({
+        conversationsAPA: updater(state.conversationsAPA),
+      })),
+    setCurrentConversationId: (id: string) => set({ currentConversationId: id }),
+    setCurrentMessages: (updater) =>
+      set((state) => ({
+        currentMessages:
+          typeof updater === "function"
+            ? updater(state.currentMessages)
+            : updater,
+      })),
+    resetCurrentConversation: () => set({
       currentConversationId: undefined,
-      currentMessages: [],
-      dashboardDataAgentAvianca: {
-        workflowsData: [],
-        recent_failures: [],
-        top_users: [],
-        users: [],
-        summary: {
-          cancel_rate: 0,
-          failure_rate: 0,
-          pass_rate: 0,
-          total_cancelled: 0,
-          total_failed: 0,
-          total_passed: 0,
-          total_workflows: 0
-        }
-      },
-      setStatusWorkflow: (newState) =>
-        set(() => ({ statusWorkflow: newState })),
-      setResultWorkflow: (newResult) =>
-        set(() => ({ resultWorkflow: newResult })),
-      setDataWorkflows: (newData) => set(() => ({ dataWorkflows: newData })),
-      setSelectedFilters: (newFilter) => set(() => ({ selectedFilters: newFilter })),
-      setDashboardDataAgentAvianca: (newdata) => set(() => ({ dashboardDataAgentAvianca: newdata })),
-      setConversationsAPA: (updater: (prev: ConversationsAPA[]) => ConversationsAPA[]) =>
-        set((state) => ({
-          conversationsAPA: updater(state.conversationsAPA),
-        })),
-      setCurrentConversationId: (id: string) => set({ currentConversationId: id }),
-      setCurrentMessages: (updater) =>
-        set((state) => ({
-          currentMessages:
-            typeof updater === "function"
-              ? updater(state.currentMessages)
-              : updater,
-        })),
-      resetCurrentConversation: () => set({
-        currentConversationId: undefined,
-        currentMessages: []
-      })
-    }),
-    {
-      name: "test-store"
-    }
-  )
+      currentMessages: []
+    })
+  })
 );
 
 export const useTestStore = () => {
