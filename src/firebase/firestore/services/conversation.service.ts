@@ -13,6 +13,7 @@ export const ConversationService = {
     },
 
     async updateConversation(id: string, data: Partial<ChatMessage>) {
+        data.updateAt = Date.now();
         return await coversationRepository.update(id, data);
     },
 
