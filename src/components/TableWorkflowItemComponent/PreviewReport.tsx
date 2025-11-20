@@ -61,9 +61,11 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                 fontSize={"sm"}
                 fontWeight={"medium"}
                 _hover={{
-                    border: "2px solid #000000",
-                    borderRadius: "md",
-                    color: "black"
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                }}
+                _focus={{
+                    outline: "none"
                 }}
             >
                 Visualizar reporte

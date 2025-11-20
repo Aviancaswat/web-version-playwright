@@ -139,7 +139,18 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
           <Td textAlign={"center"}>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
           <Td textAlign={"center"}>
             <Menu closeOnSelect={false}>
-              <MenuButton as={Button} bg="none" isDisabled={(row.status as StatusWorkflow) === "in_progress"}>
+              <MenuButton
+                as={Button}
+                bg="none"
+                isDisabled={(row.status as StatusWorkflow) === "in_progress"}
+                _hover={{
+                  bg: "gray.300",
+                  borderColor: "transparent"
+                }}
+                _focus={{
+                  outline: "none"
+                }}
+              >
                 <GripHorizontal />
               </MenuButton>
               <MenuList>
@@ -148,6 +159,13 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                     isLoadingReport ? <AnimatedLoader /> : <FolderDown />
                   }
                   onClick={() => handleDownloadReport(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Descargar Reporte
                 </MenuItem>
@@ -155,6 +173,13 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                 <MenuItem
                   icon={isLoadingRun ? <AnimatedLoader /> : <RefreshCw />}
                   onClick={() => handleRunWorkflow(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Volver a ejecutar workflow
                 </MenuItem>
@@ -167,6 +192,13 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
                     )
                   }
                   onClick={() => handleDeleteArtifactsByWorkflow(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Eliminar reportes
                 </MenuItem>
