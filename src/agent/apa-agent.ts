@@ -8,7 +8,7 @@ import {
 } from '@openai/agents';
 import OpenAI from 'openai';
 import z from 'zod';
-import { getJobsByRunId, getLogsByJobId, getReportHTMLPreview } from '../github/api';
+import { GithubService } from '../github/service/github.service';
 import { extractRelevantLogs } from '../utils/extractLogsReleevant';
 import { INSTRUCTIONS_MAIN_AGENT, MODEL } from './instructions';
 
@@ -53,21 +53,22 @@ const getReportByWorkflowIDGithubTool = tool({
 
         try {
 
-            const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
+            const { modifiedHtml: contentHTML } = await GithubService.getReportHTMLPreviewGithub(workflowId);
 
             if (!contentHTML) {
                 console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
             }
 
             console.log(`Obteniendo jobs del workflow ${workflowId}`);
-            const { total_count, jobs } = await getJobsByRunId(context.workflowId);
+            const { total_count, jobs } = await GithubService.getJobsByRunIdGithub(context.workflowId);
             console.log(`Jobs encontrados: ${jobs.length}`);
 
             let relevantLogs: string | null = null;
             if (total_count > 0 && jobs.length > 0) {
+
                 try {
                     console.log("Extrayendo logs relevantes...");
-                    const logs = await getLogsByJobId(jobs[0].id);
+                    const logs = await GithubService.getLogsByJobIdGithub(jobs[0].id);
                     relevantLogs = extractRelevantLogs(logs as string);
                     console.log("Logs extraídos exitosamente");
                 }

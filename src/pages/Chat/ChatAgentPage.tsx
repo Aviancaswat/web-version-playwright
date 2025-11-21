@@ -12,7 +12,7 @@ import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAg
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import { conversationCollection } from "../../firebase/firestore/collections/conversation.collection";
 import { ConversationService } from "../../firebase/firestore/services/conversation.service";
-import { getRunsByRepo } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import { useTestStore, type ConversationsAPA, type JSONDashboardAgentAvianca, type TopUser } from "../../store/test-store";
 import { MessageContainer } from "./MessageContainer";
 
@@ -87,7 +87,7 @@ const ChatAgentPage = () => {
     const getWorkflows = async () => {
         try {
             setLoadingWorkflows(true);
-            const runs = await getRunsByRepo();
+            const runs = await GithubService.getRunsByRepoGithub();
             if (runs.length === 0) throw new Error("No hay workflows");
             console.log("Data workflows chat ai: ", runs)
 

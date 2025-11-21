@@ -17,10 +17,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactElement } from "react";
 import { v4 as uuid } from "uuid";
-import {
-  type ResultWorkflow,
-  type StatusWorkflow
-} from "../../github/api";
+import type { ResultWorkflow, StatusWorkflow } from "../../github/repository/github.repository";
 import { GithubService } from "../../github/service/github.service";
 import AviancaToast from "../../utils/AviancaToast";
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";

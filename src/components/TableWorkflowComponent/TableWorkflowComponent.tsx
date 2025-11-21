@@ -25,7 +25,6 @@ import {
 } from "@chakra-ui/react";
 import { FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getRunsByRepo } from "../../github/api";
 import { GithubService } from "../../github/service/github.service";
 import { useTestStore } from "../../store/test-store";
 import AviancaToast from "../../utils/AviancaToast";
@@ -53,7 +52,7 @@ const TableWorkflowsDash: React.FC = () => {
   const getWorkflows = async () => {
     setLoading(true);
     try {
-      const runs = await getRunsByRepo();
+      const runs = await GithubService.getRunsByRepoGithub();
       if (runs.length === 0) throw new Error("No hay workflows");
       console.log("Data workflows: ", runs)
 

@@ -2,7 +2,7 @@ import { Box, Card, Center, Heading, HStack, Text } from "@chakra-ui/react";
 import { Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
-import { getArtefactsByRepo } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import CircleProgress from "../progressBars/CircleProgress";
 
 const CardBillingStorage = () => {
@@ -11,7 +11,7 @@ const CardBillingStorage = () => {
 
     useEffect(() => {
         const getActionsStorage = async () => {
-            const { artifacts, total_count } = await getArtefactsByRepo()
+            const { artifacts, total_count } = await GithubService.getArtefactsByRepoGithub()
             if (total_count === 0) return;
             let totalBytes = 0;
             artifacts.forEach(e => { totalBytes += e.size_in_bytes; })
@@ -36,13 +36,13 @@ const CardBillingStorage = () => {
                     </Center>
                     <Box className="text">
                         <Heading as="h3" size={"sm"}>Almacenamiento usado</Heading>
-                        <Text color={"gray.500"} display={{base: "none", md: "block"}}>Total de storage consumidos</Text>
+                        <Text color={"gray.500"} display={{ base: "none", md: "block" }}>Total de storage consumidos</Text>
                         <Text>
                             <span style={{ fontWeight: "bold" }}>{storage}</span> GB / <span style={{ fontWeight: "bold" }}>0.5</span> GB incluidos
                         </Text>
                     </Box>
                 </HStack>
-                <Box height={70} width={70} float={"inline-end"} display={{base: "none", md: "block"}}>
+                <Box height={70} width={70} float={"inline-end"} display={{ base: "none", md: "block" }}>
                     <CircleProgress
                         key={v4()}
                         value={parseInt(((storage / 0.5) * 100).toFixed(0))}

@@ -2,7 +2,7 @@ import { Box, Card, Center, Heading, HStack, Text } from "@chakra-ui/react";
 import { Hourglass } from "lucide-react";
 import { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
-import { GetActionsMinutesBilling } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import CircleProgress from "../progressBars/CircleProgress";
 
 const CardBillingMinutes = () => {
@@ -12,7 +12,7 @@ const CardBillingMinutes = () => {
     useEffect(() => {
         const currentMonth = '2025-10'
         const getActionsMinutes = async () => {
-            const { usageItems: data } = await GetActionsMinutesBilling()
+            const { usageItems: data } = await GithubService.GetActionsMinutesBillingGithub()
             console.log("response actions minutes: ", data)
 
             if (!data || data.length === 0) return;
@@ -46,13 +46,13 @@ const CardBillingMinutes = () => {
                     </Center>
                     <Box className="text">
                         <Heading as="h3" size={"sm"}>Minutos usados</Heading>
-                        <Text color={"gray.500"} display={{base: "none", md: "block"}}>Total de minutos consumidos</Text>
+                        <Text color={"gray.500"} display={{ base: "none", md: "block" }}>Total de minutos consumidos</Text>
                         <Text>
                             <span style={{ fontWeight: "bold" }}>{minutes}</span> min / <span style={{ fontWeight: "bold" }}>2000</span> min incluidos
                         </Text>
                     </Box>
                 </HStack>
-                <Box height={70} width={70} float={"inline-end"} display={{base: "none", md: "block"}}>
+                <Box height={70} width={70} float={"inline-end"} display={{ base: "none", md: "block" }}>
                     <CircleProgress
                         key={uuid()}
                         value={parseInt(((minutes / 2000) * 100).toFixed(0))}

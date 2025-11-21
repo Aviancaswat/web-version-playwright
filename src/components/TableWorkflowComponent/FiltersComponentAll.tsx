@@ -1,7 +1,7 @@
 import { Box, Button, HStack } from "@chakra-ui/react";
 import { SearchX, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getRunsByRepo } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import { useTestStore, type FilterGeneric } from "../../store/test-store";
 import AnimatedLoader from "../loaders/AnimatedLoader";
 import FilterComponent, { type FilterProps } from "./FilterComponent";
@@ -74,7 +74,7 @@ const FiltersComponentAll: React.FC = () => {
         const getWorkflows = async () => {
             setLoading(true);
             try {
-                const runs = await getRunsByRepo();
+                const runs = await GithubService.getRunsByRepoGithub();
                 if (runs.length === 0) throw new Error("No hay workflows");
                 const newData: DataWorkflows[] = runs.map((workflow) => ({
                     id: workflow.id,
