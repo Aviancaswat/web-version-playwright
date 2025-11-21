@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { FilterType } from "../components/TableWorkflowComponent/FilterComponent";
 import type { DataWorkflows } from "../components/TableWorkflowComponent/TableWorkflowComponent.types";
-import type { ResultWorkflow, StatusWorkflow } from "../github/api";
+import type { ResultWorkflow, StatusWorkflow } from "../github/repository/github.repository";
 import type { Messages } from "../pages/Chat/ChatAgentPage";
 
 export type FilterGeneric = {
