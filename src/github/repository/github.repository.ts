@@ -60,7 +60,6 @@ const octokit = new Octokit({
 const owner: string = "Aviancaswat";
 const repo: string = "avianca-test-core-nuxqa6";
 const path: string = "data/config/dataTests.ts";
-const workflow_id: number = 177616966;
 const branchRef: string = "develop";
 
 export const GithubRepository = {
