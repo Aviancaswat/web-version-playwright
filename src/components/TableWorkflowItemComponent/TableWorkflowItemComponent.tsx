@@ -18,12 +18,10 @@ import {
 import { useState, type ReactElement } from "react";
 import { v4 as uuid } from "uuid";
 import {
-  deleteArtefactById,
-  downLoadReportHTML,
-  runWorkflowById,
   type ResultWorkflow,
   type StatusWorkflow
 } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import AviancaToast from "../../utils/AviancaToast";
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
@@ -65,7 +63,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const handleDownloadReport = async (workflowId: number) => {
     try {
       setIsLoadingReport(true);
-      await downLoadReportHTML(workflowId);
+      await GithubService.downLoadReportHTMLGithub(workflowId);
       AviancaToast.success("Reporte descargado", {
         description: "Se ha descargado el reporte correctamente",
         position: "bottom-center"
@@ -88,7 +86,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const handleRunWorkflow = async (workflowId: number) => {
     try {
       setIsLoadingRun(true);
-      await runWorkflowById(workflowId);
+      await GithubService.runWorkflowByIdGithub(workflowId);
       AviancaToast.success("Run ejecutado", {
         description: "Se ha heco RUN del workflow correctamente",
         position: "bottom-center"
@@ -108,7 +106,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const handleDeleteArtifactsByWorkflow = async (workflowId: number) => {
     try {
       setIsLoadingDeleteArtifacts(true);
-      await deleteArtefactById(workflowId);
+      await GithubService.deleteArtefactByIdGithub(workflowId);
       AviancaToast.success("Artefactos eliminados", {
         description: "Se ha eliminado el artefacto correctamente",
         position: "bottom-center"

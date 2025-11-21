@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup, Center, Heading, Image, MenuItem, Modal, Moda
 import { Bell, Bot, FolderDown, ScanEye } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import logoAv from "../../assets/avianca-logo-desk.png";
-import { downLoadReportHTML, getReportHTMLPreview } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import AviancaToast from "../../utils/AviancaToast";
 import AnimatedLoader from "../loaders/AnimatedLoader";
 
@@ -20,10 +20,11 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
     const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false)
 
     const previewReporteHTML = useCallback(async (workflowId: number) => {
+
         try {
 
             setLoadingReporteHTML(true);
-            const { modifiedHtml: contentHTML } = await getReportHTMLPreview(workflowId);
+            const { modifiedHtml: contentHTML } = await GithubService.getReportHTMLPreviewGithub(workflowId);
             setReporteHTML(contentHTML);
         }
         catch (error) {
@@ -37,7 +38,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
     const downloadReportPreview = useCallback(async (workflowID: number) => {
         try {
             setIsLoadingReport(true)
-            await downLoadReportHTML(workflowID)
+            await GithubService.downLoadReportHTMLGithub(workflowID)
         } catch (error) {
             console.error("Ocurrió un error al descargar el reporte")
             AviancaToast.error("Upps! Error al descargar el reporte");

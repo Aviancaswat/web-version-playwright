@@ -143,7 +143,9 @@ const ChatAgentPage = () => {
     };
 
     useEffect(() => {
-        chatRef.current?.scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+            chatRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 400);
     }, [messages]);
 
     useEffect(() => {

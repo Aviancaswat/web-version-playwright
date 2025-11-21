@@ -25,7 +25,8 @@ import {
 } from "@chakra-ui/react";
 import { FolderX, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
+import { getRunsByRepo } from "../../github/api";
+import { GithubService } from "../../github/service/github.service";
 import { useTestStore } from "../../store/test-store";
 import AviancaToast from "../../utils/AviancaToast";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
@@ -88,13 +89,14 @@ const TableWorkflowsDash: React.FC = () => {
     setIsLoadingDelete(true);
 
     try {
-      await deleteAllArtefacts();
+
+      await GithubService.deleteAllArtefactsGithub();
       AviancaToast.success("Artefactos eliminados", {
         description: "Se han eliminado todos los artefactos correctamente"
       })
     } catch (error) {
       AviancaToast.error("Upps! no se pudo eliminar", {
-        description: error instanceof Error ? error.message : "Ha ocurrido un error al elimianr los artefactos"
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al eliminar los artefactos"
       })
       throw error;
     } finally {
