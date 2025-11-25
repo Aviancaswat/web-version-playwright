@@ -66,7 +66,12 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
             />
           </Box>
 
-          <Tooltip label={isOpen ? "Colapsar" : "Expandir"} placement="right">
+          <Tooltip
+            label={isOpen ? "Colapsar" : "Expandir"}
+            placement="right"
+            bg={"white"}
+            color={"black"}
+          >
             <IconButton
               aria-label={isOpen ? "Colapsar sidebar" : "Expandir sidebar"}
               icon={isOpen ? <ChevronLeft /> : <ChevronRight />}
@@ -78,7 +83,8 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
               borderRadius="full"
               boxShadow="md"
               onClick={toggle}
-              _hover={{ bg: "blackAlpha.700" }}
+              _hover={{ bg: "blackAlpha.700", border: "transparent" }}
+              _focus={{ outline: "none" }}
               bg="blackAlpha.800"
               color="white"
               zIndex={3}
