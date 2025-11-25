@@ -77,12 +77,16 @@ const ExampleQuestionAgent: React.FC<
                     <Tooltip label="Copiar" placement="top" borderRadius={"md"} color="black" bg={"white"}>
                         <Button
                             size={"sm"}
-                            p={1}
+                            p={2}
                             mr={2}
                             bg={"transparent"}
                             _hover={{
                                 color: "#000000",
-                                bg: "gray.50"
+                                bg: "gray.50",
+                                border: "transparent"
+                            }}
+                            _focus={{
+                                outline: "none"
                             }}
                             onClick={() => action(index, title)}
                         >
@@ -153,7 +157,7 @@ const WelcomeAgentDashboard: React.FC<Props> = ({ isLoading }) => {
                                 gap={5}
                                 justifyContent={"center"}
                                 alignItems={"center"}
-                                pb={{base: 10, md: 0}}
+                                pb={{ base: 10, md: 0 }}
                             >
                                 {
                                     dataExamples.map((data, index) => (
