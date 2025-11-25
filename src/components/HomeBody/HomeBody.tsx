@@ -3,18 +3,18 @@ import {
   Button,
   Card,
   CardBody,
+  Flex,
   Heading,
   Image,
-  Text,
-  Flex,
   SimpleGrid,
+  Text,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import ImageBG from "../../assets/avianca-img.png";
 import checkIcon from "../../assets/ico-check.png";
-import shareIcon from "../../assets/ico-share.png";
 import navigateIcon from "../../assets/ico-navigate.png";
+import shareIcon from "../../assets/ico-share.png";
 import logoAvianca from "../../assets/logo-avianca.jpeg";
-import { useNavigate } from "react-router-dom";
 
 const HomeBody = () => {
   const history = useNavigate();
@@ -42,14 +42,14 @@ const HomeBody = () => {
         mt={10}
         backgroundColor="#ff0000"
         color="white"
-      
+
       >
         <Flex direction={{ base: "column", md: "row" }} h="100%">
           <Box
             flex={{ base: "unset", md: "0.6" }}
             w={{ base: "100%", md: "auto" }}
             h={{ base: 180, md: "100%" }}
-          
+
             borderTopRadius={{ base: "lg", md: "0" }}
             borderLeftRadius={{ base: "0", md: "lg" }}
           >
