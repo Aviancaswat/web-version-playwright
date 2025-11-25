@@ -41,7 +41,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
             await GithubService.downLoadReportHTMLGithub(workflowID)
         } catch (error) {
             console.error("Ocurrió un error al descargar el reporte")
-            AviancaToast.error("Upps! Error al descargar el reporte");
+            AviancaToast.error("Upps! El reporte no existe o no se pudo descargar.");
         } finally {
             setIsLoadingReport(false)
         }
@@ -124,6 +124,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                     <ModalFooter>
                         <ButtonGroup spacing={2}>
                             <Button
+                                isDisabled={reporteHTML === "" || errorLoadingReportHTML}
                                 leftIcon={isLoadingReport ? <AnimatedLoader /> : <FolderDown />}
                                 onClick={() => downloadReportPreview(workflowID)}
                                 bg={"black"}

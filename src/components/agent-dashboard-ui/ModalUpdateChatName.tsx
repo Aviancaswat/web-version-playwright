@@ -85,7 +85,7 @@ export const ModalUpdateChatName = ({ conversationId }: { conversationId: string
                         <Text fontSize={"sm"} color={"gray.500"}>
                             Presiona Enter para actualizar el nombre
                         </Text>
-                        <List mt={5} bg={"gray.100"} p={2} borderRadius={"md"}>
+                        <List mt={5} bg={"green.100"} color={"green.600"} p={2} borderRadius={"md"}>
                             <Heading fontSize={"sm"} fontWeight={800} mb={1}>
                                 Sugerencias:
                             </Heading>
