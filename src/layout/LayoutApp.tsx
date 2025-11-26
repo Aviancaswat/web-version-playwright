@@ -21,7 +21,7 @@ const SIDEBAR_WIDTH = 280;
 const SIDEBAR_COLLAPSED = 72;
 
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const iconMap: Record<string, ChildrenSideBarDashboardProps["icon"]> = {
     House,
