@@ -1,36 +1,30 @@
-import { useState } from "react";
-import {
-  Box,
-  Text,
-  Button,
-  Divider,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-  HStack,
-  Input,
-  Circle,
-  IconButton,
-} from "@chakra-ui/react";
 import { CheckIcon, CloseIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Button,
+  Circle,
+  Divider,
+  HStack,
+  IconButton,
+  Input,
+  Text,
+} from "@chakra-ui/react";
+import { useState } from "react";
 
 // Store
-import useTestStore from "../../store/useTestStore/useTestStore";
 import useEditTestStore from "../../store/useEditTestStore/useEditTestStore";
 import useLoadingStore from "../../store/useLoadingStore/useLoadingStore";
-
-//Services
-import {
-  checkWorkflowStatus,
-  downLoadReportHTML,
-  replaceDataforNewTest,
-} from "../../github/api";
+import useTestStore from "../../store/useTestStore/useTestStore";
 
 //Types
-import type { TestResultData } from "./TestListComponent.types";
+import { GithubService } from "../../github/service/github.service";
 import type { Test } from "../../store/useTestStore/useTestStore.types";
+import type { TestResultData } from "./TestListComponent.types";
 
 const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests, blockForm, unblockForm } =
@@ -51,7 +45,7 @@ const TestListComponent: React.FC = () => {
 
     return new Promise<TestResultData | undefined>((resolve) => {
       const getStatus = async () => {
-        const response = await checkWorkflowStatus(commitSHA);
+        const response = await GithubService.checkWorkflowStatusGithub(commitSHA);
 
         if (!response) return;
 
@@ -80,10 +74,11 @@ const TestListComponent: React.FC = () => {
     if (!testListName.trim()) return;
 
     try {
+
       setShowLoading(true);
       blockForm();
 
-      const commit = await replaceDataforNewTest(
+      const commit = await GithubService.replaceDataforNewTestGithub(
         testListName,
         JSON.stringify(tests)
       );
@@ -291,7 +286,9 @@ const TestListComponent: React.FC = () => {
               colorScheme="blackAlpha"
               backgroundColor="#1b1b1b"
               borderRadius="full"
-              onClick={() => downLoadReportHTML(resultData.workflowId)}
+              onClick={async () => {
+                await GithubService.downLoadReportHTMLGithub(resultData.workflowId)
+              }}
             >
               Descargar reporte
             </Button>

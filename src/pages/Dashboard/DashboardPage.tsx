@@ -3,175 +3,127 @@ import {
   Button,
   Heading,
   HStack,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
+  Spinner,
   Text,
-  VStack,
+  VStack
 } from "@chakra-ui/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import {
-  AlignJustify,
-  Bug,
-  CirclePause,
-  FileChartLine,
-  TestTube,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-
-//Components
-import CardDetailsDash from "../../components/CardDetailsComponent/CardDetailsComponent";
+import { FileDown, SquareArrowOutUpRight } from "lucide-react";
+import { lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
+import { v4 as uuid } from "uuid";
+import ShinyTextAnimation from "../../components/animations/ShinyText/ShinyText";
 import InformDocument from "../../components/InformDocument/InformDocument";
-import TableWorkflowsDash from "../../components/TableWorkflowComponent/TableWorkflowComponent";
+import SkeletonCardsBilling from "../../components/skeletons/skeleton-billing-card";
+import SkeletonCards from "../../components/skeletons/skeleton-card";
+import SkeletonTable from "../../components/skeletons/skeleton-table";
+import { getGreeting } from "../../utils/getGreetings";
 
-//Store
-import { useTestStore } from "../../store/test-store";
-
-//Data
-import dashboardCardData from "../../json/Dashboard/dashboardCardData.json";
-
-//Types
-import type { CardDetailsDashProps } from "../../components/CardDetailsComponent/CardDetailsComponent.types";
+const CardDetailsDashLazy = lazy(() => import("../../components/CardDetailsComponent/CardDetailsComponent"))
+const TableDashLazy = lazy(() => import("../../components/TableWorkflowComponent/TableWorkflowComponent"))
+const CardBillingActionsMinutes = lazy(() => import("../../components/Billing/CardBillingMinutes"))
+const CardBillingActionsStorage = lazy(() => import("../../components/Billing/CardBillingStorage"))
 
 const DashboardPage = () => {
-  const { dataWorkflows } = useTestStore();
-
-  const [data, setDataCardsDetailsDash] = useState<CardDetailsDashProps[]>([]);
-
-  const iconMap: Record<string, CardDetailsDashProps["icon"]> = {
-    TestTube,
-    Bug,
-    CirclePause,
-  };
-
-  const dataCardsDetailsDash: CardDetailsDashProps[] = dashboardCardData.map(
-    (item) => ({
-      icon: iconMap[item.icon],
-      title: item.title,
-      value: item.value,
-      type: item.type as "success" | "error" | "cancelled",
-      stat: item.stat,
-    })
-  );
-
-  useEffect(() => {
-    if (dataWorkflows.length > 0) {
-      const successWorkflows = dataWorkflows.filter(
-        (item) => item.conclusion === "success"
-      ).length;
-
-      const failureWorkflows = dataWorkflows.filter(
-        (item) => item.conclusion === "failure"
-      ).length;
-
-      const cancelledWorkflows = dataWorkflows.filter(
-        (item) => item.conclusion === "cancelled"
-      ).length;
-
-      const totalWorkflows = dataWorkflows.length;
-
-      const newData = dataCardsDetailsDash.map((card) => {
-        switch (card.title) {
-          case "Total exitosas":
-            return {
-              ...card,
-              value: successWorkflows,
-              stat: ((successWorkflows / totalWorkflows) * 100).toFixed(2),
-            };
-          case "Total fallidas":
-            return {
-              ...card,
-              value: failureWorkflows,
-              stat: ((failureWorkflows / totalWorkflows) * 100).toFixed(2),
-            };
-          case "Total canceladas":
-            return {
-              ...card,
-              value: cancelledWorkflows,
-              stat: ((cancelledWorkflows / totalWorkflows) * 100).toFixed(2),
-            };
-          case "Total tiempo":
-            return {
-              ...card,
-              value: totalWorkflows,
-              stat: ((totalWorkflows / totalWorkflows) * 100).toFixed(2),
-            };
-          default:
-            return card;
-        }
-      });
-
-      setDataCardsDetailsDash(newData);
-    }
-  }, [dataWorkflows]);
-
   return (
-    <Box height={"95vh"} overflow={"auto"}>
-      <HStack mt={5} justify={"space-between"}>
-        <VStack align={"start"}>
-          <Heading as="h1" size={"lg"} ml={4}>
-            Panel
-          </Heading>
-          <Text color={"blackAlpha.900"} fontSize={"sm"} ml={4}>
-            Visualiza, analiza y descarga tus informes de Avianca playwright
-          </Text>
-        </VStack>
-        <Menu>
-          <MenuButton
-            as={Button}
-            bg={"gray.900"}
-            color={"white"}
-            _hover={{
-              bg: "gray.600",
-            }}
+    <Box height={"95vh"} overflow={"auto"} position={"relative"} p={2}>
+      <Box
+        mb={5}
+        display={"flex"}
+        flexWrap={"wrap"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Heading as="h1" size={"lg"} ml={2}>{getGreeting()}</Heading>
+        <Box display={"flex"} gap={2}>
+          <Link to={"/create-test"}>
+            <Button
+              variant={"outline"}
+              rightIcon={<SquareArrowOutUpRight size={16} />}
+              borderColor={"black"}
+              size={"sm"}
+              _hover={{ bg: "" }}
+            >
+              Crear test
+            </Button>
+          </Link>
+          <PDFDownloadLink
+            document={<InformDocument />}
+            fileName="informe-avianca-playwright.pdf"
           >
-            <AlignJustify />
-          </MenuButton>
-          <MenuList>
-            <PDFDownloadLink
-              document={<InformDocument />}
-              fileName="informe-avianca-playwright.pdf"
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Generando PDF..."
-                ) : (
-                  <MenuItem icon={<FileChartLine />}>
-                    Exportar Informe PDF
-                  </MenuItem>
-                )
-              }
-            </PDFDownloadLink>
-            <MenuDivider />
-            <MenuItem
-              pointerEvents={"none"}
-              color={"gray.500"}
-              textAlign={"center"}
-              width={"100%"}
-            >
-              Avianca Evolutivos
-            </MenuItem>
-          </MenuList>
-        </Menu>
-      </HStack>
-      <Box className="container-dash" mt={5}>
+            {({ loading }) =>
+              <Button
+                rightIcon={<FileDown size={16} />}
+                bg={"black"}
+                color={"white"}
+                _hover={{ bg: "gray.800" }}
+                size={"sm"}
+              >
+                {loading ? <Spinner size={"sm"} /> : "Reporte"}
+              </Button>
+            }
+          </PDFDownloadLink>
+        </Box>
+      </Box>
+      <Box className="container-dash" mt={2}>
+        <Box
+          position={"relative"}
+          display={"flex"}
+          gap={3}
+          flexWrap={"wrap"}
+        >
+          <HStack
+            borderRadius={"md"}
+            p={2}
+            width={{ base: "100%", md: "50%" }}
+            bg={"#1B1B1B"}
+            height={200}
+            justify={"space-between"}
+            backgroundImage={`
+            radial-gradient(circle at 50% 100%, rgba(70, 85, 110, 0.5) 0%, transparent 60%),
+            radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.4) 0%, transparent 70%),
+            radial-gradient(circle at 50% 100%, rgba(181, 184, 208, 0.3) 0%, transparent 80%)
+          `}
+            display={"grid"}
+            placeContent={"center"}
+          >
+            <Heading color={"white"} textAlign={"center"}>
+              Dashboard <br />
+              <ShinyTextAnimation
+                key={uuid()}
+                text="Avianca Playwright"
+                speed={3}
+              />
+            </Heading>
+            <Text color={"gray.400"} textAlign={"center"}>Visualiza, Revisa y gestiona tus workflows</Text>
+          </HStack>
+          <VStack width={{ base: "100%", md: "48%" }} height={"100%"}>
+            <Suspense fallback={<SkeletonCardsBilling />}>
+              <CardBillingActionsMinutes />
+            </Suspense>
+            <Suspense fallback={<SkeletonCardsBilling />}>
+              <CardBillingActionsStorage />
+            </Suspense>
+          </VStack>
+        </Box>
         <HStack
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
           width={"100%"}
           flexWrap={"wrap"}
+          mt={5}
         >
-          {data.map((data, index) => (
-            <CardDetailsDash key={index} {...data} />
-          ))}
+          <Suspense fallback={<SkeletonCards />}>
+            <CardDetailsDashLazy />
+          </Suspense>
         </HStack>
       </Box>
       <Box mt={5}>
         <Box width={"95%"} margin={"auto"}>
-          <TableWorkflowsDash />
+          <Suspense fallback={<SkeletonTable />}>
+            <TableDashLazy />
+          </Suspense>
         </Box>
       </Box>
     </Box>

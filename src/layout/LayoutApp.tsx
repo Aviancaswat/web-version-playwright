@@ -1,13 +1,13 @@
-import { useState, useMemo } from "react";
 import { Box, HStack, IconButton, Tooltip } from "@chakra-ui/react";
-import { FlaskConical, House, LayoutDashboard, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bot, ChevronLeft, ChevronRight, FlaskConical, House, LayoutDashboard } from "lucide-react";
+import { useMemo, useState } from "react";
 
 // Data
 import sideBarMenuData from "../json/SideBar/sideBarMenuData.json";
 
 // Components
-import SideBarDashboard from "../components/SideBarComponent/SideBarComponent";
 import LoadingScreenComponent from "../components/LoadingScreenComponent/LoadingScreenComponent";
+import SideBarDashboard from "../components/SideBarComponent/SideBarComponent";
 
 // Types
 import type { ChildrenSideBarDashboardProps } from "../components/SideBarComponent/SideBarComponent.types";
@@ -17,16 +17,17 @@ import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
 
-const SIDEBAR_WIDTH = 280;    
-const SIDEBAR_COLLAPSED = 72;  
+const SIDEBAR_WIDTH = 280;
+const SIDEBAR_COLLAPSED = 72;
 
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const iconMap: Record<string, ChildrenSideBarDashboardProps["icon"]> = {
     House,
     LayoutDashboard,
     FlaskConical,
+    Bot
   };
 
   const routesConfig: ChildrenSideBarDashboardProps[] = useMemo(
@@ -51,13 +52,12 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
           initial={{ width: SIDEBAR_WIDTH }}
           animate={{ width: isOpen ? SIDEBAR_WIDTH : SIDEBAR_COLLAPSED }}
           transition={{ type: "spring", stiffness: 260, damping: 30 }}
-          overflow="visible"      
+          overflow="visible"
           height="100%"
           bg="blackAlpha.900"
           position="relative"
-          zIndex={2}             
+          zIndex={2}
         >
-       
           <Box height="100%" overflow="hidden">
             <SideBarDashboard
               childrens={routesConfig}
@@ -66,7 +66,12 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
             />
           </Box>
 
-          <Tooltip label={isOpen ? "Colapsar" : "Expandir"} placement="right">
+          <Tooltip
+            label={isOpen ? "Colapsar" : "Expandir"}
+            placement="right"
+            bg={"white"}
+            color={"black"}
+          >
             <IconButton
               aria-label={isOpen ? "Colapsar sidebar" : "Expandir sidebar"}
               icon={isOpen ? <ChevronLeft /> : <ChevronRight />}
@@ -78,16 +83,15 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
               borderRadius="full"
               boxShadow="md"
               onClick={toggle}
-              _hover={{ bg: "blackAlpha.700" }}
+              _hover={{ bg: "blackAlpha.700", border: "transparent" }}
+              _focus={{ outline: "none" }}
               bg="blackAlpha.800"
               color="white"
-              zIndex={3}      
+              zIndex={3}
             />
           </Tooltip>
         </MotionBox>
-
-        {/* Contenido principal */}
-        <Box as="main" flex="1" p={3} height="100%" overflow="auto" bg="gray.50">
+        <Box as="main" flex="1" height="100%" overflow="auto" bg="gray.50">
           {children}
         </Box>
       </HStack>

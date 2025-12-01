@@ -10,41 +10,33 @@ import {
   ButtonGroup,
   Heading,
   HStack,
-  Spinner,
+  Skeleton,
+  SkeletonCircle,
   Table,
   TableContainer,
   Tbody,
-  Text,
+  Td,
   Th,
   Thead,
   Tooltip,
   Tr,
   useDisclosure,
-  useToast,
+  VStack
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { FolderX, RefreshCw } from "lucide-react";
-
-//Services
-import { deleteAllArtefacts, getRunsByRepo } from "../../github/api";
-
-//Store
+import { useCallback, useEffect, useRef, useState } from "react";
+import { GithubService } from "../../github/service/github.service";
 import { useTestStore } from "../../store/test-store";
-
-//Components
+import AviancaToast from "../../utils/AviancaToast";
 import PaginationTableDash from "../PaginationTableComponent/PaginationTableComponent";
 import TableWorkflowItemComponent from "../TableWorkflowItemComponent/TableWorkflowItemComponent";
-
-//Types
+import FiltersComponentAll from "./FiltersComponentAll";
 import type { DataWorkflows } from "./TableWorkflowComponent.types";
 
 const TableWorkflowsDash: React.FC = () => {
+
   const { setDataWorkflows, dataWorkflows } = useTestStore();
-
-  const toast = useToast();
-
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const [isLoading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -54,108 +46,57 @@ const TableWorkflowsDash: React.FC = () => {
   const currentItems = dataWorkflows.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
   const [isLoadingDelete, setIsLoadingDelete] = useState<boolean>(false);
-
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    const getWorkflows = async () => {
-      setLoading(true);
-      try {
-        const runs = await getRunsByRepo();
-        if (runs.length === 0) throw new Error("No hay workflows");
-
-        const newData: DataWorkflows[] = runs.map((workflow) => ({
-          id: workflow.id,
-          display_title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          total_count: workflow.total_count,
-        }));
-
-        setDataWorkflows(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWorkflows();
-  }, []);
-
-  useEffect(() => {
-    const getWorkflows = async () => {
-      setLoading(true);
-      try {
-        const runs = await getRunsByRepo();
-        if (runs.length === 0) throw new Error("No hay workflows");
-
-        const newData: DataWorkflows[] = runs.map((workflow) => ({
-          id: workflow.id,
-          display_title: workflow.display_title,
-          status: workflow.status,
-          conclusion: workflow.conclusion,
-          total_count: workflow.total_count,
-        }));
-
-        if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
-          setDataWorkflows(newData);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getWorkflows();
-  }, [dataWorkflows]);
-
-  const handleReloadTable = useCallback(async () => {
+  const getWorkflows = async () => {
     setLoading(true);
-
     try {
-      const runs = await getRunsByRepo();
+      const runs = await GithubService.getRunsByRepoGithub();
       if (runs.length === 0) throw new Error("No hay workflows");
+      console.log("Data workflows: ", runs)
+
       const newData: DataWorkflows[] = runs.map((workflow) => ({
         id: workflow.id,
+        actor: {
+          autorname: workflow?.actor?.login,
+          avatar: workflow?.actor?.avatar_url,
+        },
         display_title: workflow.display_title,
         status: workflow.status,
         conclusion: workflow.conclusion,
-        total_count: workflow.total_count,
+        total_count: workflow.total_count
       }));
 
-      if (JSON.stringify(newData) !== JSON.stringify(dataWorkflows)) {
-        setDataWorkflows(newData);
-      }
+      setDataWorkflows(newData);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [dataWorkflows]);
+  };
+
+  useEffect(() => {
+    getWorkflows();
+  }, []);
+
+  const handleReloadTable = useCallback(async () => {
+    getWorkflows()
+  }, []);
 
   const handleDeleteAllArtifacts = async () => {
     setIsLoadingDelete(true);
 
     try {
-      await deleteAllArtefacts();
-      toast({
-        status: "success",
-        title: "Artefactos eliminados",
-        description: "Se han eliminado todos los artefactos correctamente",
-      });
+
+      await GithubService.deleteAllArtefactsGithub();
+      AviancaToast.success("Artefactos eliminados", {
+        description: "Se han eliminado todos los artefactos correctamente"
+      })
     } catch (error) {
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al eliminar los artefactos",
-      });
+      AviancaToast.error("Upps! no se pudo eliminar", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al eliminar los artefactos"
+      })
       throw error;
     } finally {
       setIsLoadingDelete(false);
@@ -180,9 +121,14 @@ const TableWorkflowsDash: React.FC = () => {
         alignItems={"center"}
       >
         <HStack m={0} p={0} justify={"space-between"} width={"100%"}>
-          <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
-            Información general de los workflows
-          </Heading>
+          <VStack gap={2} width={"100%"}>
+            <Heading marginBottom={0} width={"100%"} as="h3" size={"md"}>
+              Información general de los workflows
+            </Heading>
+            <Box width={"100%"}>
+              <FiltersComponentAll />
+            </Box>
+          </VStack>
           <ButtonGroup
             width={"100%"}
             size="sm"
@@ -199,8 +145,11 @@ const TableWorkflowsDash: React.FC = () => {
                 onClick={handleReloadTable}
                 size={"xs"}
                 isDisabled={isLoading}
-                colorScheme="blackAlpha"
-                variant={"solid"}
+                bg={"black"}
+                color={"white"}
+                _hover={{
+                  bg: "gray",
+                }}
               >
                 <RefreshCw size={16} />
               </Button>
@@ -215,8 +164,11 @@ const TableWorkflowsDash: React.FC = () => {
                 onClick={onOpen}
                 size={"xs"}
                 isDisabled={isLoading}
-                colorScheme="blackAlpha"
-                variant={"solid"}
+                bg={"black"}
+                color={"white"}
+                _hover={{
+                  bg: "gray",
+                }}
               >
                 <FolderX size={16} />
               </Button>
@@ -269,28 +221,40 @@ const TableWorkflowsDash: React.FC = () => {
         >
           <Thead>
             <Tr>
-              <Th>Nombre del workflow</Th>
-              <Th>Status</Th>
-              <Th>Resultado</Th>
-              <Th>Acciones</Th>
+              <Th textAlign={"center"}>Autor</Th>
+              <Th textAlign={"center"}>Nombre del workflow</Th>
+              <Th textAlign={"center"}>Status</Th>
+              <Th textAlign={"center"}>Resultado</Th>
+              <Th textAlign={"center"}>Acciones</Th>
             </Tr>
           </Thead>
-          <Tbody width={"100%"} height={100}>
-            {isLoading ? (
-              <Box
-                width={"100%"}
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                mt={5}
-              >
-                <Text>Cargando...</Text> <Spinner ml={2} />
-              </Box>
-            ) : (
-              currentItems.length > 0 && (
-                <TableWorkflowItemComponent data={currentItems} />
-              )
-            )}
+          <Tbody width={"100%"} height={50}>
+            {
+              isLoading ? (
+                [...Array(3)].map((_, index) => (
+                  <Tr key={index}>
+                    <Td>
+                      <SkeletonCircle height="32px" width={"32px"} />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                  </Tr>
+                ))
+              ) : (
+                currentItems.length > 0 && (
+                  <TableWorkflowItemComponent data={currentItems} />
+                )
+              )}
           </Tbody>
         </Table>
       </TableContainer>

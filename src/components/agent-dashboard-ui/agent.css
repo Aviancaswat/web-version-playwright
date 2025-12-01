@@ -1,0 +1,121 @@
+.chat-ai ul li {
+  margin-bottom: 5px;
+  margin-left: 30px;
+  font-size: 16px;
+}
+
+.chat-ai ul li::before p {
+  font-weight: bold;
+}
+
+.chat-ai ol li {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.chat-ai ul ul,
+.chat-ai ol ol {
+  margin-left: 20px;
+}
+
+.chat-ai h1,
+.chat-ai h2,
+.chat-ai h3 {
+  font-weight: bold;
+  color: #333;
+}
+
+.chat-ai strong {
+  font-weight: bold;
+}
+
+.chat-ai em {
+  font-style: italic;
+}
+
+.chat-ai a {
+  color: #007BFF;
+  text-decoration: none;
+}
+
+.chat-ai a:hover {
+  text-decoration: underline;
+}
+
+.chat-ai p {
+  font-style: italic;
+}
+
+.chat-ai table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.chat-ai th,
+.chat-ai td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #000;
+}
+
+.chat-ai th {
+  background-color: #000;
+  color: white;
+  font-weight: bold;
+}
+
+.chat-ai tr:nth-child(even) {
+  background-color: #fff;
+}
+
+.chat-ai tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.chat-ai tr:hover {
+  background-color: #ddd;
+}
+
+.chat-ai td,
+.chat-ai th {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.chat-ai blockquote {
+  background-color: #f9f9f9;
+  border-left: 4px solid #007BFF;
+  padding: 10px;
+  font-style: italic;
+  margin: 20px 0;
+  color: #333;
+}
+
+.chat-ai a::after {
+  content: ' ↗';
+  font-size: 0.8em;
+  margin-left: 5px;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+
+.chat-ai a:hover::after {
+  opacity: 1;
+}
+
+.chat-ai pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  color: #dcdcdc;
+  padding: '16px';
+  line-height: '1.5';
+}
+
+.chat-ai code {
+  border-radius: 10px;
+}

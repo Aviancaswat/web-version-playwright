@@ -1,0 +1,232 @@
+import {
+    Agent,
+    imageGenerationTool,
+    run,
+    setDefaultOpenAIClient,
+    tool,
+    type AgentInputItem
+} from '@openai/agents';
+import OpenAI from 'openai';
+import z from 'zod';
+import { GithubService } from '../github/service/github.service';
+import { extractRelevantLogs } from '../utils/extractLogsReleevant';
+import { INSTRUCTIONS_MAIN_AGENT, MODEL } from './instructions';
+
+interface ReportData {
+    workflowId: number;
+    success: boolean;
+    message?: string;
+    jobs: any[];
+    relevantLogs: string | null;
+    jobsCount: number;
+}
+
+// ============================================
+// CONFIGURACIÓN DE OPENAI
+// ============================================
+
+const client = new OpenAI({
+    apiKey: import.meta.env?.VITE_API_KEY_OPENAI!,
+    dangerouslyAllowBrowser: true,
+});
+
+setDefaultOpenAIClient(client);
+
+// ============================================
+// DEFINICIÓN DE TOOLS
+// ============================================
+
+const getReportByWorkflowIDGithubTool = tool({
+    name: 'analyzer_report_github_tool',
+    description: `
+    Usa esta herramienta cuando el usuario pide analizar, obtener o recuperar la información detallada de un 
+    workflow específico de GitHub Actions, incluyendo jobs, logs y reporte HTML de Playwright. 
+    (ej: "analiza el reporte del workflow: 12345678").
+    No usar esta herramienta para graficas, crear imagenes o generar visualizaciones`,
+    parameters: z.object({
+        workflowId: z.number().positive().describe('El ID numérico del workflow de GitHub Actions')
+    }),
+    execute: async (context) => {
+        console.log('🔧 [analyzer_report_github_tool] Iniciando con workflowId:', context.workflowId);
+
+        const { workflowId } = context;
+
+        try {
+
+            const { modifiedHtml: contentHTML } = await GithubService.getReportHTMLPreviewGithub(workflowId);
+
+            if (!contentHTML) {
+                console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
+            }
+
+            console.log(`Obteniendo jobs del workflow ${workflowId}`);
+            const { total_count, jobs } = await GithubService.getJobsByRunIdGithub(context.workflowId);
+            console.log(`Jobs encontrados: ${jobs.length}`);
+
+            let relevantLogs: string | null = null;
+            if (total_count > 0 && jobs.length > 0) {
+
+                try {
+                    console.log("Extrayendo logs relevantes...");
+                    const logs = await GithubService.getLogsByJobIdGithub(jobs[0].id);
+                    relevantLogs = extractRelevantLogs(logs as string);
+                    console.log("Logs extraídos exitosamente");
+                }
+                catch (error) {
+                    console.error(`Error al obtener logs del Job ${jobs[0].id}: `, error);
+                }
+            }
+            else {
+                console.log("No hay jobs disponibles");
+            }
+
+            const responseData: ReportData = {
+                workflowId,
+                success: true,
+                jobs: jobs || [],
+                relevantLogs,
+                jobsCount: total_count
+            };
+
+            console.log(`[analyzer_report_github_tool] Completado exitosamente`);
+
+            return JSON.stringify(responseData, null, 2);
+
+        } catch (error) {
+            console.error('Error en analyzer_report_github_tool:', error);
+            const errorMsg = `Error al obtener reporte del workflow ${workflowId}: ${(error as Error).message}`;
+            return JSON.stringify({
+                workflowId,
+                success: false,
+                error: errorMsg
+            });
+        }
+    }
+});
+
+// ============================================
+// CONTEXTO DEL AGENTE
+// ============================================
+
+interface DashboardContext {
+    dashboardData: string;
+}
+
+// ============================================
+// CONFIGURACIÓN DEL AGENTE
+// ============================================
+
+const dashboardAviancaAgent = new Agent<DashboardContext>({
+    name: 'avianca_playwright_agent',
+    instructions: INSTRUCTIONS_MAIN_AGENT,
+    model: MODEL,
+    tools: [
+        imageGenerationTool({
+            name: "image_gen",
+            model: "gpt-image-1",
+            quality: "high",
+            outputFormat: 'png'
+        }),
+        getReportByWorkflowIDGithubTool
+    ],
+    toolUseBehavior: "run_llm_again",
+    modelSettings: {
+        toolChoice: "auto"
+    }
+});
+
+// ============================================
+// FUNCIÓN PRINCIPAL PARA EJECUTAR EL AGENTE
+// ============================================
+
+let messages: AgentInputItem[] = [];
+
+export const RunAgentDashboard = async (
+    dataDashboard: string,
+    questionUser: string
+) => {
+    try {
+        console.log(`\n${'='.repeat(60)} `);
+        console.log(`Nueva consulta: "${questionUser}"`);
+        console.log(`${'='.repeat(60)} \n`);
+
+        const systemMessage = `
+        # DATOS DEL DASHBOARD DISPONIBLES
+
+        ${JSON.stringify(JSON.parse(dataDashboard), null, 2)}
+
+        # INSTRUCCIONES
+        Eres un asistente esperto en pruebas de automtización con playwright que responde preguntas del usuario en base a los datos del dashboard.\n
+        tambien delegas la responsabilidad de que herramienta es mejor usar para una tarea en especifica:\n
+        
+        1. Si el usuario pide analizar/obtener/recuperar/explicar un resporte en especifico; delegas la tarea a la herramienta llamada "analyzer_report_github_tool".
+        2. Si el usuario pide crear/visualizar/generar/graficar una imagen; delegas la tarea a la herramienta llamada "image_gen".
+        reflexiona y piensa de manera detenida a que herramienta delegas o asignas la tarea dependiendo de la descripción del usuario. usa las recomendaciones que te dí anteriormente.
+
+        - Sé conciso y preciso en tus respuestas
+        `.trimStart();
+
+        if (messages.length === 0) {
+            const findRoleSystem = messages.find((e: any) => e.role === "system");
+            if (!findRoleSystem) {
+                messages.push({
+                    role: "system",
+                    content: systemMessage
+                })
+            }
+        }
+
+        const response = await run(
+            dashboardAviancaAgent,
+            messages.concat({ role: "user", content: questionUser }),
+            {
+                maxTurns: 10
+            }
+        );
+
+        messages = response.history;
+
+        console.log(`\n Respuesta generada exitosamente`);
+        console.log(`Turnos utilizados: ${response.history.length / 2} `);
+
+        return response;
+    }
+    catch (error) {
+        console.error("\nError al ejecutar el agente:", error);
+
+        if (error instanceof Error) {
+            if (error.message.includes('rate limit')) {
+                throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
+            }
+            if (error.message.includes('MaxTurnsExceededError')) {
+                throw new Error('El agente alcanzó el máximo de iteraciones. Por favor reformula tu pregunta.');
+            }
+        }
+
+        throw error;
+    }
+};
+
+export const testToolDirectly = async (toolName: string, params: any) => {
+    console.log(`\nTest directo de tool: ${toolName} `);
+    console.log(`Parámetros: `, params);
+
+    const tool = dashboardAviancaAgent.tools.find(
+        // @ts-ignore
+        t => t.name === toolName
+    );
+
+    if (!tool) {
+        throw new Error(`Tool ${toolName} no encontrada`);
+    }
+
+    try {
+        // @ts-ignore
+        const result = await tool.execute(params, {});
+        console.log(`Resultado: `, result);
+        return result;
+    } catch (error) {
+        console.error(`Error: `, error);
+        throw error;
+    }
+};

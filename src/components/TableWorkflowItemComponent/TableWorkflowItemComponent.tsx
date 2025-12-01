@@ -1,46 +1,35 @@
 import {
+  Avatar,
   Button,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
   Td,
-  Tr,
-  useToast,
+  Tooltip,
+  Tr
 } from "@chakra-ui/react";
-import { useState, type ReactElement } from "react";
 import {
   FileX2,
   FolderDown,
   GripHorizontal,
-  ImageDown,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
-
-//Services
-import {
-  deleteArtefactById,
-  downLoadReportHTML,
-  runWorkflowById,
-  type ResultWorkflow,
-  type StatusWorkflow,
-} from "../../github/api";
-
-//Components
+import { useState, type ReactElement } from "react";
+import { v4 as uuid } from "uuid";
+import type { ResultWorkflow, StatusWorkflow } from "../../github/repository/github.repository";
+import { GithubService } from "../../github/service/github.service";
+import AviancaToast from "../../utils/AviancaToast";
 import TagDash from "../TableTagItemComponent/TableTagItemComponent";
-
-//Types
 import type { TableWorkflowItemsProps } from "../TableWorkflowComponent/TableWorkflowComponent.types";
+import AnimatedLoader from "../loaders/AnimatedLoader";
+import PreviewReport from "./PreviewReport";
 
 const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   data,
 }) => {
-  const toast = useToast();
 
   const [isLoadingReport, setIsLoadingReport] = useState<boolean>(false);
-  const [isLoadingScreenshots, setIsLoadingScreenshots] =
-    useState<boolean>(false);
   const [isLoadingRun, setIsLoadingRun] = useState<boolean>(false);
   const [isLoadingDeleteArtifacts, setIsLoadingDeleteArtifacts] =
     useState<boolean>(false);
@@ -50,99 +39,61 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   ): ReactElement => {
     switch (value) {
       case "success":
-        return <TagDash key={new Date().getTime()} type="success" />;
+        return <TagDash key={uuid()} type="success" />;
       case "cancelled":
-        return <TagDash key={new Date().getTime()} type="cancelled" />;
+        return <TagDash key={uuid()} type="cancelled" />;
       case "completed":
-        return <TagDash key={new Date().getTime()} type="completed" />;
+        return <TagDash key={uuid()} type="completed" />;
       case "failure":
-        return <TagDash key={new Date().getTime()} type="failure" />;
+        return <TagDash key={uuid()} type="failure" />;
       case "in_progress":
-        return <TagDash key={new Date().getTime()} type="in_progress" />;
+        return <TagDash key={uuid()} type="in_progress" />;
       case "queued":
-        return <TagDash key={new Date().getTime()} type="queued" />;
+        return <TagDash key={uuid()} type="queued" />;
       case "neutral":
       case undefined:
       default:
-        return <TagDash key={new Date().getTime()} type="neutral" />;
+        return <TagDash key={uuid()} type="neutral" />;
     }
   };
 
   const handleDownloadReport = async (workflowId: number) => {
     try {
       setIsLoadingReport(true);
-      await downLoadReportHTML(workflowId);
-      toast({
-        status: "success",
-        title: "Reporte descargado",
-        description: `El reporte se descargó correctamente`,
-      });
+      await GithubService.downLoadReportHTMLGithub(workflowId);
+      AviancaToast.success("Reporte descargado", {
+        description: "Se ha descargado el reporte correctamente",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.error(
         `Error al descargar el reporte para el workflow ${workflowId}:`,
         error
       );
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al descargar el reporte",
-      });
+      AviancaToast.error("Upps! el reporte no existe", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al descargar el reporte",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingReport(false);
     }
   };
 
-  const handleDownloadScreenshots = async (workflowId: number) => {
-    try {
-      setIsLoadingScreenshots(true);
-      await downLoadReportHTML(workflowId, "only-screenshots");
-      toast({
-        status: "success",
-        title: "Imagenes descargadas",
-        description: `Las imagenes se descargaron correctamente`,
-      });
-    } catch (error) {
-      console.error(
-        `Error al descargar las imagenes para el workflow ${workflowId}:`,
-        error
-      );
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al descargar las imagenes",
-      });
-      throw error;
-    } finally {
-      setIsLoadingScreenshots(false);
-    }
-  };
-
   const handleRunWorkflow = async (workflowId: number) => {
     try {
       setIsLoadingRun(true);
-      await runWorkflowById(workflowId);
-      toast({
-        status: "success",
-        title: "Workflow ejecutado",
-        description: `El workflow se está ejecutando correctamente`,
-      });
+      await GithubService.runWorkflowByIdGithub(workflowId);
+      AviancaToast.success("Run ejecutado", {
+        description: "Se ha heco RUN del workflow correctamente",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.error(`Error al ejecutar el workflow ${workflowId}:`, error);
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al ejecutar el workflow",
-      });
+      AviancaToast.error("Upps! Error al hacer RUN", {
+        description: error instanceof Error ? error.message : "Ha ocurrido un error al hacer RUN del workflow",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingRun(false);
@@ -152,22 +103,17 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
   const handleDeleteArtifactsByWorkflow = async (workflowId: number) => {
     try {
       setIsLoadingDeleteArtifacts(true);
-      await deleteArtefactById(workflowId);
-      toast({
-        status: "success",
-        title: "Artefacto eliminado",
-        description: "Se ha eliminado los artefactos correctamente",
-      });
+      await GithubService.deleteArtefactByIdGithub(workflowId);
+      AviancaToast.success("Artefactos eliminados", {
+        description: "Se ha eliminado el artefacto correctamente",
+        position: "bottom-center"
+      })
     } catch (error) {
       console.log(error);
-      toast({
-        status: "error",
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocurrió un error al eliminar los artefactos",
-      });
+      AviancaToast.success("Upps! Error al eliminar el artefacto", {
+        description: error instanceof Error ? error.message : "Ocurrió un error al eliminar el artefacto",
+        position: "bottom-center"
+      })
       throw error;
     } finally {
       setIsLoadingDeleteArtifacts(false);
@@ -178,46 +124,76 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
     <>
       {data.map((row) => (
         <Tr key={row.id}>
-          <Td>{row.display_title}</Td>
-          <Td>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
-          <Td>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
-          <Td>
+          <Td textAlign={"center"}>
+            <Tooltip key={row.id} label={row?.actor?.autorname} placement="top" bg={"white"} color={"black"}>
+              <Avatar key={row.id} size='sm' name='Avianca Playwright' src={row?.actor?.avatar} />
+            </Tooltip>
+          </Td>
+          <Td textAlign={"center"} maxWidth={300} isTruncated>{row.display_title}</Td>
+          <Td textAlign={"center"}>{parserValueWorkflow(row.status as StatusWorkflow)}</Td>
+          <Td textAlign={"center"}>{parserValueWorkflow(row.conclusion as ResultWorkflow)}</Td>
+          <Td textAlign={"center"}>
             <Menu closeOnSelect={false}>
-              <MenuButton as={Button} bg="none">
+              <MenuButton
+                as={Button}
+                bg="none"
+                isDisabled={(row.status as StatusWorkflow) === "in_progress"}
+                _hover={{
+                  bg: "gray.300",
+                  borderColor: "transparent"
+                }}
+                _focus={{
+                  outline: "none"
+                }}
+              >
                 <GripHorizontal />
               </MenuButton>
               <MenuList>
                 <MenuItem
                   icon={
-                    isLoadingReport ? <Spinner size="sm" /> : <FolderDown />
+                    isLoadingReport ? <AnimatedLoader /> : <FolderDown />
                   }
                   onClick={() => handleDownloadReport(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Descargar Reporte
                 </MenuItem>
+                <PreviewReport key={uuid()} workflowID={row.id} />
                 <MenuItem
-                  icon={
-                    isLoadingScreenshots ? <Spinner size="sm" /> : <ImageDown />
-                  }
-                  onClick={() => handleDownloadScreenshots(row.id)}
-                >
-                  Descargar Imagenes
-                </MenuItem>
-                <MenuItem
-                  icon={isLoadingRun ? <Spinner size="sm" /> : <RefreshCw />}
+                  icon={isLoadingRun ? <AnimatedLoader /> : <RefreshCw />}
                   onClick={() => handleRunWorkflow(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Volver a ejecutar workflow
                 </MenuItem>
                 <MenuItem
                   icon={
                     isLoadingDeleteArtifacts ? (
-                      <Spinner size="sm" />
+                      <AnimatedLoader />
                     ) : (
                       <FileX2 />
                     )
                   }
                   onClick={() => handleDeleteArtifactsByWorkflow(row.id)}
+                  _hover={{
+                    bg: "gray.100",
+                    borderColor: "transparent"
+                  }}
+                  _focus={{
+                    outline: "none"
+                  }}
                 >
                   Eliminar reportes
                 </MenuItem>

@@ -1,9 +1,8 @@
-import type { LucideProps } from "lucide-react";
+import type { LucideIconType } from "../TableTagItemComponent/TableTagItemComponent.types";
 
 export type CardDetailsDashProps = {
-  icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-  >;
+  icon: LucideIconType,
+  iconType: LucideIconType,
   title: string;
   value: string | number;
   type: "success" | "error" | "cancelled";

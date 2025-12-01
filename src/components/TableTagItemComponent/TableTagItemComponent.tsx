@@ -1,4 +1,4 @@
-import { Tag, TagLeftIcon } from "@chakra-ui/react";
+import { Box, HStack, Tag, Text } from "@chakra-ui/react";
 import {
   CircleCheck,
   CircleQuestionMark,
@@ -8,8 +8,6 @@ import {
   RefreshCwOff,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-//Types
 import type { LucideIconType, TagDashProps } from "./TableTagItemComponent.types";
 
 const TagDash: React.FC<TagDashProps> = ({ type }) => {
@@ -29,7 +27,7 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
         case "completed":
           return { color: "green", text: "Completado", icon: CircleCheck };
         case "failure":
-          return { color: "red", text: "Error", icon: CircleX };
+          return { color: "red", text: "Fallido", icon: CircleX };
         case "in_progress":
           return { color: "blue", text: "En progreso", icon: Loader };
         case "queued":
@@ -49,9 +47,11 @@ const TagDash: React.FC<TagDashProps> = ({ type }) => {
   }, []);
 
   return (
-    <Tag variant={"outline"} colorScheme={params?.color} p={2} minW={"100%"}>
-      <TagLeftIcon as={params?.icon} />
-      {params?.text}
+    <Tag variant={"subtle"} colorScheme={params?.color} p={2} minW={100} borderRadius={"full"}>
+      <HStack width={"100%"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
+        <Box h={2} w={2} bg={params?.color} borderRadius={"full"} />
+        <Text>{params?.text}</Text>
+      </HStack>
     </Tag>
   );
 };

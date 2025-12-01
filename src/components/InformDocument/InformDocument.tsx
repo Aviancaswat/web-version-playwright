@@ -1,4 +1,5 @@
 import { Document, Font, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { useEffect } from "react";
 import aviancaLogo from "../../assets/avianca-fullname.png";
 import stopIcon from "../../assets/cancel.png";
 import checkIcon from "../../assets/checked.png";
@@ -133,12 +134,12 @@ const styles = StyleSheet.create({
 })
 
 const InformDocument = () => {
-    const { dataWorkflows } = useTestStore();
+    const { dataWorkflows, selectedFilters } = useTestStore();
     const success = dataWorkflows.filter(e => e.conclusion === "success").length;
     const errors = dataWorkflows.filter(e => e.conclusion === "failure").length;
     const cancelled = dataWorkflows.filter(e => e.conclusion === "cancelled").length;
 
-    console.log("dataWorkflows document: ", dataWorkflows);
+    useEffect(() => { }, [dataWorkflows, selectedFilters])
 
     return (
         <Document>
@@ -197,7 +198,7 @@ const InformDocument = () => {
                     width: "100%"
                 }]}>
                     <View style={[styles.tableRow, {
-                        backgroundColor: "#f0f8f0",  
+                        backgroundColor: "#f0f8f0",
                         flexDirection: "row",
                         justifyContent: "space-between",
                         paddingVertical: 12,
