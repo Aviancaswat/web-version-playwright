@@ -1,10 +1,10 @@
+import { APAService } from "@/services/apa.services";
 import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
 import { doc, onSnapshot } from "firebase/firestore";
 import 'highlight.js/styles/felipec.css';
 import { Bot } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
-import { RunAgentDashboard } from "../../agent/apa-agent";
 import logo from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
 import { SidebarChatHistory } from "../../components/agent-dashboard-ui/SidebarChatHistory";
@@ -44,6 +44,7 @@ const ChatAgentPage = () => {
     const [loadingWorkflows, setLoadingWorkflows] = useState<boolean>(false);
     const [questionUser, setQuestionUser] = useState<string>("");
     const [workflowToAnalize, setWorkflowAnalize] = useState<string | undefined>(undefined)
+    const [statusStream, setStatusStream] = useState<boolean>(false);
 
     const getTopUsers = (newData: DataWorkflows[]): TopUser[] => {
         const userStats: Record<string, TopUser> = {};
@@ -258,62 +259,53 @@ const ChatAgentPage = () => {
                 setQuestionUser("");
 
                 try {
-                    const responseAgent = await RunAgentDashboard(
+
+                    const stream = await APAService.generateContentDashboard(
                         JSON.stringify(dashboardDataAgentAvianca),
                         userMessage.message
                     );
 
-                    const newMessages: Messages[] = [];
+                    setStatusStream(true);
 
-                    const resultFunctionCall: any = responseAgent.output.find(
-                        (e: any) => e.type === "function_call_result"
-                    );
-
-                    if (resultFunctionCall) {
-                        const responseFunctionCallReport = resultFunctionCall?.output;
-                        const textResultReport = responseFunctionCallReport?.text;
-
-                        if (textResultReport) {
-                            const result = JSON.parse(textResultReport);
-
-                            if (result.success) {
-                                newMessages.push({
-                                    role: "agent",
-                                    message: result?.message ?? "",
-                                    timestamp: new Date().toISOString(),
-                                });
-                            }
-                        }
-                    }
-
-                    const responseCallFunctionImage: any = responseAgent?.output.find(
-                        (e: any) =>
-                            e.type === "hosted_tool_call" && e.name === "image_generation_call"
-                    );
-
-                    if (responseCallFunctionImage?.output) {
-                        newMessages.push({
+                    let assistantIndex = -1;
+                    setMessages(prev => {
+                        assistantIndex = prev.length;
+                        return [...prev, {
                             role: "agent",
                             message: "",
-                            timestamp: new Date().toISOString(),
-                            imageContent: responseCallFunctionImage.output,
-                        });
+                            timestamp: new Date().toISOString()
+                        }];
+                    });
+
+                    let currentText = "";
+                    let firstChunk = true;
+
+                    for await (const chunk of stream) {
+                        if (!chunk) continue;
+
+                        if (firstChunk) {
+                            setLoading(false);
+                            firstChunk = false;
+                        }
+
+                        currentText += chunk;
+
+                        setMessages(prev =>
+                            prev.map((msg, i) =>
+                                i === assistantIndex
+                                    ? { ...msg, message: currentText }
+                                    : msg
+                            )
+                        );
                     }
 
-                    if (responseAgent.finalOutput && newMessages.length === 0) {
-                        newMessages.push({
-                            role: "agent",
-                            message: responseAgent.finalOutput,
-                            timestamp: new Date().toISOString(),
-                        });
-                    } else if (responseAgent.finalOutput && newMessages.length > 0) {
-                        newMessages[0].message =
-                            responseAgent.finalOutput + "\n\n" + newMessages[0].message;
-                    }
+                    await ConversationService.addMessage(conversationId!, {
+                        role: "agent",
+                        message: currentText,
+                        timestamp: new Date().toISOString(),
+                    });
 
-                    for (const msg of newMessages) {
-                        await ConversationService.addMessage(conversationId!, msg);
-                    }
+                    setTimeout(() => setStatusStream(false), 300);
 
                 } catch (error) {
                     console.error("Error al obtener respuesta:", error);
@@ -385,6 +377,7 @@ const ChatAgentPage = () => {
                                 <MessageContainer
                                     messages={messages}
                                     isLoading={loading}
+                                    statusStream={statusStream}
                                 />
                                 <Box ref={chatRef} />
                             </Box>

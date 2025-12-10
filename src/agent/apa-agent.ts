@@ -89,7 +89,6 @@ const getReportByWorkflowIDGithubTool = tool({
             };
 
             console.log(`[analyzer_report_github_tool] Completado exitosamente`);
-
             return JSON.stringify(responseData, null, 2);
 
         } catch (error) {

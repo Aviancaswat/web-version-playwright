@@ -17,7 +17,7 @@ export type CardHomeProps = {
 const CardHome: React.FC<CardHomeProps> = (props: CardHomeProps) => {
     return (
         <Card
-            background={`${props.buttonColor}.100`}
+            background="#FF0000"
             height={props.cardHeight || "100%"}
             width={{ base: "90%", lg: "100%" }}
             boxShadow={"md"}
@@ -27,7 +27,7 @@ const CardHome: React.FC<CardHomeProps> = (props: CardHomeProps) => {
         >
             <CardHeader>
                 <Box
-                    color={`${props.buttonColor}.900`}
+                    color={"#FFFFFF"}
                     width={"auto"}
                 >
                     <props.Icon
@@ -37,7 +37,7 @@ const CardHome: React.FC<CardHomeProps> = (props: CardHomeProps) => {
                         }}
                     />
                 </Box>
-                <Text fontSize="xl" fontWeight="bold">{props.title}</Text>
+                <Text fontSize="xl" fontWeight="bold" color={"#FFFFFF"}>{props.title}</Text>
             </CardHeader>
             <CardBody
                 pt={0}
@@ -46,7 +46,7 @@ const CardHome: React.FC<CardHomeProps> = (props: CardHomeProps) => {
                 justifyContent={"space-between"}
                 height={"auto"}
             >
-                <Text mb={4}>{props.description}</Text>
+                <Text mb={4} color={"#FFFFFF"}>{props.description}</Text>
                 {props.action && (
                     <Button
                         as={Link}

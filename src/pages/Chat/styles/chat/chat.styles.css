@@ -1,0 +1,19 @@
+.loader-model {
+    width: 15px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #000;
+    animation: shrink-expand 0.9s infinite ease-in-out;
+}
+
+@keyframes shrink-expand {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.5); 
+    }
+    100% {
+        transform: scale(1); 
+    }
+}
