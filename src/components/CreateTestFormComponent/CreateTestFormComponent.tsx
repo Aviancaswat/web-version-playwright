@@ -49,6 +49,7 @@ const CreateTestFormComponent: React.FC = () => {
   };
 
   const [formData, setFormData] = useState(initializeFormData);
+  
 
   useEffect(() => {
     if (editTest) {
@@ -337,7 +338,8 @@ const CreateTestFormComponent: React.FC = () => {
       boxShadow="md"
       display="flex"
       flexDirection="column"
-      h="100%"
+      minH="100%"
+      bg="white"
     >
       <CreateTestFormStepHeaderComponent
         steps={steps}
@@ -345,6 +347,7 @@ const CreateTestFormComponent: React.FC = () => {
         stepRefs={stepRefs}
         currentStep={currentStep}
       />
+
       <CreateTestFormInputContainer
         currentStepFields={currentStepFields}
         formData={formData}
@@ -356,6 +359,7 @@ const CreateTestFormComponent: React.FC = () => {
         currentStepConfig={currentStepConfig}
         shouldShowField={shouldShowField}
       />
+
       <CreateTestFormNavigationButtonComponent
         currentStep={currentStep}
         prevStep={prevStep}

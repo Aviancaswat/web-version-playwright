@@ -115,14 +115,14 @@ export const GithubRepository = {
                 /\[\s*{[\s\S]*?}\s*]/,
                 newTestData
             );
-
+            
             const {
                 data: { commit },
             } = await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
                 owner: owner,
                 repo: repo,
                 path: path,
-                message: `${testListName} - ${this.getTimestamp()}`,
+                message: `${testListName} - ${await this.getTimestamp()}`,
                 content: btoa(updatedContent),
                 sha: fileData.sha,
                 branch: branchRef,
@@ -232,8 +232,8 @@ export const GithubRepository = {
             a.href = url;
             a.download =
                 typeReport === "playwright"
-                    ? `reporte-html-${this.getTimestamp()}.zip`
-                    : `reporte-screenshots-${this.getTimestamp()}.zip`;
+                    ? `reporte-html-${await this.getTimestamp()}.zip`
+                    : `reporte-screenshots-${await this.getTimestamp()}.zip`;
             a.click();
             URL.revokeObjectURL(url);
         } catch (error) {

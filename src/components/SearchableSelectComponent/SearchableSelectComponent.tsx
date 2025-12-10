@@ -19,60 +19,61 @@ const SearchableSelectComponent: React.FC<SearchableSelectProps> = ({
 
   const selectedLabel = options.find((opt) => opt.value === value)?.label || "";
 
-  return (
-    <Box position="relative" w="100%">
-      <Input
-        placeholder={placeholder}
-        value={isOpen ? search : selectedLabel}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-      />
+return (
+  <Box position="relative" w="100%">
+    <Input
+      placeholder={placeholder}
+      value={isOpen ? search : selectedLabel}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        setIsOpen(true);
+      }}
+      onFocus={() => setIsOpen(true)}
+    />
 
-      {isOpen && (
-        <Box
-          position="absolute"
-          top="100%"
-          left={0}
-          right={0}
-          bg="white"
-          border="1px solid"
-          borderColor="gray.200"
-          borderRadius="md"
-          mt={1}
-          maxH="200px"
-          overflowY="auto"
-          zIndex={10}
-        >
-          <List>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt) => (
-                <ListItem
-                  key={opt.value}
-                  px={3}
-                  py={2}
-                  _hover={{ bg: "gray.100", cursor: "pointer" }}
-                  onClick={() => {
-                    onChange(opt.value);
-                    setSearch("");
-                    setIsOpen(false);
-                  }}
-                >
-                  <Text>{opt.label}</Text>
-                </ListItem>
-              ))
-            ) : (
-              <ListItem px={3} py={2}>
-                <Text color="gray.500">No hay resultados</Text>
+    {isOpen && (
+      <Box
+        position="absolute"
+        top="100%"
+        left={0}
+        right={0}
+        bg="white"
+        border="1px solid"
+        borderColor="gray.200"
+        borderRadius="md"
+        mt={1}
+        maxH="200px"
+        overflowY="auto"
+        zIndex={10}
+      >
+        <List>
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((opt) => (
+              <ListItem
+                key={opt.value}
+                px={3}
+                py={2}
+                _hover={{ bg: "gray.100", cursor: "pointer" }}
+                onClick={() => {
+                  onChange(opt.value);
+                  setSearch("");
+                  setIsOpen(false);
+                }}
+              >
+                <Text>{opt.label}</Text>
               </ListItem>
-            )}
-          </List>
-        </Box>
-      )}
-    </Box>
-  );
+            ))
+          ) : (
+            <ListItem px={3} py={2}>
+              <Text color="gray.500">No hay resultados</Text>
+            </ListItem>
+          )}
+        </List>
+      </Box>
+    )}
+  </Box>
+);
+
 };
 
 export default SearchableSelectComponent;

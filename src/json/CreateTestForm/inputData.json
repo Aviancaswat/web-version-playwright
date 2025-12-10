@@ -280,15 +280,47 @@
   {
     "key": 3,
     "stepTitle": "Passenger",
-    "hasOnlyText": true,
-    "infoText": "El formulario se rellenará de manera automática.",
+    "hasOnlyText": false,
     "method": [
+      {
+        "value": "none",
+        "label": "No aplica"
+      },
       {
         "value": "passengerRellenarFormulario",
         "label": "Rellenar formulario en pasajeros"
       }
     ],
-    "input": []
+    "input": [
+      {
+        "name": "passengerBookingHolder",
+        "label": "Titular reserva: ",
+        "type": "select",
+        "isRequired": true,
+        "option": []
+      },
+      {
+        "name": "passengerBookingHolderPhonePrefix",
+        "label": "Prefijo teléfono titular reserva: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [{ "value": "57", "label": "Colombia (57)" }]
+      },
+      {
+        "name": "passengerBookingHolderPhone",
+        "label": "Teléfono titular reserva:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false
+      },
+      {
+        "name": "passengerBookingHolderEmail",
+        "label": "Correo electrónico titular reserva:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false
+      }
+    ]
   },
   {
     "key": 4,
@@ -853,9 +885,19 @@
     "key": 5,
     "stepTitle": "Seat",
     "method": [{ "value": "none", "label": "No aplica" }],
-    "hasOnlyText": true,
-    "infoText": "Se seleccionará un asiento al azar.",
-    "input": []
+    "hasOnlyText": false,
+    "input": [
+      {
+        "name": "seatSelectManually",
+        "label": "Seleccionar asientos manualmente: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "false", "label": "Ida y vuelta" },
+          { "value": "true", "label": "Solo ida" }
+        ]
+      }
+    ]
   },
   {
     "key": 6,

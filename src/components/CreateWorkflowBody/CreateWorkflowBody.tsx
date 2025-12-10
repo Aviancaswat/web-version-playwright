@@ -11,23 +11,25 @@ const CreateWorkflowBody: React.FC = () => {
   return (
     <Box
       minH={`calc(100dvh - ${NAVBAR_H})`}
+      bg="#F5F7FA"
+      px={{ base: 4, lg: 8 }}
+      py={{ base: 6, lg: 8 }}
       display="flex"
       justifyContent="center"
-      alignItems="center"
-      px={{ base: 4, lg: 0 }}
     >
       <Box
-        w={{ base: "unset", lg: "100%" }}
+        w="100%"
+        maxW="1400px"
         display="grid"
         gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr" }}
-        alignItems="stretch"
-        columnGap="5rem"
+        columnGap="3rem"
         rowGap="2rem"
       >
-        <Box m={{ base: "0 1rem", lg: "0" }}>
+        <Box>
           <CreateTestFormComponent />
         </Box>
-        <Box m={{ base: "0 1rem", lg: "0" }}>
+
+        <Box>
           <TestListComponent />
         </Box>
       </Box>

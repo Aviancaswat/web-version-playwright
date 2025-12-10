@@ -31,7 +31,7 @@ const CreateTestFormNavigationButtonComponent: React.FC<
           backgroundColor="#ffffff"
           border="2px solid #1b1b1b"
           color="#1b1b1b"
-          borderRadius="full"
+          borderRadius="md"
           _hover={{
             backgroundColor: "#1b1b1b",
             color: "#ffffff",
@@ -41,16 +41,15 @@ const CreateTestFormNavigationButtonComponent: React.FC<
           Atrás
         </Button>
       )}
+
       {!editTest &&
         formData.targetPage !== "home" &&
         steps[currentStep] === 1 && (
           <Button
             onClick={() => {
               const defaults = generateDefaultDataByStep(formData);
-
-              const combinedData = { ...formData, ...defaults };
-
-              const finalTest = transformFormDataToTest(combinedData);
+              const finalData = { ...formData, ...defaults };
+              const finalTest = transformFormDataToTest(finalData);
 
               handleCreateTestsByLanguages(finalTest);
 
@@ -61,7 +60,7 @@ const CreateTestFormNavigationButtonComponent: React.FC<
             }}
             colorScheme="blackAlpha"
             backgroundColor="#1b1b1b"
-            borderRadius="full"
+            borderRadius="md"
             isDisabled={!isStepComplete(1)}
           >
             Crear prueba automática
@@ -74,7 +73,7 @@ const CreateTestFormNavigationButtonComponent: React.FC<
           colorScheme="black"
           backgroundColor="#1b1b1b"
           isDisabled={!isStepComplete(steps[currentStep])}
-          borderRadius="full"
+          borderRadius="md"
         >
           Siguiente
         </Button>
@@ -84,7 +83,7 @@ const CreateTestFormNavigationButtonComponent: React.FC<
             onClick={handleSave}
             colorScheme="blackAlpha"
             backgroundColor="#1b1b1b"
-            borderRadius="full"
+            borderRadius="md"
             isDisabled={!isStepComplete(steps[currentStep])}
           >
             {editTest ? "Actualizar prueba" : "Crear prueba"}

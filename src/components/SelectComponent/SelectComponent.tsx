@@ -14,14 +14,15 @@ const SelectComponent: React.FC<SelectComponentProps> = ({
   return (
     <Select
       name={field.name}
-      value={formData[field.name] || ""}
+      value={formData[field.name] ?? ""}
       onChange={handleInputChange}
       disabled={isBlocked}
     >
       <option value="">Selecciona una opción</option>
-      {(dependentFieldOption[field.name] || field.option || []).map(
-        (option: Option, i: number) => (
-          <option key={i} value={option.value}>
+
+      {(dependentFieldOption[field.name] ?? field.option ?? []).map(
+        (option: Option, index: number) => (
+          <option key={index} value={option.value}>
             {option.label}
           </option>
         )

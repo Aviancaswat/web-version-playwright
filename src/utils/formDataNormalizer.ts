@@ -39,6 +39,29 @@ export const formDataNormalizer = ({
         });
       });
 
+      // --- Agrupar campos de pasajeros planas en passengerList ---
+      const passengerMap: Record<string, any> = {};
+
+      Object.entries(result).forEach(([key, value]) => {
+        const match = key.match(/^(.+?)_(passenger.+)$/);
+        if (!match) return;
+
+        const passengerType = match[1];
+        const passengerField = match[2];
+
+        if (!passengerMap[passengerType]) {
+          passengerMap[passengerType] = { passengerType };
+        }
+
+        passengerMap[passengerType][passengerField] = value;
+
+        delete result[key];
+      });
+
+      if (Object.keys(passengerMap).length > 0) {
+        result.passengerList = Object.values(passengerMap);
+      }
+
       break;
 
     case "edit":

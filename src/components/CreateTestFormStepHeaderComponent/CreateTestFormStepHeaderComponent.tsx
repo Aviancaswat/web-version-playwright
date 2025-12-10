@@ -18,29 +18,29 @@ const CreateTestFormStepHeaderComponent: React.FC<
     >
       <HStack spacing={6} justify="flex-start" minW="max-content">
         {steps.map((stepKey, index) => {
-          const step = stepFields.find((step) => step.key === stepKey);
+          const step = stepFields.find((s) => s.key === stepKey);
+          const isActive = index === currentStep;
 
           return (
             <HStack
               key={stepKey}
-              ref={(element) => {
-                if (element) stepRefs.current[index] = element;
+              ref={(el) => {
+                if (el) stepRefs.current[index] = el;
               }}
             >
               <Circle
                 size="26px"
-                bg={index === currentStep ? "#FF0000" : "gray.300"}
+                bg={isActive ? "#FF0000" : "gray.300"}
                 color="white"
                 fontWeight="bold"
               >
                 {index + 1}
               </Circle>
-              <Text
-                fontSize="sm"
-                fontWeight={index === currentStep ? "bold" : "normal"}
-              >
+
+              <Text fontSize="sm" fontWeight={isActive ? "bold" : "normal"}>
                 {step?.stepTitle}
               </Text>
+
               {index < steps.length - 1 && (
                 <Divider borderColor="gray.400" w="40px" />
               )}

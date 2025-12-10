@@ -1,7 +1,6 @@
 import { Box, HStack, Select, Text } from "@chakra-ui/react";
 
 //Types
-import type { Option } from "../CreateTestFormComponent/CreateTestFormComponent.types";
 import type { MultiselectWithTagComponentProps } from "./MultiselectWithTagComponent.types";
 
 const MultiselectWithTagComponent: React.FC<
@@ -12,30 +11,42 @@ const MultiselectWithTagComponent: React.FC<
       {(() => {
         const rawValue = formData[field.name];
 
-        const currentValues: string[] = (() => {
-          if (typeof rawValue === "string") {
-            return rawValue.split(",").filter(Boolean);
-          }
+        const currentValues: string[] = Array.isArray(rawValue)
+          ? rawValue
+          : typeof rawValue === "string"
+          ? rawValue.split(",").filter(Boolean)
+          : [];
 
-          if (Array.isArray(rawValue)) {
-            return rawValue as string[];
-          }
+        const removeValue = (value: string) => {
+          const updatedValues = currentValues.filter((currentValue) => currentValue !== value);
+          setFormData((prev: any) => ({
+            ...prev,
+            [field.name]: updatedValues.join(","),
+          }));
+        };
 
-          return [];
-        })();
+        const addValue = (value: string) => {
+          if (!value || currentValues.includes(value)) return;
+
+          const updatedValues = [...currentValues, value];
+          setFormData((prev: any) => ({
+            ...prev,
+            [field.name]: updatedValues.join(","),
+          }));
+        };
 
         return (
           <>
             {currentValues.length > 0 && (
               <HStack wrap="wrap" mb={2}>
-                {currentValues.map((language) => {
+                {currentValues.map((value) => {
                   const option = field.option?.find(
-                    (option) => option.value === language
+                    (option) => option.value === value
                   );
 
                   return (
                     <Box
-                      key={language}
+                      key={value}
                       bg="gray.200"
                       color="gray.800"
                       px={3}
@@ -46,21 +57,11 @@ const MultiselectWithTagComponent: React.FC<
                       gap={2}
                       fontSize="sm"
                     >
-                      <Text>{option?.label ?? language}</Text>
+                      <Text>{option?.label ?? value}</Text>
+
                       <Box
                         as="button"
-                        onClick={() => {
-                          const updatedValues = currentValues.filter(
-                            (v) => v !== language
-                          );
-
-                          setFormData(
-                            (prev: Record<string, string | number>) => ({
-                              ...prev,
-                              [field.name]: updatedValues.join(","),
-                            })
-                          );
-                        }}
+                        onClick={() => removeValue(value)}
                         _hover={{ color: "red.500" }}
                       >
                         ×
@@ -70,30 +71,18 @@ const MultiselectWithTagComponent: React.FC<
                 })}
               </HStack>
             )}
+
             <Select
               name={field.name}
               placeholder="Selecciona idioma(s)"
               value=""
-              onChange={(e) => {
-                const newValue = e.target.value;
-
-                if (newValue && !currentValues.includes(newValue)) {
-                  const updatedValues = [...currentValues, newValue];
-
-                  setFormData((prev: Record<string, string | number>) => ({
-                    ...prev,
-                    [field.name]: updatedValues.join(","),
-                  }));
-                }
-              }}
+              onChange={(e) => addValue(e.target.value)}
               disabled={isBlocked}
             >
               {field.option
-                ?.filter(
-                  (option) => !currentValues.includes(option.value as string)
-                )
-                .map((option: Option, i: number) => (
-                  <option key={i} value={option.value}>
+                ?.filter((option) => !currentValues.includes(option.value as string))
+                .map((option, index) => (
+                  <option key={index} value={option.value}>
                     {option.label}
                   </option>
                 ))}
