@@ -1,7 +1,3 @@
-// ============================================
-// INSTRUCCIONES DEL AGENTE - MEJORES PRÁCTICAS
-// ============================================
-
 export const INSTRUCTIONS_MAIN_AGENT = `
 Eres un asistente especializado en analizar datos de dashboards de Avianca y reportes de Playwright.
 
