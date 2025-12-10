@@ -1,125 +1,120 @@
-import { Avatar, Box, Button, Card, CardBody, Heading, Image } from "@chakra-ui/react";
-import { DownloadIcon, SquareArrowOutUpRight } from "lucide-react";
-import LogoAv from "../../assets/avianca-logo-desk.png";
-import PreviewImageGenerateAgent from "../../components/agent-dashboard-ui/previewImage";
-import ShinyTextAgent from "../../components/animations/agent-dashboard/shinyEffectComponent";
-import FadeAnimationText from "../../components/transitions/FadeText";
+import { getColor } from "@/utils/colors";
+import { Box, Icon, IconButton } from "@chakra-ui/react";
+import { Check, Copy, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import type { Messages } from "./ChatAgentPage";
-import MessageAgentUI from "./MessageAgent";
-import MessageUserUI from "./MessageUser";
+import './styles/chat/chat.styles.css';
 
 interface MessageContainerProps {
     messages: Messages[],
-    isLoading: boolean
+    isLoading: boolean,
+    statusStream: boolean
 }
 
-//Obteniendo colores del mensaje
-const colors = [["orange.100", "orange.600"], ["cyan.100", "blue.600"]]
-const colorRandom = colors[Math.floor(Math.random() * colors.length)];
+export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, isLoading, statusStream }) => {
 
-export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, isLoading }) => {
+    const [iconType, setIconCopy] = useState<LucideIcon>(Copy);
+    const [userColors] = useState<string[]>(() => getColor());
+    const [bgColor, textColor] = userColors;
+
+    const handleCopy = async (content: string) => {
+        await navigator.clipboard.writeText(content);
+        setIconCopy(Check);
+        setTimeout(() => {
+            setIconCopy(Copy)
+        }, 600)
+    }
 
     return (
         <>
             {
-                messages.map((msg, index) => (
-                    <>
-                        <FadeAnimationText
-                            key={index}
-                            marginBottom={msg.htmlContent ? 10 : 4}
+                messages.map((msg, index) => {
+
+                    const isUser = msg.role === "user";
+                    const isLastMessage = index === messages.length - 1;
+                    const showLoader = !isUser && isLastMessage && isLoading;
+
+                    return (
+                        <Box
+                            key={`${msg.role}-${index}`}
                             display="flex"
-                            flexDirection={msg.role === "user" ? "row-reverse" : "row"}
-                            alignItems="flex-start"
-                            className="chat-ai"
+                            justifyContent={isUser ? "flex-end" : "flex-start"}
+                            mb={10}
                         >
-                            {
-                                msg.role === "user" ? <MessageUserUI msg={msg} msgColor={colorRandom} /> : <MessageAgentUI {...msg} />
-                            }
-                        </FadeAnimationText>
-                        <FadeAnimationText>
-                            {
-                                msg.htmlContent && (
-                                    <Box width={"80%"} margin={"auto"} pb={20}>
-                                        <iframe
-                                            srcDoc={msg.htmlContent}
-                                            title={`Reporte Playwright ${index}`}
-                                            sandbox="allow-scripts allow-same-origin"
-                                            style={{
-                                                width: "100%",
-                                                margin: "auto",
-                                                height: "250px",
-                                                border: "none",
-                                                pointerEvents: "none",
-                                                background: "#F4F4F4",
-                                                borderRadius: "15px",
+                            <Box
+                                className="chat-ai"
+                                maxWidth="80%"
+                                py={2}
+                                px={4}
+                                borderRadius={"full"}
+                                bg={isUser ? bgColor : "transparent"}
+                                color={isUser ? textColor : "text.primary"}
+                                sx={{ wordBreak: "break-word" }}
+                            >
+                                {isUser ? (
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                                    >
+                                        {msg.message}
+                                    </ReactMarkdown>
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            '& > *': {
+                                                animation: isLastMessage && statusStream
+                                                    ? 'fadeIn 0.3s ease-out'
+                                                    : 'none',
+                                            },
+                                            '@keyframes fadeIn': {
+                                                '0%': { opacity: 0.5 },
+                                                '100%': { opacity: 1 },
+                                            },
+                                        }}
+                                    >
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                                        >
+                                            {msg.message}
+                                        </ReactMarkdown>
+                                    </Box>
+                                )}
+
+                                {msg.role === "agent" && statusStream === false && (
+                                    <Box className="animate__animated animate__fadeIn">
+                                        <IconButton
+                                            aria-label="Copy to clipboard"
+                                            size="sm"
+                                            ml={1}
+                                            onClick={() => handleCopy(msg.message)}
+                                            icon={<Icon as={iconType} boxSize={4} />}
+                                            variant="ghost"
+                                            sx={{
+                                                _focus: {
+                                                    outline: "none",
+                                                    border: "transparent"
+                                                },
+                                                _hover: {
+                                                    border: "transparent",
+                                                    bg: "gray.200"
+                                                }
                                             }}
                                         />
-                                        <Box mt={5} float={"inline-end"}>
-                                            <Button
-                                                onClick={() => {
-                                                    const blob = new Blob([msg.htmlContent!], { type: 'text/html' });
-                                                    const url = URL.createObjectURL(blob);
-                                                    window.open(url, '_blank');
-                                                }}
-                                                rightIcon={<SquareArrowOutUpRight size={15} />}
-                                                size={"sm"}
-                                                bg="black"
-                                                color="white"
-                                                _hover={{
-                                                    bg: "blackAlpha.700",
-                                                }}
-                                            >
-                                                Abrir en otra pestaña
-                                            </Button>
-                                        </Box>
                                     </Box>
-                                )
-                            }
-                        </FadeAnimationText>
-                        <FadeAnimationText display={"flex"} justifyContent={"center"}>
-                            {
-                                msg.imageContent && (
-                                    <Box display={"flex"} flexDirection={"column"}>
-                                        <Card maxW={"lg"}>
-                                            <CardBody>
-                                                <Image
-                                                    src={`data:image/png;base64,${msg.imageContent}`}
-                                                    alt='generate imagen agent'
-                                                    borderRadius='lg'
-                                                    maxH={400}
-                                                />
-                                            </CardBody>
-                                        </Card>
-                                        <Box display={"flex"} gap={1} justifyContent={"flex-end"} mt={1}>
-                                            <PreviewImageGenerateAgent imageContent={msg.imageContent} />
-                                            <Button
-                                                size={"sm"}
-                                                onClick={() => {
-                                                    const enlace = document.createElement("a");
-                                                    enlace.href = `data:image/png;base64,${msg.imageContent}`;
-                                                    enlace.download = "imagen-apa.png";
-                                                    enlace.click();
-                                                }}
-                                            >
-                                                <DownloadIcon size={18} />
-                                            </Button>
-                                        </Box>
-                                    </Box>
-                                )
-                            }
-                        </FadeAnimationText>
-                    </>
-                ))
-            }
-            {
-                isLoading && (
-                    <Box display={"flex"} gap={2} alignItems={"center"} height={200}>
-                        <Avatar size='sm' name='Avianca Agent' src={LogoAv} bg={"black"} color={"white"} />
-                        <Heading color={"black"} size={"sm"} fontWeight={"light"}>
-                            <ShinyTextAgent text="Pensando..." />
-                        </Heading>
-                    </Box>
-                )
+                                )}
+                            </Box>
+
+                            {showLoader && (
+                                <Box ml={1} mt={1} mb={5} className="loader-model" />
+                            )}
+                        </Box>
+                    );
+                })
             }
         </>
     )

@@ -3,8 +3,7 @@ import { GithubService } from "@/github/service/github.service";
 import type { ReportData } from "@/interfaces/apa/apa.interfaces";
 import { extractRelevantLogs } from "@/utils/extractLogsReleevant";
 import { getPromptSystem } from "@/utils/prompt";
-import { Agent, imageGenerationTool, run, tool, type AgentInputItem } from "@openai/agents";
-import { setDefaultOpenAIClient } from "node_modules/@openai/agents-openai/dist/defaults";
+import { Agent, imageGenerationTool, run, setDefaultOpenAIClient, tool, type AgentInputItem } from "@openai/agents";
 import OpenAI from "openai";
 import z from "zod";
 
@@ -129,6 +128,7 @@ export class APARepository {
         return dashboardAviancaAgent;
     }
 
+    //@ts-ignore
     private static async evaluateTools(toolName: string, params: any) {
         console.log(`\nTest directo de tool: ${toolName} `);
         console.log(`Parámetros: `, params);
@@ -155,10 +155,10 @@ export class APARepository {
         }
     }
 
-    static generateContentDashboard = async (
+    static async *generateContentDashboard(
         dataDashboard: string,
         questionUser: string
-    ) => {
+    ): AsyncGenerator<string, any, unknown> {
 
         try {
 
@@ -184,7 +184,8 @@ export class APARepository {
                 dashboardAviancaAgent,
                 this.messages.concat({ role: "user", content: questionUser }),
                 {
-                    maxTurns: 10
+                    maxTurns: 10,
+                    stream: true
                 }
             );
 
@@ -193,7 +194,14 @@ export class APARepository {
             console.log(`\n Respuesta generada exitosamente`);
             console.log(`Turnos utilizados: ${response.history.length / 2} `);
 
-            return response;
+            for await (const part of response) {
+                if (part.type === 'raw_model_stream_event') {
+                    console.log(`${part.type} %o`, part.data);
+                    if (part.data.type === "output_text_delta") {
+                        yield part.data.delta;
+                    }
+                }
+            }
         }
         catch (error) {
             console.error("\nError al ejecutar el agente:", error);

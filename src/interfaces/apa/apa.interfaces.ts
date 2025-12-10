@@ -1,3 +1,4 @@
+
 export interface ReportData {
     workflowId: number;
     success: boolean;
