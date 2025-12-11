@@ -183,7 +183,6 @@ export class APARepository {
 
             for await (const part of response) {
                 if (part.type === 'raw_model_stream_event') {
-                    console.log(`${part.type} %o`, part.data);
                     if (part.data.type === "output_text_delta") {
                         yield part.data.delta;
                     }

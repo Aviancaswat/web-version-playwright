@@ -13,7 +13,6 @@ const CardBillingMinutes = () => {
         const currentMonth = '2025-10'
         const getActionsMinutes = async () => {
             const { usageItems: data } = await GithubService.GetActionsMinutesBillingGithub()
-            console.log("response actions minutes: ", data)
 
             if (!data || data.length === 0) return;
 

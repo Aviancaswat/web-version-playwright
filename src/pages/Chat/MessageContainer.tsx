@@ -15,6 +15,24 @@ interface MessageContainerProps {
     statusStream: boolean
 }
 
+// Define los estilos que quieres para el contenido del agente
+const MarkdownComponents = {
+    // Aplica márgenes a los encabezados
+    h1: (props: any) => <Box as="h1" fontSize="2xl" fontWeight="bold" mt={6} mb={3} {...props} />,
+    h2: (props: any) => <Box as="h2" fontSize="xl" fontWeight="semibold" mt={5} mb={2} {...props} />,
+    // Aplica márgenes a las listas (esto es clave)
+    ul: (props: any) => <Box as="ul" pl={5} mb={3} sx={{ listStyleType: 'disc' }} {...props} />,
+    ol: (props: any) => <Box as="ol" pl={5} mb={3} {...props} />,
+    // Aplica margen a los párrafos
+    p: (props: any) => <Box as="p" mb={2} {...props} />,
+    // Estilos para el bloque de código (sección pre)
+    pre: (props: any) => <Box as="pre" p={3} my={3} bg="gray.700" color="white" borderRadius="md" overflowX="auto" {...props} />,
+    // Estilos para las tablas
+    table: (props: any) => <Box as="table" width="full" borderCollapse="collapse" my={4} {...props} />,
+    th: (props: any) => <Box as="th" border="1px solid" borderColor="gray.300" p={2} textAlign="left" bg="gray.100" {...props} />,
+    td: (props: any) => <Box as="td" border="1px solid" borderColor="gray.300" p={2} {...props} />,
+};
+
 export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, isLoading, statusStream }) => {
 
     const [iconType, setIconCopy] = useState<LucideIcon>(Copy);
@@ -48,7 +66,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                             <Box
                                 className="chat-ai"
                                 maxWidth="80%"
-                                py={2}
+                                pt={2}
                                 px={4}
                                 borderRadius={"full"}
                                 bg={isUser ? bgColor : "transparent"}
@@ -77,6 +95,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ messages, is
                                         }}
                                     >
                                         <ReactMarkdown
+                                            components={MarkdownComponents}
                                             remarkPlugins={[remarkGfm]}
                                             rehypePlugins={[rehypeRaw, rehypeHighlight]}
                                         >
