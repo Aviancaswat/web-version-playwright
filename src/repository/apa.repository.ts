@@ -1,19 +1,14 @@
-import { INSTRUCTIONS_MAIN_AGENT, MODEL } from "@/agent/instructions";
 import { GithubService } from "@/github/service/github.service";
-import type { ReportData } from "@/interfaces/apa/apa.interfaces";
+import type { DashboardContext, ReportData } from "@/interfaces/apa/apa.interfaces";
 import { extractRelevantLogs } from "@/utils/extractLogsReleevant";
-import { getPromptSystem } from "@/utils/prompt";
+import { getPromptSystem, INSTRUCTIONS_MAIN_AGENT } from "@/utils/prompt";
 import { Agent, imageGenerationTool, run, setDefaultOpenAIClient, tool, type AgentInputItem } from "@openai/agents";
 import OpenAI from "openai";
 import z from "zod";
 
-interface DashboardContext {
-    dashboardData: string;
-}
-
 export class APARepository {
     private static genAI: OpenAI | undefined;
-    private static modelName: string = MODEL;
+    private static modelName: string = "gpt-4.1-nano-2025-04-14";
     private static agentName: string = "avianca_playwright_agent";
     private static messages: AgentInputItem[] = [];
 
@@ -166,23 +161,15 @@ export class APARepository {
             console.log(`Nueva consulta: "${questionUser}"`);
             console.log(`${'='.repeat(60)} \n`);
 
-            const systemMessage = getPromptSystem(dataDashboard);
-
-            if (this.messages.length === 0) {
-                const findRoleSystem = this.messages.find((e: any) => e.role === "system");
-                if (!findRoleSystem) {
-                    this.messages.push({
-                        role: "system",
-                        content: systemMessage
-                    })
-                }
-            }
+            const dashboardContext = getPromptSystem(dataDashboard);
+            const userMessage = `${dashboardContext}\n\n# 📝 SOLICITUD DEL USUARIO:\n${questionUser}`;
+            const messagesToSend = this.messages.concat({ role: "user", content: userMessage });
 
             const dashboardAviancaAgent = this.buildAgent();
 
             const response = await run(
                 dashboardAviancaAgent,
-                this.messages.concat({ role: "user", content: questionUser }),
+                messagesToSend,
                 {
                     maxTurns: 10,
                     stream: true

@@ -7,3 +7,7 @@ export interface ReportData {
     relevantLogs: string | null;
     jobsCount: number;
 }
+
+export interface DashboardContext {
+    dashboardData: string;
+}
