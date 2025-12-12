@@ -157,10 +157,6 @@ export class APARepository {
 
         try {
 
-            console.log(`\n${'='.repeat(60)} `);
-            console.log(`Nueva consulta: "${questionUser}"`);
-            console.log(`${'='.repeat(60)} \n`);
-
             const dashboardContext = getPromptSystem(dataDashboard);
             const userMessage = `${dashboardContext}\n\n# 📝 SOLICITUD DEL USUARIO:\n${questionUser}`;
             const messagesToSend = this.messages.concat({ role: "user", content: userMessage });
@@ -178,9 +174,6 @@ export class APARepository {
 
             this.messages = response.history;
 
-            console.log(`\n Respuesta generada exitosamente`);
-            console.log(`Turnos utilizados: ${response.history.length / 2} `);
-
             for await (const part of response) {
                 if (part.type === 'raw_model_stream_event') {
                     if (part.data.type === "output_text_delta") {
@@ -191,16 +184,6 @@ export class APARepository {
         }
         catch (error) {
             console.error("\nError al ejecutar el agente:", error);
-
-            if (error instanceof Error) {
-                if (error.message.includes('rate limit')) {
-                    throw new Error('Límite de tasa alcanzado. Por favor espera unos momentos e intenta de nuevo.');
-                }
-                if (error.message.includes('MaxTurnsExceededError')) {
-                    throw new Error('El agente alcanzó el máximo de iteraciones. Por favor reformula tu pregunta.');
-                }
-            }
-
             throw error;
         }
     };

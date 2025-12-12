@@ -308,15 +308,45 @@ const ChatAgentPage = () => {
                     setTimeout(() => setStatusStream(false), 300);
 
                 } catch (error) {
-                    console.error("Error al obtener respuesta:", error);
+
+                    let userErrorMessage = "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente.";
+                    const technicalErrorMessage = (error as any)?.message || 'Mensaje de error no disponible.';
+                    const errorCode = (error as any)?.status || (error as any)?.code;
+
+                    if (errorCode) {
+
+                        switch (errorCode) {
+                            case 400:
+                                userErrorMessage = "El cuerpo de la solicitud tiene un formato incorrecto. Por favor, verifica y vuelve a intentarlo.";
+                                break;
+                            case 403:
+                                userErrorMessage = "Tu clave de API no tiene los permisos necesarios. Por favor, revisa la configuración de tu cuenta.";
+                                break;
+                            case 404:
+                                userErrorMessage = "No se encontró un archivo de imagen, audio o video al que se hace referencia en tu solicitud. Por favor, verifica y vuelve a intentarlo.";
+                                break;
+                            case 429:
+                                userErrorMessage = "Has alcanzado temporalmente el límite de solicitudes (cuota) permitido. Por favor, espera unos momentos para que se restablezca la cuota por minuto/hora.";
+                                break;
+                            case 500:
+                                userErrorMessage = "El contexto de entrada es demasiado largo. Por favor, reduce la cantidad de información y vuelve a intentarlo.";
+                                break;
+                            case 503:
+                                userErrorMessage = "El servicio de Target Scan está temporalmente sobrecargado. Espera unos minutos y vuelve a intentarlo.";
+                                break;
+                            default:
+                                userErrorMessage = `Ocurrió un error inesperado (Código: ${errorCode}). Por favor, contacta a soporte.`;
+                        }
+                    }
 
                     const errorMsg: Messages = {
                         role: "agent",
-                        message: "Lo siento, ocurrió un error al procesar tu solicitud.",
+                        message: userErrorMessage + ` (Detalle técnico: ${technicalErrorMessage})`,
                         timestamp: new Date().toISOString(),
                     };
 
                     await ConversationService.addMessage(conversationId!, errorMsg);
+                    console.error("Error fetching AI response:", error);
 
                 } finally {
                     setLoading(false);
