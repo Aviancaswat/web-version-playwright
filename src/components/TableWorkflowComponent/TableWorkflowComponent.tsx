@@ -54,7 +54,6 @@ const TableWorkflowsDash: React.FC = () => {
     try {
       const runs = await GithubService.getRunsByRepoGithub();
       if (runs.length === 0) throw new Error("No hay workflows");
-      console.log("Data workflows: ", runs)
 
       const newData: DataWorkflows[] = runs.map((workflow) => ({
         id: workflow.id,
@@ -70,7 +69,7 @@ const TableWorkflowsDash: React.FC = () => {
 
       setDataWorkflows(newData);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }

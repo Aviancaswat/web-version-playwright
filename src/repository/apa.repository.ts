@@ -51,18 +51,14 @@ export class APARepository {
                         console.warn(`No se encontró reporte HTML para workflow ${workflowId}`);
                     }
 
-                    console.log(`Obteniendo jobs del workflow ${workflowId}`);
                     const { total_count, jobs } = await GithubService.getJobsByRunIdGithub(context.workflowId);
-                    console.log(`Jobs encontrados: ${jobs.length}`);
 
                     let relevantLogs: string | null = null;
                     if (total_count > 0 && jobs.length > 0) {
 
                         try {
-                            console.log("Extrayendo logs relevantes...");
                             const logs = await GithubService.getLogsByJobIdGithub(jobs[0].id);
                             relevantLogs = extractRelevantLogs(logs as string);
-                            console.log("Logs extraídos exitosamente");
                         }
                         catch (error) {
                             console.error(`Error al obtener logs del Job ${jobs[0].id}: `, error);

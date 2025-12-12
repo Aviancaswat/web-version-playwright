@@ -18,7 +18,7 @@ const MessageAgentUI = (msg: Messages) => {
             await navigator.clipboard.writeText(text);
             AviancaToast.success("Respuesta copiada")
         } catch (error) {
-            console.log("Error copying text: ", error);
+            console.error("Error copying text: ", error);
             AviancaToast.error("Error copiando la respuesta al portapapeles")
         }
     }, [])

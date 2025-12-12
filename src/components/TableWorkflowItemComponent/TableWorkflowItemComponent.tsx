@@ -109,7 +109,7 @@ const TableWorkflowItemComponent: React.FC<TableWorkflowItemsProps> = ({
         position: "bottom-center"
       })
     } catch (error) {
-      console.log(error);
+      console.error(error);
       AviancaToast.success("Upps! Error al eliminar el artefacto", {
         description: error instanceof Error ? error.message : "Ocurrió un error al eliminar el artefacto",
         position: "bottom-center"

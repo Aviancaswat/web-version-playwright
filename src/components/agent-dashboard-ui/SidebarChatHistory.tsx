@@ -25,7 +25,7 @@ import {
     VStack
 } from '@chakra-ui/react';
 import { Bot, Ellipsis, MessageCircleMore, MessageCircleOff, PanelRightOpen, SquarePen, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { v4 as uuid } from "uuid";
 import { ConversationService } from '../../firebase/firestore/services/conversation.service';
 import { useTestStore } from '../../store/test-store';
@@ -42,10 +42,6 @@ export const SidebarChatHistory = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const btnRef = useRef<HTMLButtonElement>(null);
     const [hoverChatId, setHoverChatId] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        console.log("cambió conversationsAPA: ", conversationsAPA);
-    }, [conversationsAPA])
 
     const handleDeleteChat = async (conversationId: string) => {
         if (!conversationId) return;
@@ -67,7 +63,6 @@ export const SidebarChatHistory = () => {
         const newId = uuid();
         setCurrentConversationId(newId);
         setCurrentMessages([]);
-        console.log("Nuevo chat creado:", newId);
         onClose();
     };
 

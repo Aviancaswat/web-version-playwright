@@ -34,7 +34,6 @@ const ChatAgentPage = () => {
         setDataWorkflows,
         setDashboardDataAgentAvianca,
         dashboardDataAgentAvianca,
-        conversationsAPA,
         setConversationsAPA
     } = useTestStore();
 
@@ -90,7 +89,6 @@ const ChatAgentPage = () => {
             setLoadingWorkflows(true);
             const runs = await GithubService.getRunsByRepoGithub();
             if (runs.length === 0) throw new Error("No hay workflows");
-            console.log("Data workflows chat ai: ", runs)
 
             const newData: DataWorkflows[] = runs.map((workflow) => ({
                 id: workflow.id,
@@ -137,7 +135,7 @@ const ChatAgentPage = () => {
             setDataWorkflows(newData);
             setDashboardDataAgentAvianca(dataJSON);
         } catch (error) {
-            console.log(error);
+            console.error(error);
         } finally {
             setLoadingWorkflows(false);
         }
@@ -150,13 +148,9 @@ const ChatAgentPage = () => {
     }, [messages]);
 
     useEffect(() => {
-        console.log("Obteniendo workflows...")
         getWorkflows();
-        //Obteniendo conversaciones ID
         const conversationUUID = uuid();
         setConversationId(conversationUUID);
-        console.log("Se creo la conversación con id: ", conversationUUID);
-        console.log("conversationsAPA: ", conversationsAPA);
     }, [])
 
     useEffect(() => {
@@ -183,10 +177,6 @@ const ChatAgentPage = () => {
             }, 1000)
         }
     }, [workflowToAnalize])
-
-    useEffect(() => {
-        console.log("Se actualiza las conversaciones: ", conversationsAPA)
-    }, [conversationsAPA])
 
     useEffect(() => {
 

@@ -28,7 +28,7 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
             setReporteHTML(contentHTML);
         }
         catch (error) {
-            console.log("Error loading preview report: ", error);
+            console.error("Error loading preview report: ", error);
             setErrorLoadingReportHTML(true);
         } finally {
             setLoadingReporteHTML(false);
@@ -141,7 +141,6 @@ export default function PreviewReport({ workflowID }: PreviewReportProps) {
                                 onClick={() => {
                                     const url = new URL(document.URL).origin;
                                     const urlChatAPA = url + "/chat-ai?workflowID=" + workflowID;
-                                    console.log("urlchatapa: ", urlChatAPA);
                                     window.location.href = urlChatAPA;
                                 }}
                                 size={"sm"}
