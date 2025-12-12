@@ -1,7 +1,7 @@
 import { APAService } from "@/services/apa.services";
 import { Box, Heading, HStack, Image, Text, Textarea } from "@chakra-ui/react";
 import { doc, onSnapshot } from "firebase/firestore";
-import 'highlight.js/styles/felipec.css';
+import 'highlight.js/styles/tokyo-night-dark.css';
 import { Bot } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";

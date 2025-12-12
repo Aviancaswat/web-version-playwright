@@ -134,12 +134,3 @@
   margin: 1.5rem 0;
   overflow-x: auto;
 }
-
-.chat-ai code {
-  background-color: #edf2f7;
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', 'Consolas', monospace;
-  font-size: 0.9em;
-  color: #2D3748;
-}
