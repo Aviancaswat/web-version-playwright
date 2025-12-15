@@ -102,7 +102,7 @@ export class APARepository {
         ];
     }
 
-    static buildAgent(): Agent<DashboardContext, "text"> {
+    private static buildAgent(): Agent<DashboardContext, "text"> {
         this.ensureClient();
         const tools = this.getToolsAgent();
         const dashboardAviancaAgent = new Agent<DashboardContext>({

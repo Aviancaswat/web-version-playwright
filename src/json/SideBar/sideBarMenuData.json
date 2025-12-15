@@ -5,7 +5,7 @@
     "icon": "House"
   },
   {
-    "name": "Panel",
+    "name": "Dashboard",
     "path": "/dashboard",
     "icon": "LayoutDashboard"
   },
