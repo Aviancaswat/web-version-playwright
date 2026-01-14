@@ -49,7 +49,6 @@ const CreateTestFormComponent: React.FC = () => {
   };
 
   const [formData, setFormData] = useState(initializeFormData);
-  
 
   useEffect(() => {
     if (editTest) {
@@ -256,8 +255,9 @@ const CreateTestFormComponent: React.FC = () => {
         if (departureDate < today) return false;
       }
 
-      if (field.name === "homeFechaLlegada") {
+      if (field.name === "homeFechaLLegada") {
         const departureDate = new Date(formData["homeFechaSalida"]);
+
         const returnDate = new Date(value);
 
         if (returnDate <= departureDate) return false;
@@ -275,7 +275,12 @@ const CreateTestFormComponent: React.FC = () => {
     return dependencyValue === field.showIf.equals;
   };
 
-  const generateDefaultDataByStep = (formData: Record<string, any>) => {
+  const generateDefaultDataByStep = (rawFormData: Record<string, any>) => {
+    const formData: Record<string, any> = {
+      paymentTypeOfPayment: rawFormData.paymentTypeOfPayment ?? "pse",
+      ...rawFormData,
+    };
+
     const defaultData: Record<string, any> = {};
     const targetPage = formData.targetPage;
 
@@ -300,7 +305,9 @@ const CreateTestFormComponent: React.FC = () => {
         step.input.forEach((field) => {
           if ("showIf" in field && field.showIf) {
             const { field: depName, equals } = field.showIf;
+
             const depVal = formData?.[depName];
+
             if (normalize(depVal) !== normalize(equals)) {
               return;
             }

@@ -28,8 +28,7 @@ export const formDataNormalizer = ({
             result[field.name] = formatDate(result[field.name], "mm-dd") ?? "";
           } else if (
             field.name === "bookingNumeroVueloIda" ||
-            field.name === "bookingNumeroVueloRegreso" ||
-            field.name === "homeisActiveOptionOutbound"
+            field.name === "bookingNumeroVueloRegreso"
           ) {
             result[field.name] = String(result[field.name]);
           } else if (field.type === "number") {
@@ -39,11 +38,11 @@ export const formDataNormalizer = ({
         });
       });
 
-      // --- Agrupar campos de pasajeros planas en passengerList ---
       const passengerMap: Record<string, any> = {};
 
       Object.entries(result).forEach(([key, value]) => {
         const match = key.match(/^(.+?)_(passenger.+)$/);
+
         if (!match) return;
 
         const passengerType = match[1];
@@ -62,10 +61,66 @@ export const formDataNormalizer = ({
         result.passengerList = Object.values(passengerMap);
       }
 
+      const seatMap: Record<string, any> = {};
+
+      Object.entries(result).forEach(([key, value]) => {
+        const match = key.match(
+          /^(.+?)_seat(Number|Letter)(Departure|Return)$/
+        );
+
+        if (!match) return;
+
+        const passengerType = match[1];
+        const part = match[2];
+        const segment = match[3];
+
+        if (!seatMap[passengerType]) {
+          seatMap[passengerType] = {
+            passengerType,
+            seatDeparture: "",
+            seatReturn: "",
+          };
+
+          if (result.homeisActiveOptionOutbound !== "false") {
+            delete seatMap[passengerType].seatReturn;
+          }
+        }
+
+        const current = seatMap[passengerType];
+
+        if (segment === "Departure") {
+          current.seatDeparture =
+            part === "Letter"
+              ? `${current.seatDeparture.replace(/^[A-Z]/, "")}${String(
+                  value
+                ).toUpperCase()}`
+              : `${value}${current.seatDeparture.replace(/\d+$/, "")}`;
+        }
+
+        if (
+          segment === "Return" &&
+          result.homeisActiveOptionOutbound === "false"
+        ) {
+          current.seatReturn =
+            part === "Letter"
+              ? `${current.seatReturn.replace(/^[A-Z]/, "")}${String(
+                  value
+                ).toUpperCase()}`
+              : `${value}${current.seatReturn.replace(/\d+$/, "")}`;
+        }
+
+        delete result[key];
+      });
+
+      if (Object.keys(seatMap).length > 0) {
+        result.seatByPassengerList = Object.values(seatMap);
+      }
       break;
 
     case "edit":
       Object.entries(result).forEach(([key, value]) => {
+        if (key === "passengerList" || key === "seatByPassengerList") return;
+
         if (typeof value === "object" && value !== null) {
           const isActive = Object.values(value).some((value) => {
             if (typeof value === "boolean") return value === true;
@@ -93,6 +148,50 @@ export const formDataNormalizer = ({
           }
         });
       });
+
+      if (Array.isArray(result.passengerList)) {
+        result.passengerList.forEach((passenger: any) => {
+          const passengerType = passenger.passengerType;
+
+          Object.entries(passenger).forEach(([key, value]) => {
+            if (key === "passengerType") return;
+
+            result[`${passengerType}_${key}`] = String(value);
+          });
+        });
+
+        delete result.passengerList;
+      }
+
+      if (Array.isArray(result.seatByPassengerList)) {
+        result.seatByPassengerList.forEach((seat: any) => {
+          const passengerType = seat.passengerType;
+
+          if (seat.seatDeparture) {
+            const match = String(seat.seatDeparture).match(/^(\d+)([A-Z])$/);
+
+            if (match) {
+              const [, number, letter] = match;
+
+              result[`${passengerType}_seatNumberDeparture`] = number;
+              result[`${passengerType}_seatLetterDeparture`] = letter;
+            }
+          }
+
+          if (seat.seatReturn) {
+            const match = String(seat.seatReturn).match(/^(\d+)([A-Z])$/);
+
+            if (match) {
+              const [, number, letter] = match;
+
+              result[`${passengerType}_seatNumberReturn`] = number;
+              result[`${passengerType}_seatLetterReturn`] = letter;
+            }
+          }
+        });
+
+        delete result.seatByPassengerList;
+      }
       break;
 
     default:

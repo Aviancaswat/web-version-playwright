@@ -3,6 +3,8 @@ import { Button, ButtonGroup } from "@chakra-ui/react";
 //Types
 import type { CreateTestFormNavigationButtonComponentProps } from "./CreateTestFormNavigationButtonComponent.types";
 
+// import { generatePassengerDataByStep } from "@/utils/generatePassenger";
+
 const CreateTestFormNavigationButtonComponent: React.FC<
   CreateTestFormNavigationButtonComponentProps
 > = ({
@@ -48,7 +50,17 @@ const CreateTestFormNavigationButtonComponent: React.FC<
           <Button
             onClick={() => {
               const defaults = generateDefaultDataByStep(formData);
-              const finalData = { ...formData, ...defaults };
+
+              // const passengerData = generatePassengerDataByStep(
+              //   formData,
+              //   steps
+              // );
+
+              const finalData = {
+                ...formData,
+                ...defaults
+              };
+
               const finalTest = transformFormDataToTest(finalData);
 
               handleCreateTestsByLanguages(finalTest);

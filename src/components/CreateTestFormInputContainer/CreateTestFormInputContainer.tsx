@@ -21,6 +21,8 @@ import MultiselectWithTagComponent from "../MultiselectWithTagComponent/Multisel
 
 //Types
 import type { CreateTestFormInputContainerProps } from "./CreateTestFormInputContainer.types";
+import type { Option } from "../CreateTestFormComponent/CreateTestFormComponent.types";
+import { generatePassengerList } from "@/utils/generatePassenger";
 
 const CreateTestFormInputContainer: React.FC<
   CreateTestFormInputContainerProps
@@ -35,39 +37,17 @@ const CreateTestFormInputContainer: React.FC<
   currentStepConfig,
   shouldShowField,
 }) => {
-  const generatePassengerList = (formData: any) => {
-    const passengers: any[] = [];
-
-    const groups = [
-      { count: formData.homePassengerAdults, label: "Adulto", type: "adult" },
-      { count: formData.homePassengerYouths, label: "Joven", type: "youth" },
-      { count: formData.homePassengerChildren, label: "Niño", type: "child" },
-      { count: formData.homePassengerInfant, label: "Bebé", type: "infant" },
-    ];
-
-    groups.forEach((group) => {
-      for (let index = 1; index <= (Number(group.count) || 0); index++) {
-        passengers.push({
-          id: `${group.type}-${index}`,
-          title: `${group.label} ${index}`,
-        });
-      }
-    });
-
-    return passengers;
-  };
-
-  const generatePassengerFullNames = () => {
+  const generatePassengerListToSelect = () => {
     return generatePassengerList(formData)
-      .map((p) => {
-        const name = formData[`${p.id}_passengerName`] || "";
-        const last = formData[`${p.id}_passengerLastName`] || "";
+      .map((passenger) => {
+        const name = formData[`${passenger.id}_passengerName`] || "";
+        const lastName = formData[`${passenger.id}_passengerLastName`] || "";
 
-        if (!name && !last) return null;
+        if (!name && !lastName) return null;
 
         return {
-          id: p.id,
-          fullName: `${name} ${last}`.trim(),
+          id: passenger.id,
+          fullName: `${name} ${lastName}`,
         };
       })
       .filter(Boolean);
@@ -112,6 +92,91 @@ const CreateTestFormInputContainer: React.FC<
       option: [
         { value: "", label: "--Selecciona--" },
         { value: "CO", label: "Colombia" },
+        { value: "AF", label: "Afganistán" },
+        { value: "AL", label: "Albania" },
+        { value: "DE", label: "Alemania" },
+        { value: "AD", label: "Andorra" },
+        { value: "AO", label: "Angola" },
+        { value: "AG", label: "Antigua y Barbuda" },
+        { value: "SA", label: "Arabia Saudita" },
+        { value: "DZ", label: "Argelia" },
+        { value: "AR", label: "Argentina" },
+        { value: "AM", label: "Armenia" },
+        { value: "AU", label: "Australia" },
+        { value: "AT", label: "Austria" },
+        { value: "AZ", label: "Azerbaiyán" },
+        { value: "BS", label: "Bahamas" },
+        { value: "BD", label: "Bangladés" },
+        { value: "BB", label: "Barbados" },
+        { value: "BE", label: "Bélgica" },
+        { value: "BZ", label: "Belice" },
+        { value: "BO", label: "Bolivia" },
+        { value: "BR", label: "Brasil" },
+        { value: "BG", label: "Bulgaria" },
+        { value: "CA", label: "Canadá" },
+        { value: "CL", label: "Chile" },
+        { value: "CN", label: "China" },
+        { value: "CY", label: "Chipre" },
+        { value: "KR", label: "Corea del Sur" },
+        { value: "CR", label: "Costa Rica" },
+        { value: "HR", label: "Croacia" },
+        { value: "CU", label: "Cuba" },
+        { value: "DK", label: "Dinamarca" },
+        { value: "DM", label: "Dominica" },
+        { value: "EC", label: "Ecuador" },
+        { value: "EG", label: "Egipto" },
+        { value: "SV", label: "El Salvador" },
+        { value: "AE", label: "Emiratos Árabes Unidos" },
+        { value: "SK", label: "Eslovaquia" },
+        { value: "SI", label: "Eslovenia" },
+        { value: "ES", label: "España" },
+        { value: "US", label: "Estados Unidos" },
+        { value: "EE", label: "Estonia" },
+        { value: "PH", label: "Filipinas" },
+        { value: "FI", label: "Finlandia" },
+        { value: "FR", label: "Francia" },
+        { value: "GE", label: "Georgia" },
+        { value: "GH", label: "Ghana" },
+        { value: "GR", label: "Grecia" },
+        { value: "GT", label: "Guatemala" },
+        { value: "HT", label: "Haití" },
+        { value: "HN", label: "Honduras" },
+        { value: "HU", label: "Hungría" },
+        { value: "IN", label: "India" },
+        { value: "ID", label: "Indonesia" },
+        { value: "IE", label: "Irlanda" },
+        { value: "IS", label: "Islandia" },
+        { value: "IL", label: "Israel" },
+        { value: "IT", label: "Italia" },
+        { value: "JM", label: "Jamaica" },
+        { value: "JP", label: "Japón" },
+        { value: "LV", label: "Letonia" },
+        { value: "LT", label: "Lituania" },
+        { value: "LU", label: "Luxemburgo" },
+        { value: "MY", label: "Malasia" },
+        { value: "MA", label: "Marruecos" },
+        { value: "MX", label: "México" },
+        { value: "NP", label: "Nepal" },
+        { value: "NI", label: "Nicaragua" },
+        { value: "NO", label: "Noruega" },
+        { value: "NZ", label: "Nueva Zelanda" },
+        { value: "PA", label: "Panamá" },
+        { value: "PY", label: "Paraguay" },
+        { value: "NL", label: "Países Bajos" },
+        { value: "PE", label: "Perú" },
+        { value: "PL", label: "Polonia" },
+        { value: "PT", label: "Portugal" },
+        { value: "GB", label: "Reino Unido" },
+        { value: "DO", label: "República Dominicana" },
+        { value: "RO", label: "Rumanía" },
+        { value: "SE", label: "Suecia" },
+        { value: "CH", label: "Suiza" },
+        { value: "TH", label: "Tailandia" },
+        { value: "TR", label: "Turquía" },
+        { value: "UA", label: "Ucrania" },
+        { value: "UY", label: "Uruguay" },
+        { value: "VE", label: "Venezuela" },
+        { value: "VN", label: "Vietnam" },
       ],
     },
     {
@@ -125,6 +190,23 @@ const CreateTestFormInputContainer: React.FC<
         { value: "lifemiles", label: "Lifemiles" },
         { value: "aeroplan", label: "Aeroplan" },
         { value: "airindia", label: "Air India - Maharaja Club" },
+        { value: "airpoints", label: "AirPoints" },
+        { value: "ana_milage_club", label: "ANA Mileage Club" },
+        { value: "asiana_club", label: "Asiana Club" },
+        { value: "connect_miles", label: "Connect Miles" },
+        { value: "euro_bonus", label: "Euro Bonus" },
+        { value: "iberia_plus", label: "Iberia Plus" },
+        { value: "inifinity_mileagelands", label: "Infinity MileageLands" },
+        { value: "krisflyer", label: "KrisFlyer" },
+        { value: "mileage_plus", label: "Mileage Plus" },
+        { value: "miles_bonus", label: "Miles&Bonus" },
+        { value: "miles_go", label: "Miles&Go" },
+        { value: "miles_more", label: "Miles&More" },
+        { value: "miles_smiles", label: "Miles&Smiles" },
+        { value: "phoenix_miles", label: "Phoenix Miles" },
+        { value: "sheba_miles", label: "Sheba Miles" },
+        { value: "smiles", label: "Smiles" },
+        { value: "voyager", label: "Voyager" },
       ],
     },
     {
@@ -135,6 +217,121 @@ const CreateTestFormInputContainer: React.FC<
       showIf: {
         field: "passengerFrequentFlyerProgram",
         noEquals: "none",
+      },
+    },
+  ];
+
+  const seatInputs = [
+    {
+      name: "seatNumberDeparture",
+      label: "Número de asiento de ida:",
+      type: "select",
+      isRequired: true,
+      option: [
+        { value: "", label: "--Selecciona--" },
+        { value: "4", label: "4" },
+        { value: "5", label: "5" },
+        { value: "6", label: "6" },
+        { value: "7", label: "7" },
+        { value: "8", label: "8" },
+        { value: "9", label: "9" },
+        { value: "10", label: "10" },
+        { value: "11", label: "11" },
+        { value: "12", label: "12" },
+        { value: "14", label: "14" },
+        { value: "15", label: "15" },
+        { value: "16", label: "16" },
+        { value: "17", label: "17" },
+        { value: "18", label: "18" },
+        { value: "19", label: "19" },
+        { value: "20", label: "20" },
+        { value: "21", label: "21" },
+        { value: "22", label: "22" },
+        { value: "23", label: "23" },
+        { value: "24", label: "24" },
+        { value: "25", label: "25" },
+        { value: "26", label: "26" },
+        { value: "27", label: "27" },
+        { value: "28", label: "28" },
+        { value: "29", label: "29" },
+        { value: "30", label: "30" },
+        { value: "31", label: "31" },
+        { value: "32", label: "32" },
+      ],
+    },
+    {
+      name: "seatLetterDeparture",
+      label: "Letra de asiento de ida:",
+      type: "select",
+      isRequired: true,
+      option: [
+        { value: "", label: "--Selecciona--" },
+        { value: "A", label: "A" },
+        { value: "B", label: "B" },
+        { value: "C", label: "C" },
+        { value: "D", label: "D" },
+        { value: "E", label: "E" },
+        { value: "K", label: "K" },
+      ],
+    },
+    {
+      name: "seatNumberReturn",
+      label: "Número de asiento de vuelta:",
+      type: "select",
+      isRequired: true,
+      option: [
+        { value: "", label: "--Selecciona--" },
+        { value: "4", label: "4" },
+        { value: "5", label: "5" },
+        { value: "6", label: "6" },
+        { value: "7", label: "7" },
+        { value: "8", label: "8" },
+        { value: "9", label: "9" },
+        { value: "10", label: "10" },
+        { value: "11", label: "11" },
+        { value: "12", label: "12" },
+        { value: "14", label: "14" },
+        { value: "15", label: "15" },
+        { value: "16", label: "16" },
+        { value: "17", label: "17" },
+        { value: "18", label: "18" },
+        { value: "19", label: "19" },
+        { value: "20", label: "20" },
+        { value: "21", label: "21" },
+        { value: "22", label: "22" },
+        { value: "23", label: "23" },
+        { value: "24", label: "24" },
+        { value: "25", label: "25" },
+        { value: "26", label: "26" },
+        { value: "27", label: "27" },
+        { value: "28", label: "28" },
+        { value: "29", label: "29" },
+        { value: "30", label: "30" },
+        { value: "31", label: "31" },
+        { value: "32", label: "32" },
+      ],
+      showIf: {
+        field: "homeisActiveOptionOutbound",
+        equals: "false",
+      },
+    },
+    {
+      name: "seatLetterReturn",
+      label: "Letra de asiento de vuelta:",
+      type: "select",
+      isRequired: true,
+      option: [
+        { value: "", label: "--Selecciona--" },
+        { value: "A", label: "A" },
+        { value: "B", label: "B" },
+        { value: "C", label: "C" },
+        { value: "D", label: "D" },
+        { value: "E", label: "E" },
+        { value: "K", label: "K" },
+      ],
+      showIf: {
+        field: "homeisActiveOptionOutbound",
+        equals: "false",
       },
     },
   ];
@@ -153,77 +350,104 @@ const CreateTestFormInputContainer: React.FC<
     >
       {currentStepConfig.key === 3 && (
         <Box>
-          <Accordion allowToggle>
-            {generatePassengerList(formData).map((p) => (
-              <AccordionItem
-                key={p.id}
-                border="1px solid #ddd"
-                borderRadius="md"
-                mb={4}
-              >
-                <h2>
-                  <AccordionButton>
-                    <Box flex="1" textAlign="left" fontWeight="bold">
-                      {p.title}
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
+          {formData.passengerSelectManually === "false" ||
+          formData.passengerSelectManually === "" ? (
+            <Text fontSize="md" color="gray.600" textAlign="center" p={4}>
+              Los datos de los pasajeros se generarán automáticamente.
+            </Text>
+          ) : (
+            <Accordion allowToggle>
+              {generatePassengerList(formData).map((passenger) => (
+                <AccordionItem
+                  key={passenger.id}
+                  border="1px solid #ddd"
+                  borderRadius="md"
+                  mb={4}
+                >
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="bold">
+                        {passenger.title}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
 
-                <AccordionPanel>
-                  <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                    {passengerInputs.map((field: any) => {
-                      if (field.showIf) {
-                        const fieldToCheck = `${p.id}_${field.showIf.field}`;
-                        const expectedValue = field.showIf.noEquals;
+                  <AccordionPanel>
+                    <Grid
+                      templateColumns="repeat(2, 1fr)"
+                      alignItems={"flex-end"}
+                      gap={6}
+                    >
+                      {passengerInputs.map((field: any) => {
+                        if (field.showIf) {
+                          const fieldToCheck = `${passenger.id}_${field.showIf.field}`;
 
-                        if (formData[fieldToCheck] === expectedValue) {
-                          return null;
+                          const expectedValue = field.showIf.noEquals;
+
+                          if (
+                            formData[fieldToCheck] === expectedValue ||
+                            formData[fieldToCheck] === undefined ||
+                            formData[fieldToCheck] === ""
+                          ) {
+                            return null;
+                          }
                         }
-                      }
 
-                      return (
-                        <GridItem key={`${p.id}-${field.name}`}>
-                          <FormControl isRequired={field.isRequired}>
-                            <FormLabel fontSize="sm">{field.label}</FormLabel>
-                            {field.type === "select" && (
-                              <Select
-                                value={formData[`${p.id}_${field.name}`] || ""}
-                                onChange={(e) =>
-                                  setFormData({
-                                    ...formData,
-                                    [`${p.id}_${field.name}`]: e.target.value,
-                                  })
-                                }
-                              >
-                                {field.option.map((op) => (
-                                  <option key={op.value} value={op.value}>
-                                    {op.label}
-                                  </option>
-                                ))}
-                              </Select>
-                            )}
-                            {field.type !== "select" && (
-                              <Input
-                                type={field.type}
-                                value={formData[`${p.id}_${field.name}`] || ""}
-                                onChange={(e) =>
-                                  setFormData({
-                                    ...formData,
-                                    [`${p.id}_${field.name}`]: e.target.value,
-                                  })
-                                }
-                              />
-                            )}
-                          </FormControl>
-                        </GridItem>
-                      );
-                    })}
-                  </Grid>
-                </AccordionPanel>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                        return (
+                          <GridItem key={`${passenger.id}-${field.name}`}>
+                            <FormControl isRequired={field.isRequired}>
+                              <FormLabel fontSize="sm">{field.label}</FormLabel>
+                              {field.type === "select" && (
+                                <Select
+                                  value={
+                                    formData[`${passenger.id}_${field.name}`] ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      [`${passenger.id}_${field.name}`]:
+                                        e.target.value,
+                                    })
+                                  }
+                                >
+                                  {field.option.map((option: Option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </Select>
+                              )}
+                              {field.type !== "select" && (
+                                <Input
+                                  type={field.type}
+                                  value={
+                                    formData[`${passenger.id}_${field.name}`] ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      [`${passenger.id}_${field.name}`]:
+                                        e.target.value,
+                                    })
+                                  }
+                                />
+                              )}
+                            </FormControl>
+                          </GridItem>
+                        );
+                      })}
+                    </Grid>
+                  </AccordionPanel>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
         </Box>
       )}
 
@@ -261,7 +485,7 @@ const CreateTestFormInputContainer: React.FC<
                   {field.type === "select" &&
                     (field.name === "passengerBookingHolder" ? (
                       (() => {
-                        const passengers = generatePassengerFullNames();
+                        const passengers = generatePassengerListToSelect();
 
                         return (
                           <Select
@@ -274,10 +498,9 @@ const CreateTestFormInputContainer: React.FC<
                             }
                           >
                             <option value="">Seleccione titular</option>
-
-                            {passengers.map((p) => (
-                              <option key={p.id} value={p.id}>
-                                {p.fullName}
+                            {passengers.map((passenger) => (
+                              <option key={passenger?.id} value={passenger?.id}>
+                                {passenger?.fullName}
                               </option>
                             ))}
                           </Select>
@@ -382,6 +605,96 @@ const CreateTestFormInputContainer: React.FC<
             ))}
         </Grid>
       )}
+
+      {currentStepConfig.key === 5 &&
+        formData.seatSelectManually !== undefined && (
+          <Box mb={6}>
+            {formData.seatSelectManually === "false" ||
+            formData.seatSelectManually === "" ? (
+              <Text fontSize="md" color="gray.600" textAlign="center" p={4}>
+                Los asientos se seleccionarán automáticamente.
+              </Text>
+            ) : (
+              <Accordion allowToggle>
+                {generatePassengerList(formData).map((passenger) => (
+                  <AccordionItem
+                    key={passenger.id}
+                    border="1px solid #ddd"
+                    borderRadius="md"
+                    mb={4}
+                    mt={4}
+                  >
+                    <h2>
+                      <AccordionButton>
+                        <Box flex="1" textAlign="left" fontWeight="bold">
+                          {passenger.title}
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+
+                    <AccordionPanel>
+                      <Grid
+                        templateColumns="repeat(2, 1fr)"
+                        alignItems={"flex-end"}
+                        gap={6}
+                      >
+                        {seatInputs.map((field: any) => {
+                          if (field.showIf) {
+                            const fieldToCheck = `${field.showIf.field}`;
+
+                            const expectedValue = field.showIf.equals;
+
+                            if (
+                              formData[fieldToCheck] !== expectedValue ||
+                              formData[fieldToCheck] === undefined ||
+                              formData[fieldToCheck] === ""
+                            ) {
+                              return null;
+                            }
+                          }
+
+                          return (
+                            <GridItem key={`${passenger.id}-${field.name}`}>
+                              <FormControl isRequired={field.isRequired}>
+                                <FormLabel fontSize="sm">
+                                  {field.label}
+                                </FormLabel>
+
+                                <Select
+                                  value={
+                                    formData[`${passenger.id}_${field.name}`] ||
+                                    ""
+                                  }
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      [`${passenger.id}_${field.name}`]:
+                                        e.target.value,
+                                    })
+                                  }
+                                >
+                                  {field.option.map((option: Option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </GridItem>
+                          );
+                        })}
+                      </Grid>
+                    </AccordionPanel>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
+          </Box>
+        )}
     </Box>
   );
 };

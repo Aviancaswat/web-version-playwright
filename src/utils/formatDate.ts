@@ -5,18 +5,18 @@ export const formatDate = (dateString: string, typeFormat: string) => {
     const [, month, day] = dateString.toString().split("-");
 
     const months = [
-      "jan",
+      "ene",
       "feb",
       "mar",
-      "apr",
+      "abr",
       "may",
       "jun",
       "jul",
-      "aug",
+      "ago",
       "sep",
       "oct",
       "nov",
-      "dec",
+      "dic",
     ];
 
     return `${months[Number(month) - 1]} ${Number(day)} `;
@@ -24,18 +24,18 @@ export const formatDate = (dateString: string, typeFormat: string) => {
 
   if (typeFormat === "yyyy-mm-dd") {
     const months: Record<string, string> = {
-      jan: "01",
+      ene: "01",
       feb: "02",
       mar: "03",
-      apr: "04",
+      abr: "04",
       may: "05",
       jun: "06",
       jul: "07",
-      aug: "08",
+      ago: "08",
       sep: "09",
       oct: "10",
       nov: "11",
-      dec: "12",
+      dic: "12",
     };
 
     const [mon, dayStr] = (dateString as string).split(" ");
