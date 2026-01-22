@@ -30,7 +30,6 @@ const TestListComponent: React.FC = () => {
   const { tests, removeTest, clearTests, blockForm, unblockForm } =
     useTestStore();
 
-
   const { setEditTest } = useEditTestStore();
 
   const { setShowLoading } = useLoadingStore();
@@ -46,7 +45,9 @@ const TestListComponent: React.FC = () => {
 
     return new Promise<TestResultData | undefined>((resolve) => {
       const getStatus = async () => {
-        const response = await GithubService.checkWorkflowStatusGithub(commitSHA);
+        const response = await GithubService.checkWorkflowStatusGithub(
+          commitSHA
+        );
 
         if (!response) return;
 
@@ -54,6 +55,8 @@ const TestListComponent: React.FC = () => {
 
         if (status === "completed") {
           clearInterval(intervalId);
+
+          sessionStorage.removeItem("test-list");
 
           resolve({
             status,
@@ -73,7 +76,6 @@ const TestListComponent: React.FC = () => {
     if (!testListName.trim()) return;
 
     try {
-
       setShowLoading(true);
       blockForm();
 
@@ -94,6 +96,7 @@ const TestListComponent: React.FC = () => {
 
   const handleCleanList = () => {
     clearTests();
+    unblockForm();
   };
 
   const handleCleanAll = () => {
@@ -115,6 +118,8 @@ const TestListComponent: React.FC = () => {
       flexDirection="column"
       h="100%"
       mt={2}
+      minH="100%"
+      bg="white"
     >
       <Box p={5} flex="1 1 auto" minH={0}>
         <Text fontSize="sm" fontWeight="bold" mb={2}>
@@ -123,23 +128,26 @@ const TestListComponent: React.FC = () => {
 
         {resultData?.status !== "completed" && (
           <Input
+            borderRadius={"md"}
             placeholder="Nombre set de pruebas*"
             mb={4}
             value={testListName}
             onChange={(e) => setTestListName(e.target.value)}
           />
         )}
+
         {resultData?.status === "completed" && (
           <Box
             mb={4}
-            display={"flex"}
-            alignItems={"center"}
-            w={"100%"}
-            justifyContent={"space-between"}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            w="100%"
           >
-            <Text fontSize="md" fontWeight={"bold"}>
+            <Text fontSize="md" fontWeight="bold">
               {resultData.title}
             </Text>
+
             {resultData.result === "success" ? (
               <Circle size="20px" mt={2} bg="green.400" color="white">
                 <CheckIcon w={3} h={3} />
@@ -169,32 +177,36 @@ const TestListComponent: React.FC = () => {
                 <h2>
                   <AccordionButton
                     _expanded={{ bg: "red.50" }}
-                    _hover={{ borderColor: "#FF0000" }}
+                    _hover={{ borderColor: "#FF0000", borderRadius: "md" }}
                     _focus={{ borderColor: "#FF0000", outline: "none" }}
                   >
                     <HStack justify="space-between" w="100%">
                       <Text fontWeight="bold" fontSize="sm">
                         {test.id}
                       </Text>
+
                       <HStack>
                         {resultData?.status !== "completed" && (
                           <IconButton
                             size="sm"
+                            borderRadius={"md"}
                             aria-label="Eliminar"
                             title="Eliminar"
                             icon={<DeleteIcon />}
                             colorScheme="red"
-                            _hover={{ borderColor: "#FF0000" }}
                             variant="ghost"
+                            _hover={{ borderColor: "#FF0000" }}
                             onClick={(e) => {
                               e.stopPropagation();
                               removeTest(index);
                             }}
                           />
                         )}
+
                         {resultData?.status !== "completed" && (
                           <IconButton
                             size="sm"
+                            borderRadius={"md"}
                             aria-label="Editar"
                             title="Editar"
                             icon={<EditIcon />}
@@ -206,11 +218,13 @@ const TestListComponent: React.FC = () => {
                             }}
                           />
                         )}
+
                         <AccordionIcon />
                       </HStack>
                     </HStack>
                   </AccordionButton>
                 </h2>
+
                 <AccordionPanel pb={4}>
                   <pre style={{ margin: 0, fontSize: "0.8rem" }}>
                     {JSON.stringify(test, null, 2)}
@@ -232,36 +246,40 @@ const TestListComponent: React.FC = () => {
         p={5}
         mt="auto"
       >
-        {tests.length > 0 && !resultData && (
-          <Button
-            w="100%"
-            backgroundColor="#ffffff"
-            border="2px solid #1b1b1b"
-            color="#1b1b1b"
-            borderRadius="full"
-            _hover={{
-              backgroundColor: "#1b1b1b",
-              color: "#ffffff",
-              borderColor: "#1b1b1b",
-            }}
-            onClick={handleCleanList}
-            isDisabled={tests.length === 0}
-          >
-            Limpiar lista
-          </Button>
-        )}
         {!resultData && (
-          <Button
-            w="100%"
-            colorScheme="blackAlpha"
-            backgroundColor="#1b1b1b"
-            borderRadius="full"
-            onClick={handleSubmitTest}
-            isDisabled={tests.length === 0 || !testListName.trim()}
-          >
-            Iniciar prueba
-          </Button>
+          <>
+            {tests.length > 0 && (
+              <Button
+                w="100%"
+                backgroundColor="#ffffff"
+                border="2px solid #1b1b1b"
+                color="#1b1b1b"
+                borderRadius="md"
+                _hover={{
+                  backgroundColor: "#1b1b1b",
+                  color: "#ffffff",
+                  borderColor: "#1b1b1b",
+                }}
+                onClick={handleCleanList}
+                isDisabled={tests.length === 0}
+              >
+                Limpiar lista
+              </Button>
+            )}
+
+            <Button
+              w="100%"
+              colorScheme="blackAlpha"
+              backgroundColor="#1b1b1b"
+              borderRadius="md"
+              onClick={handleSubmitTest}
+              isDisabled={tests.length === 0 || !testListName.trim()}
+            >
+              Iniciar prueba
+            </Button>
+          </>
         )}
+
         {resultData && (
           <>
             <Button
@@ -269,7 +287,7 @@ const TestListComponent: React.FC = () => {
               backgroundColor="#ffffff"
               border="2px solid #1b1b1b"
               color="#1b1b1b"
-              borderRadius="full"
+              borderRadius="md"
               _hover={{
                 backgroundColor: "#1b1b1b",
                 color: "#ffffff",
@@ -279,13 +297,16 @@ const TestListComponent: React.FC = () => {
             >
               Reiniciar
             </Button>
+
             <Button
               w="100%"
               colorScheme="blackAlpha"
               backgroundColor="#1b1b1b"
-              borderRadius="full"
+              borderRadius="md"
               onClick={async () => {
-                await GithubService.downLoadReportHTMLGithub(resultData.workflowId)
+                await GithubService.downLoadReportHTMLGithub(
+                  resultData.workflowId
+                );
               }}
             >
               Descargar reporte

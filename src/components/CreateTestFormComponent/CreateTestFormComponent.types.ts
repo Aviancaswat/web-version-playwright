@@ -7,7 +7,13 @@ export interface Option {
 export interface InputTypes {
   name: string;
   label: string;
-  type: "select" | "text" | "date" | "number" | "searchable-select";
+  type:
+    | "select"
+    | "text"
+    | "date"
+    | "number"
+    | "searchable-select"
+    | "multi-select";
   isRequired: boolean;
   hasPlaceholder?: boolean;
   hasDefaultValue?: boolean;

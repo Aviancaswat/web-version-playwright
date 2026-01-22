@@ -17,7 +17,11 @@
         "isRequired": true,
         "option": [
           { "value": "home", "label": "Home", "stepKey": 1 },
-          { "value": "booking", "label": "Booking", "stepKey": 2 }
+          { "value": "booking", "label": "Booking", "stepKey": 2 },
+          { "value": "passenger", "label": "Passenger", "stepKey": 3 },
+          { "value": "services", "label": "Services", "stepKey": 4 },
+          { "value": "seat", "label": "Seat", "stepKey": 5 },
+          { "value": "payment", "label": "Payment", "stepKey": 6 }
         ]
       },
       {
@@ -30,7 +34,7 @@
       {
         "name": "homeIdioma",
         "label": "Idioma:",
-        "type": "select",
+        "type": "multi-select",
         "isRequired": true,
         "option": [
           { "value": "es", "label": "Español" },
@@ -104,16 +108,20 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca (AUC)" },
-          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
-          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "BOG", "label": "Bogotá (BOG)" },
+          { "value": "MDE", "label": "Medellín (MDE)" },
           { "value": "CTG", "label": "Cartagena (CTG)" },
-          { "value": "MTR", "label": "Monteria (MTR)" },
-          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "CLO", "label": "Cali (CLO)" },
+          { "value": "SMR", "label": "Santa Marta (SMR)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" },
+          { "value": "ADZ", "label": "San Andrés (ADZ)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CUC", "label": "Cúcuta (CUC)" },
           { "value": "PEI", "label": "Pereira (PEI)" },
-          { "value": "VUP", "label": "Valledupar (VUP)" },
-          { "value": "AXM", "label": "Armenia (AXM)" },
-          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+          { "value": "IAD", "label": "Whashington (IAD)" },
+          { "value": "MIA", "label": "Miami (MIA)" },
+          { "value": "NYC", "label": "Nueva York (NYC)" },
+          { "value": "SAL", "label": "San Salvador (SAL)" }
         ]
       },
       {
@@ -122,26 +130,30 @@
         "type": "searchable-select",
         "isRequired": true,
         "option": [
-          { "value": "AUC", "label": "Arauca (AUC)" },
-          { "value": "EJA", "label": "Barrancabermeja (EJA)" },
-          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "BOG", "label": "Bogotá (BOG)" },
+          { "value": "MDE", "label": "Medellín (MDE)" },
           { "value": "CTG", "label": "Cartagena (CTG)" },
-          { "value": "MTR", "label": "Monteria (MTR)" },
-          { "value": "NVA", "label": "Neiva (NVA)" },
+          { "value": "CLO", "label": "Cali (CLO)" },
+          { "value": "SMR", "label": "Santa Marta (SMR)" },
+          { "value": "BAQ", "label": "Barranquilla (BAQ)" },
+          { "value": "ADZ", "label": "San Andrés (ADZ)" },
+          { "value": "BGA", "label": "Bucaramanga (BGA)" },
+          { "value": "CUC", "label": "Cúcuta (CUC)" },
           { "value": "PEI", "label": "Pereira (PEI)" },
-          { "value": "VUP", "label": "Valledupar (VUP)" },
-          { "value": "AXM", "label": "Armenia (AXM)" },
-          { "value": "BAQ", "label": "Barranquilla (BAQ)" }
+          { "value": "IAD", "label": "Whashington (IAD)" },
+          { "value": "MIA", "label": "Miami (MIA)" },
+          { "value": "NYC", "label": "Nueva York (NYC)" },
+          { "value": "SAL", "label": "San Salvador (SAL)" }
         ]
       },
       {
         "name": "homeisActiveOptionOutbound",
-        "label": "Tipo de vuelo*: ",
+        "label": "Tipo de vuelo: ",
         "type": "select",
         "isRequired": true,
         "option": [
-          { "value": "false", "label": "Ida y vuelta" },
-          { "value": "true", "label": "Solo ida" }
+          { "value": false, "label": "Ida y vuelta" },
+          { "value": true, "label": "Solo ida" }
         ]
       },
       {
@@ -151,8 +163,8 @@
         "isRequired": true
       },
       {
-        "name": "homeFechaLlegada",
-        "label": "Vuelta",
+        "name": "homeFechaLLegada",
+        "label": "Vuelta:",
         "type": "date",
         "isRequired": true,
         "showIf": {
@@ -170,7 +182,7 @@
       },
       {
         "name": "homePassengerYouths",
-        "label": "Jóvenes",
+        "label": "Jóvenes:",
         "type": "number",
         "isRequired": false,
         "hasDefaultValue": true,
@@ -178,7 +190,7 @@
       },
       {
         "name": "homePassengerChildren",
-        "label": "Niños",
+        "label": "Niños:",
         "type": "number",
         "isRequired": false,
         "hasDefaultValue": true,
@@ -186,7 +198,7 @@
       },
       {
         "name": "homePassengerInfant",
-        "label": "Bebés",
+        "label": "Bebés:",
         "type": "number",
         "isRequired": false,
         "hasDefaultValue": true,
@@ -198,6 +210,10 @@
     "key": 2,
     "stepTitle": "Booking",
     "method": [
+      {
+        "value": "none",
+        "label": "No aplica"
+      },
       {
         "value": "bookingSeleccionarVueloIda",
         "label": "Seleccionar Vuelo de Ida en Reserva"
@@ -230,9 +246,11 @@
       },
       {
         "name": "bookingTarifaIda",
-        "label": "Tarifa de ida*: ",
+        "label": "Tarifa de ida: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "light",
         "option": [
           { "value": "light", "label": "Light" },
           { "value": "basic", "label": "Basic" },
@@ -244,9 +262,11 @@
       },
       {
         "name": "bookingTarifaVuelta",
-        "label": "Tarifa de vuelta*: ",
+        "label": "Tarifa de vuelta: ",
         "type": "select",
-        "isRequired": true,
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "light",
         "option": [
           { "value": "light", "label": "Light" },
           { "value": "basic", "label": "Basic" },
@@ -258,6 +278,1302 @@
         "showIf": {
           "field": "homeisActiveOptionOutbound",
           "equals": "false"
+        }
+      }
+    ]
+  },
+  {
+    "key": 3,
+    "stepTitle": "Passenger",
+    "hasOnlyText": false,
+    "method": [
+      {
+        "value": "none",
+        "label": "No aplica"
+      },
+      {
+        "value": "passengerRellenarFormulario",
+        "label": "Rellenar formulario en pasajeros"
+      }
+    ],
+    "input": [
+      {
+        "name": "passengerSelectManually",
+        "label": "Ingresar pasajeros manualmente: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "true", "label": "Si" },
+          { "value": "false", "label": "No" }
+        ],
+        "hasDefaultValue": true,
+        "defaultValue": "false"
+      },
+      {
+        "name": "passengerBookingHolder",
+        "label": "Titular reserva: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [],
+        "showIf": {
+          "field": "passengerSelectManually",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "passengerBookingHolderPhonePrefix",
+        "label": "Prefijo teléfono titular reserva: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "57", "label": "Colombia (57)" },
+          { "value": "93", "label": "Afganistán (93)" },
+          { "value": "355", "label": "Albania (355)" },
+          { "value": "49", "label": "Alemania (49)" },
+          { "value": "376", "label": "Andorra (376)" },
+          { "value": "244", "label": "Angola (244)" },
+          { "value": "1", "label": "Anguila (1)" },
+          { "value": "1", "label": "Antigua y Barbuda (1)" },
+          { "value": "966", "label": "Arabia Saudita (966)" },
+          { "value": "213", "label": "Argelia (213)" },
+          { "value": "54", "label": "Argentina (54)" },
+          { "value": "374", "label": "Armenia (374)" },
+          { "value": "297", "label": "Aruba (297)" },
+          { "value": "61", "label": "Australia (61)" },
+          { "value": "43", "label": "Austria (43)" },
+          { "value": "994", "label": "Azerbaiyán (994)" },
+          { "value": "1", "label": "Bahamas (1)" },
+          { "value": "880", "label": "Bangladés (880)" },
+          { "value": "1", "label": "Barbados (1)" },
+          { "value": "32", "label": "Bélgica (32)" },
+          { "value": "501", "label": "Belice (501)" },
+          { "value": "229", "label": "Benín (229)" },
+          { "value": "1", "label": "Bermudas (1)" },
+          { "value": "375", "label": "Bielorrusia (375)" },
+          { "value": "591", "label": "Bolivia (591)" },
+          { "value": "387", "label": "Bosnia y Herzegovina (387)" },
+          { "value": "267", "label": "Botsuana (267)" },
+          { "value": "55", "label": "Brasil (55)" },
+          { "value": "673", "label": "Brunéi (673)" },
+          { "value": "359", "label": "Bulgaria (359)" },
+          { "value": "855", "label": "Camboya (855)" },
+          { "value": "237", "label": "Camerún (237)" },
+          { "value": "1", "label": "Canadá (1)" },
+          { "value": "56", "label": "Chile (56)" },
+          { "value": "86", "label": "China (86)" },
+          { "value": "357", "label": "Chipre (357)" },
+          { "value": "506", "label": "Costa Rica (506)" },
+          { "value": "385", "label": "Croacia (385)" },
+          { "value": "53", "label": "Cuba (53)" },
+          { "value": "45", "label": "Dinamarca (45)" },
+          { "value": "593", "label": "Ecuador (593)" },
+          { "value": "20", "label": "Egipto (20)" },
+          { "value": "503", "label": "El Salvador (503)" },
+          { "value": "971", "label": "Emiratos Árabes Unidos (971)" },
+          { "value": "34", "label": "España (34)" },
+          { "value": "1", "label": "Estados Unidos (1)" },
+          { "value": "33", "label": "Francia (33)" },
+          { "value": "502", "label": "Guatemala (502)" },
+          { "value": "504", "label": "Honduras (504)" },
+          { "value": "852", "label": "Hong Kong (852)" },
+          { "value": "91", "label": "India (91)" },
+          { "value": "62", "label": "Indonesia (62)" },
+          { "value": "98", "label": "Irán (98)" },
+          { "value": "964", "label": "Irak (964)" },
+          { "value": "353", "label": "Irlanda (353)" },
+          { "value": "972", "label": "Israel (972)" },
+          { "value": "39", "label": "Italia (39)" },
+          { "value": "81", "label": "Japón (81)" },
+          { "value": "962", "label": "Jordania (962)" },
+          { "value": "7", "label": "Kazajistán (7)" },
+          { "value": "965", "label": "Kuwait (965)" },
+          { "value": "52", "label": "México (52)" },
+          { "value": "505", "label": "Nicaragua (505)" },
+          { "value": "507", "label": "Panamá (507)" },
+          { "value": "595", "label": "Paraguay (595)" },
+          { "value": "51", "label": "Perú (51)" },
+          { "value": "48", "label": "Polonia (48)" },
+          { "value": "351", "label": "Portugal (351)" },
+          { "value": "44", "label": "Reino Unido (44)" },
+          { "value": "40", "label": "Rumania (40)" },
+          { "value": "7", "label": "Rusia (7)" },
+          { "value": "221", "label": "Senegal (221)" },
+          { "value": "65", "label": "Singapur (65)" },
+          { "value": "27", "label": "Sudáfrica (27)" },
+          { "value": "46", "label": "Suecia (46)" },
+          { "value": "41", "label": "Suiza (41)" },
+          { "value": "90", "label": "Turquía (90)" },
+          { "value": "380", "label": "Ucrania (380)" },
+          { "value": "598", "label": "Uruguay (598)" },
+          { "value": "58", "label": "Venezuela (58)" }
+        ],
+        "showIf": {
+          "field": "passengerSelectManually",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "passengerBookingHolderPhone",
+        "label": "Teléfono titular reserva:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "passengerSelectManually",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "passengerBookingHolderEmail",
+        "label": "Correo electrónico titular reserva:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "passengerSelectManually",
+          "equals": "true"
+        }
+      }
+    ]
+  },
+  {
+    "key": 4,
+    "stepTitle": "Services",
+    "method": [{ "value": "none", "label": "No aplica" }],
+    "input": [
+      {
+        "name": "servicesEquipajeManoBodega",
+        "label": "Incluir equipaje de mano o bodega: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      },
+      {
+        "name": "servicesEquipajeManoIda",
+        "label": "Equipaje de mano en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesEquipajeManoBodega",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesEquipajeManoVuelta",
+        "label": "Equipaje de mano en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesEquipajeManoBodega",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesEquipajeBodegaIda",
+        "label": "Equipaje de bodega de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesEquipajeManoBodega",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesEquipajeBodegaVuelta",
+        "label": "Equipaje de bodega de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesEquipajeManoBodega",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesEquipajeDeportivo",
+        "label": "Incluir equipaje deportivo: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      },
+      {
+        "name": "servicesDeportivoBicicletaIda",
+        "label": "Bicicleta en vuelo de ida: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoBicicletaVuelta",
+        "label": "Bicicleta en vuelo de vuelta: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoGolfIda",
+        "label": "Golf en vuelo de ida: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoGolfVuelta",
+        "label": "Golf en vuelo de vuelta: ",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoBuceoIda",
+        "label": "Buceo en vuelo de ida:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoBuceoVuelta",
+        "label": "Buceo en vuelo de vuelta:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoSurfIda",
+        "label": "Surf en vuelo de ida:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoSurfVuelta",
+        "label": "Surf en vuelo de vuelta:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoEsquiarIda",
+        "label": "Esquiar en vuelo de ida:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesDeportivoEsquiarVuelta",
+        "label": "Esquiar en vuelo de vuelta:",
+        "type": "number",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": 0,
+        "showIf": {
+          "field": "servicesEquipajeDeportivo",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAbordajePrioritario",
+        "label": "Incluir abordaje prioritario: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      },
+      {
+        "name": "servicesAbordajePrioritarioIda",
+        "label": "Abordaje prioritario en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAbordajePrioritario",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAbordajePrioritarioVuelta",
+        "label": "Abordaje prioritario en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAbordajePrioritario",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAviancaLounges",
+        "label": "Incluir avianca lounges: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      },
+      {
+        "name": "servicesLoungesPrioritarioIda",
+        "label": "Lounges prioritario en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAviancaLounges",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesLoungesPrioritarioVuelta",
+        "label": "Lounges prioritario en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAviancaLounges",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaEspecial",
+        "label": "Incluir asistencia especial: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadVisualIda",
+        "label": "Asistencia discapacidad visual en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadVisualVuelta",
+        "label": "Asistencia discapacidad visual en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadAuditivaIda",
+        "label": "Asistencia discapacidad auditiva en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadAuditivaVuelta",
+        "label": "Asistencia discapacidad auditiva en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadIntelectualIda",
+        "label": "Asistencia discapacidad intelectual en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadIntelectualVuelta",
+        "label": "Asistencia discapacidad intelectual en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaPerroServicioIda",
+        "label": "Asistencia perro en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaPerroServicioVuelta",
+        "label": "Asistencia perro en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadFisicaIda",
+        "label": "Asistencia discapacidad fisica en vuelo de ida: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaDiscapacidadFisicaVuelta",
+        "label": "Asistencia discapacidad fisica en vuelo de vuelta: ",
+        "type": "select",
+        "isRequired": false,
+        "option": [
+          {
+            "value": "false",
+            "label": "No"
+          },
+          {
+            "value": "true",
+            "label": "Si"
+          }
+        ],
+        "showIf": {
+          "field": "servicesAsistenciaEspecial",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "servicesAsistenciaViaje",
+        "label": "Incluir asistencia de viaje: ",
+        "type": "select",
+        "isRequired": false,
+        "hasDefaultValue": true,
+        "defaultValue": "false",
+        "option": [
+          { "value": "false", "label": "No" },
+          { "value": "true", "label": "Si" }
+        ]
+      }
+    ]
+  },
+  {
+    "key": 5,
+    "stepTitle": "Seat",
+    "method": [{ "value": "none", "label": "No aplica" }],
+    "hasOnlyText": false,
+    "input": [
+      {
+        "name": "seatSelectManually",
+        "label": "Seleccionar asientos manualmente: ",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "true", "label": "Si" },
+          { "value": "false", "label": "No" }
+        ],
+        "hasDefaultValue": true,
+        "defaultValue": "false"
+      }
+    ]
+  },
+  {
+    "key": 6,
+    "stepTitle": "Payment",
+    "method": [{ "value": "none", "label": "No aplica" }],
+    "hasOnlyText": false,
+    "input": [
+      {
+        "name": "paymentTypeOfPayment",
+        "label": "Tipo de medio de pago:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "avianca_credits", "label": "Avianca Credits" },
+          { "value": "pse", "label": "PSE" },
+          {
+            "value": "debit_credit_card",
+            "label": "Tarjeta de crédito o debito"
+          }
+        ],
+        "hasDefaultValue": true,
+        "defaultValue": "pse"
+      },
+      {
+        "name": "paymentAviancaCreditsNumber",
+        "label": "Número de Avianca Credits:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "avianca_credits"
+        }
+      },
+      {
+        "name": "paymentAviancaCreditsPinNumber",
+        "label": "Pin de Avianca Credits:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "avianca_credits"
+        }
+      },
+      {
+        "name": "paymentPseBankInstitution",
+        "label": "Entidad bancaria:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "alianza_fiduciaria", "label": "Alianza Fiduciaria" },
+          { "value": "ban100", "label": "BAN100" },
+          { "value": "bancamia", "label": "Bancamia S.A." },
+          { "value": "banco_agrario", "label": "Banco Agrario" },
+          { "value": "av_villas", "label": "Banco AV Villas" },
+          { "value": "bbva", "label": "Banco BBVA Colombia S.A." },
+          { "value": "banco_caja_social", "label": "Banco Caja Social" },
+          { "value": "coopcentral", "label": "Banco Cooperativo Coopcentral" },
+          { "value": "davivienda", "label": "Banco Davivienda" },
+          { "value": "banco_bogota", "label": "Banco de Bogotá" },
+          { "value": "banco_occidente", "label": "Banco de Occidente" },
+          { "value": "banco_falabella", "label": "Banco Falabella" },
+          { "value": "finandina", "label": "Banco Finandina S.A. BIC" },
+          { "value": "gnb_sudameris", "label": "Banco GNB Sudameris" },
+          { "value": "itau", "label": "Banco Itau" },
+          { "value": "jp_morgan", "label": "Banco J.P. Morgan Colombia S.A." },
+          { "value": "bancolombia", "label": "Bancolombia" },
+          { "value": "mundo_mujer", "label": "Banco Mundo Mujer S.A." },
+          { "value": "bancoomeva", "label": "Bancoomeva S.A." },
+          { "value": "pichincha", "label": "Banco Pichincha S.A." },
+          { "value": "banco_popular", "label": "Banco Popular" },
+          { "value": "santander", "label": "Banco Santander Colombia" },
+          { "value": "serfinanza", "label": "Banco Serfinanza" },
+          { "value": "banco_union", "label": "Banco Unión" },
+          { "value": "bold", "label": "Bold CF" },
+          { "value": "cfa", "label": "CFA Cooperativa Financiera" },
+          { "value": "citibank", "label": "CityBank" },
+          { "value": "coink", "label": "Coink SA" },
+          { "value": "coltefinanciera", "label": "Coltefinanciera" },
+          { "value": "confiar", "label": "Confiar Cooperativa Financiera" },
+          { "value": "cotrafa", "label": "Cotrafa" },
+          { "value": "crezcamos", "label": "Crezcamos MOSI" },
+          { "value": "dale", "label": "Dale" },
+          { "value": "daviplata", "label": "Daviplata" },
+          { "value": "davibank", "label": "DaviBank S.A." },
+          { "value": "ding", "label": "Ding" },
+          {
+            "value": "juriscoop",
+            "label": "Financiera Juriscoop SA Compañia de Financiamiento"
+          },
+          { "value": "global66", "label": "Global66" },
+          { "value": "iris", "label": "Iris" },
+          { "value": "jfk", "label": "JFK Cooperativa Financiera" },
+          { "value": "lulo_bank", "label": "Lulo Bank" },
+          { "value": "movii", "label": "Movii S.A." },
+          { "value": "nequi", "label": "Nequi" },
+          { "value": "nu", "label": "Nu" },
+          { "value": "powwi", "label": "Powwi" },
+          { "value": "rappipay", "label": "Rappipay" },
+          { "value": "uala", "label": "Ualá" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        },
+        "hasDefaultValue": true,
+        "defaultValue": "bancolombia"
+      },
+      {
+        "name": "paymentPseAccountHolderName",
+        "label": "Nombre titular de cuenta:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "hasDefaultValue": true,
+        "defaultValue": "Monitoreo Digital",
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderEmail",
+        "label": "Correo electrónico:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "hasDefaultValue": true,
+        "defaultValue": "monitoreo@digital.com",
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderDocumentType",
+        "label": "Tipo de documento:",
+        "type": "select",
+        "isRequired": true,
+        "hasDefaultValue": true,
+        "defaultValue": "CC",
+        "option": [
+          { "value": "CC", "label": "Cedula de Ciudadania" },
+          { "value": "CE", "label": "Cedula de Extranjeria" },
+          { "value": "NIT", "label": "Número de Identificación Tributario" },
+          { "value": "PP", "label": "Pasaporte" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderDocument",
+        "label": "Número de documento:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "hasDefaultValue": true,
+        "defaultValue": "123456789",
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderPhonePrefix",
+        "label": "Prefijo:",
+        "type": "select",
+        "isRequired": true,
+        "hasDefaultValue": true,
+        "defaultValue": "57",
+        "option": [
+          { "value": "57", "label": "Colombia (57)" },
+          { "value": "93", "label": "Afganistán (93)" },
+          { "value": "355", "label": "Albania (355)" },
+          { "value": "49", "label": "Alemania (49)" },
+          { "value": "376", "label": "Andorra (376)" },
+          { "value": "244", "label": "Angola (244)" },
+          { "value": "1", "label": "Anguila (1)" },
+          { "value": "1", "label": "Antigua y Barbuda (1)" },
+          { "value": "966", "label": "Arabia Saudita (966)" },
+          { "value": "213", "label": "Argelia (213)" },
+          { "value": "54", "label": "Argentina (54)" },
+          { "value": "374", "label": "Armenia (374)" },
+          { "value": "297", "label": "Aruba (297)" },
+          { "value": "61", "label": "Australia (61)" },
+          { "value": "43", "label": "Austria (43)" },
+          { "value": "994", "label": "Azerbaiyán (994)" },
+          { "value": "1", "label": "Bahamas (1)" },
+          { "value": "880", "label": "Bangladés (880)" },
+          { "value": "1", "label": "Barbados (1)" },
+          { "value": "32", "label": "Bélgica (32)" },
+          { "value": "501", "label": "Belice (501)" },
+          { "value": "229", "label": "Benín (229)" },
+          { "value": "1", "label": "Bermudas (1)" },
+          { "value": "375", "label": "Bielorrusia (375)" },
+          { "value": "591", "label": "Bolivia (591)" },
+          { "value": "387", "label": "Bosnia y Herzegovina (387)" },
+          { "value": "267", "label": "Botsuana (267)" },
+          { "value": "55", "label": "Brasil (55)" },
+          { "value": "673", "label": "Brunéi (673)" },
+          { "value": "359", "label": "Bulgaria (359)" },
+          { "value": "855", "label": "Camboya (855)" },
+          { "value": "237", "label": "Camerún (237)" },
+          { "value": "1", "label": "Canadá (1)" },
+          { "value": "56", "label": "Chile (56)" },
+          { "value": "86", "label": "China (86)" },
+          { "value": "357", "label": "Chipre (357)" },
+          { "value": "506", "label": "Costa Rica (506)" },
+          { "value": "385", "label": "Croacia (385)" },
+          { "value": "53", "label": "Cuba (53)" },
+          { "value": "45", "label": "Dinamarca (45)" },
+          { "value": "593", "label": "Ecuador (593)" },
+          { "value": "20", "label": "Egipto (20)" },
+          { "value": "503", "label": "El Salvador (503)" },
+          { "value": "971", "label": "Emiratos Árabes Unidos (971)" },
+          { "value": "34", "label": "España (34)" },
+          { "value": "1", "label": "Estados Unidos (1)" },
+          { "value": "33", "label": "Francia (33)" },
+          { "value": "502", "label": "Guatemala (502)" },
+          { "value": "504", "label": "Honduras (504)" },
+          { "value": "852", "label": "Hong Kong (852)" },
+          { "value": "91", "label": "India (91)" },
+          { "value": "62", "label": "Indonesia (62)" },
+          { "value": "98", "label": "Irán (98)" },
+          { "value": "964", "label": "Irak (964)" },
+          { "value": "353", "label": "Irlanda (353)" },
+          { "value": "972", "label": "Israel (972)" },
+          { "value": "39", "label": "Italia (39)" },
+          { "value": "81", "label": "Japón (81)" },
+          { "value": "962", "label": "Jordania (962)" },
+          { "value": "7", "label": "Kazajistán (7)" },
+          { "value": "965", "label": "Kuwait (965)" },
+          { "value": "52", "label": "México (52)" },
+          { "value": "505", "label": "Nicaragua (505)" },
+          { "value": "507", "label": "Panamá (507)" },
+          { "value": "595", "label": "Paraguay (595)" },
+          { "value": "51", "label": "Perú (51)" },
+          { "value": "48", "label": "Polonia (48)" },
+          { "value": "351", "label": "Portugal (351)" },
+          { "value": "44", "label": "Reino Unido (44)" },
+          { "value": "40", "label": "Rumania (40)" },
+          { "value": "7", "label": "Rusia (7)" },
+          { "value": "221", "label": "Senegal (221)" },
+          { "value": "65", "label": "Singapur (65)" },
+          { "value": "27", "label": "Sudáfrica (27)" },
+          { "value": "46", "label": "Suecia (46)" },
+          { "value": "41", "label": "Suiza (41)" },
+          { "value": "90", "label": "Turquía (90)" },
+          { "value": "380", "label": "Ucrania (380)" },
+          { "value": "598", "label": "Uruguay (598)" },
+          { "value": "58", "label": "Venezuela (58)" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderPhone",
+        "label": "Teléfono:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "hasDefaultValue": true,
+        "defaultValue": "3000000000",
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentPseAccountHolderAddress",
+        "label": "Dirección de residencia:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "hasDefaultValue": true,
+        "defaultValue": "Calle 123",
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "pse"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderName",
+        "label": "Nombre del titular:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderCardNumber",
+        "label": "Número de tarjeta:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderExpirationMonth",
+        "label": "Mes de expiración:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "1", "label": "1" },
+          { "value": "2", "label": "2" },
+          { "value": "3", "label": "3" },
+          { "value": "4", "label": "4" },
+          { "value": "5", "label": "5" },
+          { "value": "6", "label": "6" },
+          { "value": "7", "label": "7" },
+          { "value": "8", "label": "8" },
+          { "value": "9", "label": "9" },
+          { "value": "10", "label": "10" },
+          { "value": "11", "label": "11" },
+          { "value": "12", "label": "12" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderExpirationYear",
+        "label": "Año de expiración:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "25", "label": "25" },
+          { "value": "26", "label": "26" },
+          { "value": "27", "label": "27" },
+          { "value": "28", "label": "28" },
+          { "value": "29", "label": "29" },
+          { "value": "30", "label": "30" },
+          { "value": "31", "label": "31" },
+          { "value": "32", "label": "32" },
+          { "value": "33", "label": "33" },
+          { "value": "34", "label": "34" },
+          { "value": "35", "label": "35" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderCVV",
+        "label": "CVV:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderDeferToQuotas",
+        "label": "Diferir a cuotas:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "true", "label": "Si" },
+          { "value": "false", "label": "No" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderQuotas",
+        "label": "Cuotas:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "1", "label": "1" },
+          { "value": "2", "label": "2" },
+          { "value": "3", "label": "3" },
+          { "value": "4", "label": "4" },
+          { "value": "5", "label": "5" },
+          { "value": "6", "label": "6" },
+          { "value": "7", "label": "7" },
+          { "value": "8", "label": "8" },
+          { "value": "9", "label": "9" },
+          { "value": "10", "label": "10" },
+          { "value": "11", "label": "11" },
+          { "value": "12", "label": "12" },
+          { "value": "13", "label": "13" },
+          { "value": "14", "label": "14" },
+          { "value": "15", "label": "15" },
+          { "value": "16", "label": "16" },
+          { "value": "17", "label": "17" },
+          { "value": "18", "label": "18" },
+          { "value": "19", "label": "19" },
+          { "value": "20", "label": "20" },
+          { "value": "21", "label": "21" },
+          { "value": "22", "label": "22" },
+          { "value": "23", "label": "23" },
+          { "value": "24", "label": "24" },
+          { "value": "25", "label": "25" },
+          { "value": "26", "label": "26" },
+          { "value": "27", "label": "27" },
+          { "value": "28", "label": "28" },
+          { "value": "29", "label": "29" },
+          { "value": "30", "label": "30" },
+          { "value": "31", "label": "31" },
+          { "value": "32", "label": "32" },
+          { "value": "33", "label": "33" },
+          { "value": "34", "label": "34" },
+          { "value": "35", "label": "35" },
+          { "value": "36", "label": "36" }
+        ],
+        "showIf": {
+          "field": "paymentCardAccountHolderDeferToQuotas",
+          "equals": "true"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderEmail",
+        "label": "Correo electrónico:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderAddress",
+        "label": "Dirección de residencia:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderCity",
+        "label": "Ciudad:",
+        "type": "text",
+        "isRequired": true,
+        "hasPlaceholder": false,
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
+        }
+      },
+      {
+        "name": "paymentCardAccountHolderCountry",
+        "label": "País:",
+        "type": "select",
+        "isRequired": true,
+        "option": [
+          { "value": "colombia", "label": "Colombia" },
+          { "value": "afganistan", "label": "Afganistán" },
+          { "value": "albania", "label": "Albania" },
+          { "value": "alemania", "label": "Alemania" },
+          { "value": "andorra", "label": "Andorra" },
+          { "value": "angola", "label": "Angola" },
+          { "value": "antigua_y_barbuda", "label": "Antigua y Barbuda" },
+          { "value": "arabia_saudita", "label": "Arabia Saudita" },
+          { "value": "argelia", "label": "Argelia" },
+          { "value": "argentina", "label": "Argentina" },
+          { "value": "armenia", "label": "Armenia" },
+          { "value": "australia", "label": "Australia" },
+          { "value": "austria", "label": "Austria" },
+          { "value": "azerbaiyan", "label": "Azerbaiyán" },
+          { "value": "bahamas", "label": "Bahamas" },
+          { "value": "banglades", "label": "Bangladés" },
+          { "value": "barbados", "label": "Barbados" },
+          { "value": "belgica", "label": "Bélgica" },
+          { "value": "belice", "label": "Belice" },
+          { "value": "bolivia", "label": "Bolivia" },
+          { "value": "brasil", "label": "Brasil" },
+          { "value": "bulgaria", "label": "Bulgaria" },
+          { "value": "canada", "label": "Canadá" },
+          { "value": "chile", "label": "Chile" },
+          { "value": "china", "label": "China" },
+          { "value": "chipre", "label": "Chipre" },
+          { "value": "corea_del_sur", "label": "Corea del Sur" },
+          { "value": "costa_rica", "label": "Costa Rica" },
+          { "value": "croacia", "label": "Croacia" },
+          { "value": "cuba", "label": "Cuba" },
+          { "value": "dinamarca", "label": "Dinamarca" },
+          { "value": "dominica", "label": "Dominica" },
+          { "value": "ecuador", "label": "Ecuador" },
+          { "value": "egipto", "label": "Egipto" },
+          { "value": "el_salvador", "label": "El Salvador" },
+          {
+            "value": "emiratos_arabes_unidos",
+            "label": "Emiratos Árabes Unidos"
+          },
+          { "value": "eslovaquia", "label": "Eslovaquia" },
+          { "value": "eslovenia", "label": "Eslovenia" },
+          { "value": "espana", "label": "España" },
+          { "value": "estados_unidos", "label": "Estados Unidos" },
+          { "value": "estonia", "label": "Estonia" },
+          { "value": "filipinas", "label": "Filipinas" },
+          { "value": "finlandia", "label": "Finlandia" },
+          { "value": "francia", "label": "Francia" },
+          { "value": "georgia", "label": "Georgia" },
+          { "value": "ghana", "label": "Ghana" },
+          { "value": "grecia", "label": "Grecia" },
+          { "value": "guatemala", "label": "Guatemala" },
+          { "value": "haiti", "label": "Haití" },
+          { "value": "honduras", "label": "Honduras" },
+          { "value": "hungria", "label": "Hungría" },
+          { "value": "india", "label": "India" },
+          { "value": "indonesia", "label": "Indonesia" },
+          { "value": "irlanda", "label": "Irlanda" },
+          { "value": "islandia", "label": "Islandia" },
+          { "value": "israel", "label": "Israel" },
+          { "value": "italia", "label": "Italia" },
+          { "value": "jamaica", "label": "Jamaica" },
+          { "value": "japon", "label": "Japón" },
+          { "value": "letonia", "label": "Letonia" },
+          { "value": "lituania", "label": "Lituania" },
+          { "value": "luxemburgo", "label": "Luxemburgo" },
+          { "value": "malasia", "label": "Malasia" },
+          { "value": "mexico", "label": "México" },
+          { "value": "marruecos", "label": "Marruecos" },
+          { "value": "nepal", "label": "Nepal" },
+          { "value": "nicaragua", "label": "Nicaragua" },
+          { "value": "noruega", "label": "Noruega" },
+          { "value": "nueva_zelanda", "label": "Nueva Zelanda" },
+          { "value": "panama", "label": "Panamá" },
+          { "value": "paraguay", "label": "Paraguay" },
+          { "value": "paises_bajos", "label": "Países Bajos" },
+          { "value": "peru", "label": "Perú" },
+          { "value": "polonia", "label": "Polonia" },
+          { "value": "portugal", "label": "Portugal" },
+          { "value": "reino_unido", "label": "Reino Unido" },
+          { "value": "republica_dominicana", "label": "República Dominicana" },
+          { "value": "rumania", "label": "Rumanía" },
+          { "value": "suecia", "label": "Suecia" },
+          { "value": "suiza", "label": "Suiza" },
+          { "value": "tailandia", "label": "Tailandia" },
+          { "value": "turquia", "label": "Turquía" },
+          { "value": "ucrania", "label": "Ucrania" },
+          { "value": "uruguay", "label": "Uruguay" },
+          { "value": "venezuela", "label": "Venezuela" },
+          { "value": "vietnam", "label": "Vietnam" }
+        ],
+        "showIf": {
+          "field": "paymentTypeOfPayment",
+          "equals": "debit_credit_card"
         }
       }
     ]

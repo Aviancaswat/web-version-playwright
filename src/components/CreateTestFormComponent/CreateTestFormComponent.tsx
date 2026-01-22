@@ -1,19 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Select,
-  Input,
-  FormControl,
-  FormLabel,
-  HStack,
-  Circle,
-  Text,
-  Divider,
-  Grid,
-  GridItem,
-} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Box } from "@chakra-ui/react";
 
 //Data
 import stepFields from "../../json/CreateTestForm/inputData.json";
@@ -23,34 +9,40 @@ import useTestStore from "../../store/useTestStore/useTestStore";
 import useEditTestStore from "../../store/useEditTestStore/useEditTestStore";
 
 //Components
-import SearchableSelectComponent from "../SearchableSelectComponent/SearchableSelectComponent";
+import CreateTestFormNavigationButtonComponent from "../CreateTestFormNavigationButtonComponent/CreateTestFormNavigationButtonComponent";
+import CreateTestFormStepHeaderComponent from "../CreateTestFormStepHeaderComponent/CreateTestFormStepHeaderComponent";
+import CreateTestFormInputContainer from "../CreateTestFormInputContainer/CreateTestFormInputContainer";
 
 //Types
 import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 
-//TODO: Cuando seleccione pasajeros o flujo superior en el paso de pasajeros, mostrar texto explicativo: "El formulario se va rellenar."
-//TODO: Mostrar mensaje en paso de asientos: "Se va seleccionar un asiento al azar."
-//TODO: en paso de payment, mostrar un mensaje: "Se ejecuta un pago al azar."
+//Utils
+import { formDataNormalizer } from "../../utils/formDataNormalizer";
+import { groupServices } from "../../utils/groupServices";
+import { useFormStep } from "../../hooks/useFormStep";
 
 const CreateTestFormComponent: React.FC = () => {
   const { addTest, isBlocked, updateTest } = useTestStore();
   const { editTest, testIndexToEdit, cleanEditTest } = useEditTestStore();
 
+  const { currentStep, setCurrentStep, nextStep, prevStep, stepRefs } =
+    useFormStep();
+
   const [steps, setSteps] = useState<number[]>([0]);
-  const [currentStep, setCurrentStep] = useState<number>(0);
   const [dependentFieldOption, setDependentFieldOption] = useState<
     Record<string, Option[]>
   >({});
 
   const initializeFormData = () => {
-    const initialData: { [key: string]: string | number } = {};
+    const initialData: Record<string, string | number> = {};
+    const initialStep = stepFields.find((step) => step.key === 0);
 
-    stepFields.forEach((step) => {
-      step.input.map((field) => {
-        if ((field as InputTypes).hasDefaultValue) {
-          initialData[field.name] = (field as InputTypes).defaultValue ?? "";
-        }
-      });
+    if (!initialStep) return initialData;
+
+    initialStep.input.forEach((field) => {
+      if ((field as InputTypes).hasDefaultValue && !("showIf" in field)) {
+        initialData[field.name] = (field as InputTypes).defaultValue ?? "";
+      }
     });
 
     return initialData;
@@ -58,22 +50,16 @@ const CreateTestFormComponent: React.FC = () => {
 
   const [formData, setFormData] = useState(initializeFormData);
 
-  const stepRefs = useRef<HTMLElement[]>([]);
-
   useEffect(() => {
     if (editTest) {
-      const updatedData: typeof formData = { ...editTest };
-
-      stepFields.forEach((step) => {
-        step.input.forEach((field) => {
-          if (field.type === "date" && updatedData[field.name]) {
-            updatedData[field.name] =
-              formatDate(updatedData[field.name], "yyyy-mm-dd") ?? "";
-          }
-        });
+      const updatedData = formDataNormalizer({
+        data: editTest,
+        stepFields,
+        type: "edit",
       });
 
       setFormData(updatedData);
+
       if (editTest.targetPage) {
         applyTargetPageFunction(editTest.targetPage);
       }
@@ -81,21 +67,10 @@ const CreateTestFormComponent: React.FC = () => {
   }, [editTest]);
 
   useEffect(() => {
-    if (stepRefs.current[currentStep]) {
-      stepRefs.current[currentStep].scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
-  }, [currentStep]);
-
-  useEffect(() => {
     stepFields.forEach((step) => {
       step.input.forEach((field) => {
         if ("showIf" in field) {
           const inputField = field as InputTypes;
-
           const dependencyValue = formData[inputField.showIf?.field ?? ""];
 
           if (
@@ -112,6 +87,51 @@ const CreateTestFormComponent: React.FC = () => {
       });
     });
   }, [formData.homeisActiveOptionOutbound]);
+
+  useEffect(() => {
+    const stepConfig = stepFields.find(
+      (step) => step.key === steps[currentStep]
+    );
+
+    if (!stepConfig) return;
+
+    const newDefaults: Record<string, any> = {};
+
+    stepConfig.input.forEach((field) => {
+      const isVisible = shouldShowField(field);
+
+      if (isVisible && (field as any).hasDefaultValue) {
+        const name = field.name;
+        const defaultValue = (field as any).defaultValue ?? "";
+
+        if (formData[name] === undefined || formData[name] === "") {
+          newDefaults[name] = defaultValue;
+        }
+      }
+    });
+
+    if (Object.keys(newDefaults).length > 0) {
+      setFormData((prev) => ({ ...prev, ...newDefaults }));
+    }
+  }, [currentStep, steps, formData]);
+
+  const handleCreateTestsByLanguages = (data: Record<string, any>) => {
+    const selectedLanguages = Array.isArray(data.homeIdioma)
+      ? data.homeIdioma
+      : typeof data.homeIdioma === "string"
+      ? data.homeIdioma.split(",").filter(Boolean)
+      : [];
+
+    selectedLanguages.forEach((language) => {
+      const testByLanguage = {
+        ...data,
+        homeIdioma: language,
+        id: `${data.id}-${language}`,
+      };
+
+      addTest(testByLanguage);
+    });
+  };
 
   const applyTargetPageFunction = (targetPage: string) => {
     const targetPageField = stepFields!.find((step) => step.key === 0);
@@ -144,17 +164,8 @@ const CreateTestFormComponent: React.FC = () => {
   };
 
   const getMethodOptionsByStep = (targetKey: number) => {
-    let accumulatedOptions: Option[] = [];
-
-    for (let i = 1; i <= targetKey; i++) {
-      const step = stepFields.find((step) => step.key === i);
-
-      if (step?.method) {
-        accumulatedOptions = [...accumulatedOptions, ...step.method];
-      }
-    }
-
-    return accumulatedOptions;
+    const step = stepFields.find((step) => step.key === targetKey);
+    return step?.method || [];
   };
 
   const handleInputChange = (
@@ -170,33 +181,22 @@ const CreateTestFormComponent: React.FC = () => {
     }
   };
 
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
-
-  const prevStep = () => setCurrentStep((prev) => prev - 1);
-
   const handleSave = () => {
-    const transformedData = { ...formData };
+    let transformedData = {};
 
-    stepFields.forEach((step) => {
-      step.input.forEach((field) => {
-        if (field.type === "date" && transformedData[field.name]) {
-          transformedData[field.name] =
-            formatDate(transformedData[field.name], "mm-dd") ?? "";
-        }
-
-        if (field.type === "number" && transformedData[field.name]) {
-          transformedData[field.name] = parseInt(
-            transformedData[field.name].toString()
-          );
-        }
-      });
+    const normalizeData = formDataNormalizer({
+      data: formData,
+      stepFields,
+      type: "new",
     });
+
+    transformedData = groupServices(normalizeData);
 
     if (editTest && testIndexToEdit !== null) {
       updateTest(testIndexToEdit, transformedData);
       cleanEditTest();
     } else {
-      addTest(transformedData);
+      handleCreateTestsByLanguages(transformedData);
     }
 
     setFormData(initializeFormData);
@@ -205,8 +205,22 @@ const CreateTestFormComponent: React.FC = () => {
     setCurrentStep(0);
   };
 
-  const currentStepFields =
-    stepFields.find((step) => step.key === steps[currentStep])?.input || [];
+  const currentStepConfig: any = stepFields.find(
+    (step) => step.key === steps[currentStep]
+  );
+
+  const currentStepFields: any[] =
+    (currentStepConfig?.input.filter((field: InputTypes) => {
+      const validTypes = [
+        "number",
+        "text",
+        "select",
+        "multi-select",
+        "searchable-select",
+        "date",
+      ];
+      return validTypes.includes(field.type);
+    }) as InputTypes[]) || [];
 
   const isStepComplete = (stepKey: Option["stepKey"]) => {
     const step = stepFields.find((step) => step.key === stepKey);
@@ -241,8 +255,9 @@ const CreateTestFormComponent: React.FC = () => {
         if (departureDate < today) return false;
       }
 
-      if (field.name === "homeFechaLlegada") {
+      if (field.name === "homeFechaLLegada") {
         const departureDate = new Date(formData["homeFechaSalida"]);
+
         const returnDate = new Date(value);
 
         if (returnDate <= departureDate) return false;
@@ -260,59 +275,62 @@ const CreateTestFormComponent: React.FC = () => {
     return dependencyValue === field.showIf.equals;
   };
 
-  const formatDate = (dateString: string | number, typeFormat: string) => {
-    if (!dateString) return "";
+  const generateDefaultDataByStep = (rawFormData: Record<string, any>) => {
+    const formData: Record<string, any> = {
+      paymentTypeOfPayment: rawFormData.paymentTypeOfPayment ?? "pse",
+      ...rawFormData,
+    };
 
-    if (typeFormat === "mm-dd") {
-      const [, month, day] = dateString.toString().split("-");
+    const defaultData: Record<string, any> = {};
+    const targetPage = formData.targetPage;
 
-      const months = [
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-      ];
+    const normalize = (value: any) => {
+      if (value === true || value === "true" || value === 1 || value === "1")
+        return true;
+      if (value === false || value === "false" || value === 0 || value === "0")
+        return false;
+      return value;
+    };
 
-      return `${months[Number(month) - 1]} ${Number(day)} `;
-    }
+    const targetStep = stepFields.find(
+      (step) => step.stepTitle.toLowerCase() === targetPage.toLowerCase()
+    );
 
-    if (typeFormat === "yyyy-mm-dd") {
-      const months: Record<string, string> = {
-        jan: "01",
-        feb: "02",
-        mar: "03",
-        apr: "04",
-        may: "05",
-        jun: "06",
-        jul: "07",
-        aug: "08",
-        sep: "09",
-        oct: "10",
-        nov: "11",
-        dec: "12",
-      };
+    if (!targetStep) return {};
 
-      const [mon, dayStr] = (dateString as string).split(" ");
-      const day = String(dayStr).padStart(2, "0");
-      const today = new Date();
-      const year = today.getFullYear();
+    const targetKey = targetStep.key;
 
-      let candidate = new Date(`${year}-${months[mon.toLowerCase()]}-${day}`);
+    stepFields.forEach((step) => {
+      if (step.key <= targetKey) {
+        step.input.forEach((field) => {
+          if ("showIf" in field && field.showIf) {
+            const { field: depName, equals } = field.showIf;
 
-      if (candidate < today) {
-        candidate.setFullYear(year + 1);
+            const depVal = formData?.[depName];
+
+            if (normalize(depVal) !== normalize(equals)) {
+              return;
+            }
+          }
+
+          if ((field as any).hasDefaultValue) {
+            defaultData[field.name] = (field as any).defaultValue ?? "";
+          }
+        });
       }
+    });
 
-      return candidate.toISOString().split("T")[0];
-    }
+    return defaultData;
+  };
+
+  const transformFormDataToTest = (raw: Record<string, any>) => {
+    const transformedData = formDataNormalizer({
+      data: raw,
+      stepFields,
+      type: "new",
+    });
+
+    return transformedData;
   };
 
   return (
@@ -327,179 +345,46 @@ const CreateTestFormComponent: React.FC = () => {
       boxShadow="md"
       display="flex"
       flexDirection="column"
-      h="100%"
+      minH="100%"
+      bg="white"
     >
-      <Box
-        overflowX="auto"
-        mb={8}
-        sx={{
-          "&::-webkit-scrollbar": { display: "none" },
-          "-ms-overflow-style": "none",
-          "scrollbar-width": "none",
-        }}
-      >
-        <HStack spacing={6} justify="flex-start" minW="max-content">
-          {steps.map((stepKey, index) => {
-            const step = stepFields.find((step) => step.key === stepKey);
-            return (
-              <HStack
-                key={stepKey}
-                ref={(element) => {
-                  if (element) stepRefs.current[index] = element;
-                }}
-              >
-                <Circle
-                  size="26px"
-                  bg={index === currentStep ? "#FF0000" : "gray.300"}
-                  color="white"
-                  fontWeight="bold"
-                >
-                  {index + 1}
-                </Circle>
-                <Text
-                  fontSize="sm"
-                  fontWeight={index === currentStep ? "bold" : "normal"}
-                >
-                  {step?.stepTitle}
-                </Text>
-                {index < steps.length - 1 && (
-                  <Divider borderColor="gray.400" w="40px" />
-                )}
-              </HStack>
-            );
-          })}
-        </HStack>
-      </Box>
-      <Box flex="1 1 auto" minH={0} maxH="100%" overflowY="auto" pr={1}>
-        <Grid templateColumns="repeat(2, 1fr)" alignItems="end" gap={4}>
-          {currentStepFields
-            .filter((field) => shouldShowField(field))
-            .map((field, index, array) => (
-              <GridItem
-                key={field.name}
-                colSpan={
-                  array.length % 2 !== 0 && index === array.length - 1 ? 2 : 1
-                }
-              >
-                <FormControl isRequired={field.isRequired}>
-                  <FormLabel>{field.label}</FormLabel>
+      <CreateTestFormStepHeaderComponent
+        steps={steps}
+        stepFields={stepFields}
+        stepRefs={stepRefs}
+        currentStep={currentStep}
+      />
 
-                  {field.type === "select" && (
-                    <Select
-                      name={field.name}
-                      value={formData[field.name] || ""}
-                      onChange={handleInputChange}
-                      disabled={isBlocked}
-                    >
-                      <option value="">Selecciona una opción</option>
-                      {(
-                        dependentFieldOption[field.name] ||
-                        field.option ||
-                        []
-                      ).map((option: Option, i: number) => (
-                        <option key={i} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
+      <CreateTestFormInputContainer
+        currentStepFields={currentStepFields}
+        formData={formData}
+        setFormData={setFormData}
+        editTest={editTest}
+        handleInputChange={handleInputChange}
+        isBlocked={isBlocked}
+        dependentFieldOption={dependentFieldOption}
+        currentStepConfig={currentStepConfig}
+        shouldShowField={shouldShowField}
+      />
 
-                  {field.type === "searchable-select" && field.option && (
-                    <SearchableSelectComponent
-                      options={
-                        field.name === "homeCiudadDestino" &&
-                        formData["homeCiudadOrigen"]
-                          ? field.option.filter(
-                              (option) =>
-                                option.value !== formData["homeCiudadOrigen"]
-                            )
-                          : field.option
-                      }
-                      value={formData[field.name] || ""}
-                      onChange={(val) =>
-                        setFormData((prev) => ({ ...prev, [field.name]: val }))
-                      }
-                    />
-                  )}
-
-                  {field.type !== "select" &&
-                    field.type !== "searchable-select" && (
-                      <Input
-                        type={field.type}
-                        min={new Date().toISOString().split("T")[0]}
-                        name={field.name}
-                        disabled={isBlocked}
-                        placeholder={
-                          "placeholderText" in field
-                            ? field?.placeholderText
-                            : ""
-                        }
-                        value={
-                          formData[field.name] ??
-                          ("defaultValue" in field ? field.defaultValue : "")
-                        }
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          if (field.type === "number") {
-                            if (value === "" || Number(value) >= 0) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                [field.name]: value,
-                              }));
-                            }
-                          } else {
-                            handleInputChange(e);
-                          }
-                        }}
-                      />
-                    )}
-                </FormControl>
-              </GridItem>
-            ))}
-        </Grid>
-      </Box>
-
-      <ButtonGroup justifyContent="space-between" mt="auto" pt={4} w="100%">
-        {currentStep > 0 && (
-          <Button
-            onClick={prevStep}
-            backgroundColor="#ffffff"
-            border="2px solid #1b1b1b"
-            color="#1b1b1b"
-            borderRadius="full"
-            _hover={{
-              backgroundColor: "#1b1b1b",
-              color: "#ffffff",
-              borderColor: "#1b1b1b",
-            }}
-          >
-            Atrás
-          </Button>
-        )}
-        {currentStep < steps.length - 1 ? (
-          <Button
-            onClick={nextStep}
-            colorScheme="black"
-            backgroundColor="#1b1b1b"
-            isDisabled={!isStepComplete(steps[currentStep])}
-            borderRadius="full"
-          >
-            Siguiente
-          </Button>
-        ) : (
-          currentStep !== 0 && (
-            <Button
-              onClick={handleSave}
-              colorScheme="blackAlpha"
-              backgroundColor="#1b1b1b"
-              borderRadius="full"
-              isDisabled={!isStepComplete(steps[currentStep])}
-            >
-              {editTest ? "Actualizar prueba" : "Crear prueba"}
-            </Button>
-          )
-        )}
-      </ButtonGroup>
+      <CreateTestFormNavigationButtonComponent
+        currentStep={currentStep}
+        prevStep={prevStep}
+        nextStep={nextStep}
+        editTest={editTest}
+        formData={formData}
+        steps={steps}
+        generateDefaultDataByStep={generateDefaultDataByStep}
+        transformFormDataToTest={transformFormDataToTest}
+        handleCreateTestsByLanguages={handleCreateTestsByLanguages}
+        setFormData={setFormData}
+        setDependentFieldOption={setDependentFieldOption}
+        setSteps={setSteps}
+        setCurrentStep={setCurrentStep}
+        initializeFormData={initializeFormData}
+        isStepComplete={isStepComplete}
+        handleSave={handleSave}
+      />
     </Box>
   );
 };
