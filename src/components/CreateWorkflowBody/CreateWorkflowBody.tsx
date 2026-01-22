@@ -416,51 +416,6 @@ TEXTO DEL USUARIO
   };
 
 
-  // Función para normalizar métodos objetivo
-  const normalizeTargetMethod = (input: string): string => {
-    const normalized = input.toLowerCase().trim();
-
-    // Mapeo de variaciones comunes
-    const methodMap: Record<string, string> = {
-      "seleccionar origen": "homeSeleccionarOrigen",
-      "seleccionar destino": "homeSeleccionarDestino",
-      "seleccionarorigen": "homeSeleccionarOrigen",
-      "seleccioanr origen": "homeSeleccionarOrigen", // Typo común
-      "seleccion origen": "homeSeleccionarOrigen",
-      "select origin": "homeSeleccionarOrigen",
-      "select destination": "homeSeleccionarDestino",
-    };
-
-
-    // Si hay un mapeo directo, usarlo
-    if (methodMap[normalized]) {
-      return methodMap[normalized];
-    }
-
-
-    // Si contiene "origen" o "origin", normalizar a homeSeleccionarOrigen
-    if (normalized.includes("origen") || normalized.includes("origin")) {
-      return "homeSeleccionarOrigen";
-    }
-
-
-    // Si contiene "destino" o "destination", normalizar a homeSeleccionarDestino
-    if (normalized.includes("destino") || normalized.includes("destination")) {
-      return "homeSeleccionarDestino";
-    }
-
-
-    // Si ya está en formato camelCase o parece un método válido, mantenerlo
-    if (normalized.includes("home") || /^[a-z]+[A-Z]/.test(input)) {
-      return input; // Mantener formato original si parece válido
-    }
-
-
-    // Por defecto, devolver el input original
-    return input;
-  };
-
-
   // Función para extraer datos del código TypeScript generado
   const extractDataFromCode = (code: string): RequiredTestData | null => {
     try {
