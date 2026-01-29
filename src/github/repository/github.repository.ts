@@ -103,19 +103,21 @@ export const GithubRepository = {
         newTestData: string
     ): Promise<string | undefined> {
 
+        console.log("fai => Replacing data for new test:", testListName);
+        console.log("fai => New test data:", newTestData);
+
         if (!newTestData || newTestData === "") return;
 
         try {
 
             let fileData = await this.getFileData();
-
             let fileContent = atob(fileData.content);
 
             const updatedContent = fileContent.replace(
-                /\[\s*{[\s\S]*?}\s*]/,
-                newTestData
+                /const\s+tests[\s\S]*?=\s*\[[\s\S]*?\];/,
+                `const tests: TGenericCopys[] = ${newTestData};`
             );
-            
+
             const {
                 data: { commit },
             } = await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
@@ -128,8 +130,8 @@ export const GithubRepository = {
                 branch: branchRef,
             });
 
-            const commitSHA = commit.sha;
-            return commitSHA;
+            return commit.sha;
+
         } catch (error) {
             console.error(`Error en el proceso del commit ${error}`);
             throw error;

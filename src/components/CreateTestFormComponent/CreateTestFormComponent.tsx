@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 //Data
 import stepFields from "../../json/CreateTestForm/inputData.json";
 
 //Store
-import useTestStore from "../../store/useTestStore/useTestStore";
 import useEditTestStore from "../../store/useEditTestStore/useEditTestStore";
+import useTestStore from "../../store/useTestStore/useTestStore";
 
 //Components
+import CreateTestFormInputContainer from "../CreateTestFormInputContainer/CreateTestFormInputContainer";
 import CreateTestFormNavigationButtonComponent from "../CreateTestFormNavigationButtonComponent/CreateTestFormNavigationButtonComponent";
 import CreateTestFormStepHeaderComponent from "../CreateTestFormStepHeaderComponent/CreateTestFormStepHeaderComponent";
-import CreateTestFormInputContainer from "../CreateTestFormInputContainer/CreateTestFormInputContainer";
 
 //Types
 import type { InputTypes, Option } from "./CreateTestFormComponent.types";
 
 //Utils
+import { useFormStep } from "../../hooks/useFormStep";
 import { formDataNormalizer } from "../../utils/formDataNormalizer";
 import { groupServices } from "../../utils/groupServices";
-import { useFormStep } from "../../hooks/useFormStep";
 
 const CreateTestFormComponent: React.FC = () => {
   const { addTest, isBlocked, updateTest } = useTestStore();
