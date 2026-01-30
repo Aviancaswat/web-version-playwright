@@ -9,6 +9,7 @@ import logo from "../../assets/avianca-logo-desk.png";
 import '../../components/agent-dashboard-ui/agent.css';
 import { SidebarChatHistory } from "../../components/agent-dashboard-ui/SidebarChatHistory";
 import WelcomeAgentDashboard from "../../components/agent-dashboard-ui/welcomeAgent";
+import { MaintenancePage } from "../../components/MaintenancePage/MaintenancePage";
 import type { DataWorkflows } from "../../components/TableWorkflowComponent/TableWorkflowComponent.types";
 import { conversationCollection } from "../../firebase/firestore/collections/conversation.collection";
 import { ConversationService } from "../../firebase/firestore/services/conversation.service";
@@ -345,6 +346,13 @@ const ChatAgentPage = () => {
         },
         [questionUser, dashboardDataAgentAvianca, conversationId]
     );
+
+    // Cambiar MAINTENANCE_MODE a true para activar el modo mantenimiento
+    const MAINTENANCE_MODE = true;
+
+    if (MAINTENANCE_MODE) {
+        return <MaintenancePage />;
+    }
 
     return (
         <Box
